@@ -1,18 +1,22 @@
-"use client";
+import type { Metadata } from "next";
+import { HomePage } from "@/components/home-page";
+import { siteConfig } from "@/lib/seo";
 
-import { authClient } from "@/lib/auth-client";
+export const metadata: Metadata = {
+  title: {
+    absolute: siteConfig.name,
+  },
+  description: siteConfig.description,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: siteConfig.name,
+    description: siteConfig.description,
+    url: "/",
+  },
+};
 
-export default function Home() {
-  return (
-    <button
-      onClick={() =>
-        authClient.signIn.social({
-          provider: "google",
-          callbackURL: "/dashboard",
-        })
-      }
-    >
-      login
-    </button>
-  );
+export default function Page() {
+  return <HomePage />;
 }

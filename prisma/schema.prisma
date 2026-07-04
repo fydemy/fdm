@@ -7,16 +7,25 @@ datasource db {
   provider = "postgresql"
 }
 
+enum ApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
-  id            String    @id
+  id            String        @id
   name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
+  email         String        @unique
+  emailVerified Boolean       @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  role          String        @default("user")
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
   accounts      Account[]
   sessions      Session[]
+  applications   Application[]
+  materialItems  MaterialItem[]
 
   @@map("user")
 }
@@ -66,4 +75,80 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model Application {
+  id              String            @id @default(cuid())
+  name            String
+  description     String
+  logoUrl         String?
+  websiteUrl      String?
+  discordUsername String            @default("")
+  proposalUrl     String
+  proposalName    String
+  status          ApplicationStatus @default(PENDING)
+  reviewNote      String?
+  reviewedAt      DateTime?
+  userId          String
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  members         Member[]
+  launches        Launch[]
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@map("application")
+}
+
+model Member {
+  id            String      @id @default(cuid())
+  name          String
+  email         String
+  linkedin      String
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+  @@map("member")
+}
+
+model Launch {
+  id            String      @id @default(cuid())
+  title         String
+  content       String
+  youtubeUrl    String?
+  socialEmbeds  String[]    @default([])
+  featured      Boolean     @default(false)
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([applicationId])
+  @@index([featured])
+  @@map("launch")
+}
+
+enum MaterialType {
+  FOLDER
+  FILE
+}
+
+model MaterialItem {
+  id          String         @id @default(cuid())
+  name        String
+  type        MaterialType
+  content     String?
+  parentId    String?
+  parent      MaterialItem?  @relation("MaterialTree", fields: [parentId], references: [id], onDelete: Cascade)
+  children    MaterialItem[] @relation("MaterialTree")
+  createdById String
+  createdBy   User           @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([parentId])
+  @@index([createdById])
+  @@map("material_item")
 }

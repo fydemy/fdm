@@ -1,35 +1,131 @@
-## Next.js Starter Template
+# Fydemy
 
-Minimal Next.js app with Google sign-in, a protected dashboard page, and a tRPC `hello` route wired end-to-end.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-### Tech stack
+Open-source platform for product applications, reviewer decisions, public launches, and shared materials — built for the [Fydemy](https://fydemy.com) community.
 
-- **Infrastructure**: Supabase
-- **Framework**: Next.js 16 (App Router, TypeScript, React 19)
-- **API**: tRPC 11 with `fetch` adapter
-- **Data / ORM**: Prisma + `pg` (PostgreSQL)
-- **Auth**: `better-auth` with Google OAuth
+## Features
 
-### Getting started
+**Applicants**
 
-- **Install dependencies**
+- Apply with product name, description, logo, proposal upload, and team members
+- Confirmation email (via Resend) to the applicant and every team member
+- After approval, publish launches (markdown, YouTube, social embeds)
+- Read materials published by reviewers
+
+**Reviewers**
+
+- Approve or reject applications with optional notes
+- Approval / rejection emails via Resend templates
+- Monitor launches across approved products
+- Create multi-section markdown materials for approved applicants
+
+**Public site**
+
+- Featured launches on the home page
+- Browse and view individual launch pages
+- SEO-friendly metadata, sitemap, and robots
+
+## Tech stack
+
+| Layer | Choice |
+| --- | --- |
+| Framework | Next.js 16 (App Router), React 19, TypeScript |
+| UI | shadcn/ui, Tailwind CSS |
+| API | tRPC 11 |
+| Database | PostgreSQL + Prisma |
+| Auth | better-auth (Google OAuth) |
+| Email | Resend |
+
+## Prerequisites
+
+- [Bun](https://bun.sh/) (or Node.js 20+)
+- PostgreSQL 14+
+- Google OAuth credentials
+- Resend API key (optional in local dev if you skip email flows)
+
+## Getting started
 
 ```bash
-bun install # or npm install / pnpm install
+git clone https://github.com/fydemy/fdm.git
+cd fdm
+bun install
+cp .env.example .env
 ```
 
-- **Env setup**
+### Environment variables
+
+Copy `.env.example` to `.env` and fill in:
+
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | Postgres connection string (app) |
+| `DIRECT_URL` | Direct Postgres URL (Prisma migrations / push) |
+| `BETTER_AUTH_SECRET` | Random secret for session signing |
+| `BETTER_AUTH_URL` | Public app URL (e.g. `http://localhost:3000`) |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
+| `RESEND_API_KEY` | Resend API key |
+| `RESEND_FROM_EMAIL` | From address, e.g. `Fydemy <onboarding@resend.dev>` |
+| `REVIEWER_EMAILS` | Comma-separated emails with reviewer access |
+
+Generate a secret:
 
 ```bash
-cp .env.example .env.local
+openssl rand -base64 32
 ```
 
-Set your database and auth config (e.g. Postgres URL, Google client ID/secret).
-
-- **Run dev server**
+### Database and dev server
 
 ```bash
+bunx prisma db push
+bunx prisma generate
 bun dev
 ```
 
-Visit `http://localhost:3000`, click **login**, and you’ll be redirected to `/dashboard`, which calls `trpc.hello.getAll` and renders the result.
+Visit [http://localhost:3000](http://localhost:3000), sign in with Google, and open `/dashboard`.
+
+Emails listed in `REVIEWER_EMAILS` (or users with `role = "reviewer"` in the database) can open `/dashboard/review`.
+
+### Google OAuth
+
+In [Google Cloud Console](https://console.cloud.google.com/), create an OAuth client and add authorized redirect URIs for better-auth, typically:
+
+```
+http://localhost:3000/api/auth/callback/google
+```
+
+Use your production origin in place of `localhost` when deploying.
+
+## Project structure
+
+```
+src/
+  app/                 # App Router pages and API routes
+  components/          # UI and feature components
+  lib/                 # Auth, email, Prisma, tRPC, helpers
+prisma/
+  schema.prisma        # Database schema
+storage/               # Local uploads (proposals, logos) — gitignored
+```
+
+## Scripts
+
+| Command | Description |
+| --- | --- |
+| `bun dev` | Development server |
+| `bun run build` | Production build |
+| `bun start` | Start production server |
+| `bun run lint` | ESLint |
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Please read the [Code of Conduct](CODE_OF_CONDUCT.md) before participating.
+
+## Security
+
+Report vulnerabilities privately — see [SECURITY.md](SECURITY.md).
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).

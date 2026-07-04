@@ -1,26 +1,13 @@
-"use client";
+import type { Metadata } from "next";
+import { DashboardShell } from "@/components/dashboard-shell";
 
-import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
-
-const Layout = ({ children }: { children: React.ReactNode }) => {
-  const router = useRouter();
-  const { data: session } = authClient.useSession();
-
-  return (
-    <div>
-      {session?.user?.name}
-      <button
-        onClick={() => {
-          authClient.signOut();
-          router.push("/");
-        }}
-      >
-        logout
-      </button>
-      {children}
-    </div>
-  );
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
-export default Layout;
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return <DashboardShell>{children}</DashboardShell>;
+}

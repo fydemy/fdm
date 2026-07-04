@@ -30,8 +30,15 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files — keep the example committed
+.env
+.env.*
+!.env.example
+
+# local / editor
+.cursor/
+.vscode/
+!.vscode/extensions.json
 
 # vercel
 .vercel
@@ -41,3 +48,15 @@ yarn-error.log*
 next-env.d.ts
 
 /generated/prisma
+
+# uploads (keep directory placeholders)
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+/storage/*
+!/storage/proposals/
+/storage/proposals/*
+!/storage/proposals/.gitkeep
+!/storage/logos/
+/storage/logos/*
+!/storage/logos/.gitkeep
