@@ -70,11 +70,11 @@ export function ApplicationForm({
     onError: (error) => toast.error(error.message),
   });
 
-  const [proposal, setProposal] = useState<{ url: string; name: string } | null>(
+  const [pitchDeck, setPitchDeck] = useState<{ url: string; name: string } | null>(
     null,
   );
   const [logo, setLogo] = useState<{ url: string; name: string } | null>(null);
-  const [uploadingProposal, setUploadingProposal] = useState(false);
+  const [uploadingPitchDeck, setUploadingPitchDeck] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
 
   const form = useForm<FormValues>({
@@ -94,20 +94,20 @@ export function ApplicationForm({
     name: "members",
   });
 
-  async function uploadProposal(file: File) {
-    setUploadingProposal(true);
+  async function uploadPitchDeck(file: File) {
+    setUploadingPitchDeck(true);
     try {
       const body = new FormData();
       body.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body });
+      const res = await fetch("/api/upload/pitchdeck", { method: "POST", body });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Upload failed");
-      setProposal({ url: data.url, name: data.name });
-      toast.success("Proposal uploaded");
+      setPitchDeck({ url: data.url, name: data.name });
+      toast.success("Pitch deck uploaded");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Upload failed");
     } finally {
-      setUploadingProposal(false);
+      setUploadingPitchDeck(false);
     }
   }
 
@@ -129,16 +129,16 @@ export function ApplicationForm({
   }
 
   async function onSubmit(values: FormValues) {
-    if (!proposal) {
-      toast.error("Upload a proposal file first");
+    if (!pitchDeck) {
+      toast.error("Upload a pitch deck file first");
       return;
     }
 
     await create.mutateAsync({
       ...values,
       logoUrl: logo?.url,
-      proposalUrl: proposal.url,
-      proposalName: proposal.name,
+      pitchDeckUrl: pitchDeck.url,
+      pitchDeckName: pitchDeck.name,
     });
   }
 
@@ -257,25 +257,25 @@ export function ApplicationForm({
             </div>
 
             <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="proposal">Proposal upload</Label>
+              <Label htmlFor="pitchdeck">Pitch deck upload</Label>
               <div className="flex flex-wrap items-center gap-3">
                 <Input
-                  id="proposal"
+                  id="pitchdeck"
                   type="file"
                   accept=".pdf,.doc,.docx,.txt,.md"
                   onChange={(event) => {
                     const file = event.target.files?.[0];
-                    if (file) void uploadProposal(file);
+                    if (file) void uploadPitchDeck(file);
                   }}
                 />
-                {uploadingProposal && (
+                {uploadingPitchDeck && (
                   <Loader2 className="size-4 animate-spin" />
                 )}
               </div>
-              {proposal && (
+              {pitchDeck && (
                 <p className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Upload className="size-4" />
-                  {proposal.name}
+                  {pitchDeck.name}
                 </p>
               )}
             </div>
@@ -343,7 +343,7 @@ export function ApplicationForm({
 
           <Button
             type="submit"
-            disabled={create.isPending || uploadingProposal || uploadingLogo}
+            disabled={create.isPending || uploadingPitchDeck || uploadingLogo}
           >
             {create.isPending && <Loader2 className="size-4 animate-spin" />}
             Submit application

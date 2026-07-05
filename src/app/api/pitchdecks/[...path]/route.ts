@@ -1,20 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readFile } from "fs/promises";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { assertSafeStoragePath } from "@/lib/supabase-storage";
 import {
-  assertSafeProposalFilename,
-  canAccessProposal,
+  canAccessPitchDeck,
   contentTypeForFilename,
-  proposalFilePath,
-  proposalUrlFor,
-  readProposalMeta,
-} from "@/lib/proposals";
+  downloadPitchDeckFile,
+  pitchDeckUrlFor,
+} from "@/lib/pitchdecks";
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ filename: string }> },
+  { params }: { params: Promise<{ path: string[] }> },
 ) {
   const session = await auth.api.getSession({ headers: await headers() });
 
@@ -22,25 +20,25 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { filename } = await params;
+  const { path: segments } = await params;
+  const storagePath = segments.join("/");
 
-  if (!assertSafeProposalFilename(filename)) {
+  if (!assertSafeStoragePath(storagePath)) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { id: true, email: true, role: true },
+    select: { id: true, role: true },
   });
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const allowed = await canAccessProposal({
-    filename,
+  const allowed = await canAccessPitchDeck({
+    storagePath,
     userId: user.id,
-    email: user.email,
     role: user.role,
   });
 
@@ -49,19 +47,16 @@ export async function GET(
   }
 
   try {
-    const data = await readFile(proposalFilePath(filename));
+    const blob = await downloadPitchDeckFile(storagePath);
+    const data = Buffer.from(await blob.arrayBuffer());
+    const filename = storagePath.split("/").pop() ?? storagePath;
+
     const application = await prisma.application.findFirst({
-      where: {
-        OR: [
-          { proposalUrl: proposalUrlFor(filename) },
-          { proposalUrl: `/uploads/${filename}` },
-        ],
-      },
-      select: { proposalName: true },
+      where: { pitchDeckUrl: pitchDeckUrlFor(storagePath) },
+      select: { pitchDeckName: true },
     });
-    const meta = await readProposalMeta(filename);
-    const downloadName =
-      application?.proposalName ?? meta?.originalName ?? filename;
+
+    const downloadName = application?.pitchDeckName ?? filename;
     const safeName = downloadName.replace(/"/g, "");
 
     return new NextResponse(data, {

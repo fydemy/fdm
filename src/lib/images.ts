@@ -6,34 +6,44 @@ import {
   uploadStorageObject,
 } from "@/lib/supabase-storage";
 
-export async function saveLogoFile(input: {
+export const ALLOWED_IMAGE_EXT = new Set([
+  ".png",
+  ".jpg",
+  ".jpeg",
+  ".webp",
+  ".gif",
+]);
+
+export const ALLOWED_IMAGE_TYPES = new Set([
+  "image/png",
+  "image/jpeg",
+  "image/webp",
+  "image/gif",
+]);
+
+export async function saveImageFile(input: {
   filename: string;
   userId: string;
   originalName: string;
   data: Buffer;
 }) {
   const storagePath = await uploadStorageObject({
-    bucket: STORAGE_BUCKETS.logos,
+    bucket: STORAGE_BUCKETS.images,
     userId: input.userId,
     filename: input.filename,
     data: input.data,
-    contentType: contentTypeForLogo(input.filename),
+    contentType: contentTypeForImage(input.filename),
     originalName: input.originalName,
   });
 
-  return publicObjectUrl(STORAGE_BUCKETS.logos, storagePath);
+  return publicObjectUrl(STORAGE_BUCKETS.images, storagePath);
 }
 
-export function parseLogoUrl(url: string) {
-  return parsePublicStorageUrl(url, STORAGE_BUCKETS.logos);
+export function parseImageUrl(url: string) {
+  return parsePublicStorageUrl(url, STORAGE_BUCKETS.images);
 }
 
-export function logoBelongsToUser(url: string, userId: string) {
-  const parsed = parseLogoUrl(url);
-  return parsed?.userId === userId;
-}
-
-export function contentTypeForLogo(filename: string) {
+export function contentTypeForImage(filename: string) {
   const ext = path.extname(filename).toLowerCase();
   switch (ext) {
     case ".png":
@@ -45,8 +55,6 @@ export function contentTypeForLogo(filename: string) {
       return "image/webp";
     case ".gif":
       return "image/gif";
-    case ".svg":
-      return "image/svg+xml";
     default:
       return "application/octet-stream";
   }

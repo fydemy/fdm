@@ -48,7 +48,7 @@ Open [http://localhost:3000](http://localhost:3000).
 1. Fork the repository and create a branch from `main`.
 2. Keep changes focused — one concern per PR when possible.
 3. Match existing naming, formatting, and patterns in the surrounding code.
-4. Do not commit secrets, local env files, or uploaded content under `storage/` or `public/uploads/`.
+4. Do not commit secrets or local env files.
 5. Run `bun run lint` and fix any issues you introduce.
 6. Open a PR with a clear description of **what** changed and **why**.
 

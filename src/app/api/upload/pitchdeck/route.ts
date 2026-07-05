@@ -3,7 +3,7 @@ import path from "path";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { randomUUID } from "crypto";
-import { proposalUrlFor, saveProposalFile } from "@/lib/proposals";
+import { savePitchDeckFile } from "@/lib/pitchdecks";
 import { isStaff } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { id: true, email: true, role: true },
+    select: { id: true, role: true },
   });
 
   if (!user) {
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
   const ext = path.extname(file.name) || ".bin";
   const filename = `${randomUUID()}${ext}`;
 
-  await saveProposalFile({
+  const url = await savePitchDeckFile({
     filename,
     userId: user.id,
     originalName: file.name,
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
   });
 
   return NextResponse.json({
-    url: proposalUrlFor(filename),
+    url,
     name: file.name,
   });
 }

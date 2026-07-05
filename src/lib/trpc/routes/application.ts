@@ -4,8 +4,11 @@ import { t } from "../trpc";
 import { applicantProcedure } from "../context";
 import { prisma } from "@/lib/prisma";
 import { sendApplicationReceivedEmail } from "@/lib/email";
-import { assertSafeProposalFilename, readProposalMeta } from "@/lib/proposals";
-import { assertSafeLogoFilename, readLogoMeta } from "@/lib/logos";
+import {
+  readPitchDeckMeta,
+  resolvePitchDeckStoragePath,
+} from "@/lib/pitchdecks";
+import { logoBelongsToUser } from "@/lib/logos";
 
 const memberSchema = z.object({
   name: z.string().min(1),
@@ -55,8 +58,8 @@ export const applicationRouter = t.router({
           ),
         linkedin: z.string().url(),
         discordUsername: z.string().min(2).max(37),
-        proposalUrl: z.string().min(1),
-        proposalName: z.string().min(1),
+        pitchDeckUrl: z.string().min(1),
+        pitchDeckName: z.string().min(1),
         members: z.array(memberSchema).default([]),
       }),
     )
@@ -76,32 +79,21 @@ export const applicationRouter = t.router({
         });
       }
 
-      const proposalFilename = input.proposalUrl.startsWith("/api/proposals/")
-        ? input.proposalUrl.slice("/api/proposals/".length)
+      const pitchDeckPath = resolvePitchDeckStoragePath(input.pitchDeckUrl);
+      const pitchDeckMeta = pitchDeckPath
+        ? readPitchDeckMeta(pitchDeckPath)
         : null;
-      const meta =
-        proposalFilename && assertSafeProposalFilename(proposalFilename)
-          ? await readProposalMeta(proposalFilename)
-          : null;
 
-      if (!meta || meta.userId !== ctx.user.id) {
+      if (!pitchDeckMeta || pitchDeckMeta.userId !== ctx.user.id) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Upload a proposal file before submitting",
+          message: "Upload a pitch deck file before submitting",
         });
       }
 
       let logoUrl: string | null = null;
       if (input.logoUrl) {
-        const logoFilename = input.logoUrl.startsWith("/api/logos/")
-          ? input.logoUrl.slice("/api/logos/".length)
-          : null;
-        const logoMeta =
-          logoFilename && assertSafeLogoFilename(logoFilename)
-            ? await readLogoMeta(logoFilename)
-            : null;
-
-        if (!logoMeta || logoMeta.userId !== ctx.user.id) {
+        if (!logoBelongsToUser(input.logoUrl, ctx.user.id)) {
           throw new TRPCError({
             code: "BAD_REQUEST",
             message: "Upload a valid logo before submitting",
@@ -119,8 +111,8 @@ export const applicationRouter = t.router({
           websiteUrl: input.websiteUrl || null,
           linkedin: input.linkedin.trim(),
           discordUsername: input.discordUsername.trim(),
-          proposalUrl: input.proposalUrl,
-          proposalName: input.proposalName,
+          pitchDeckUrl: input.pitchDeckUrl,
+          pitchDeckName: input.pitchDeckName,
           userId: ctx.user.id,
           members: {
             create: input.members,

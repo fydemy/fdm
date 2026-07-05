@@ -3,20 +3,14 @@ import path from "path";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { randomUUID } from "crypto";
-import { saveLogoFile } from "@/lib/logos";
-import { isStaff } from "@/lib/auth-helpers";
+import {
+  ALLOWED_IMAGE_EXT,
+  ALLOWED_IMAGE_TYPES,
+  saveImageFile,
+} from "@/lib/images";
 import { prisma } from "@/lib/prisma";
 
-const MAX_SIZE = 2 * 1024 * 1024;
-const ALLOWED = new Set([
-  "image/png",
-  "image/jpeg",
-  "image/webp",
-  "image/gif",
-  "image/svg+xml",
-]);
-
-const ALLOWED_EXT = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"]);
+const MAX_SIZE = 5 * 1024 * 1024;
 
 export async function POST(request: NextRequest) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -27,18 +21,11 @@ export async function POST(request: NextRequest) {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { id: true, role: true },
+    select: { id: true },
   });
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  if (isStaff(user.role)) {
-    return NextResponse.json(
-      { error: "Workspace access is not available to staff accounts" },
-      { status: 403 },
-    );
   }
 
   const formData = await request.formData();
@@ -50,22 +37,22 @@ export async function POST(request: NextRequest) {
 
   if (file.size > MAX_SIZE) {
     return NextResponse.json(
-      { error: "Logo must be under 2MB" },
+      { error: "Image must be under 5MB" },
       { status: 400 },
     );
   }
 
   const ext = path.extname(file.name).toLowerCase();
-  if (!ALLOWED_EXT.has(ext) || (file.type && !ALLOWED.has(file.type))) {
+  if (!ALLOWED_IMAGE_EXT.has(ext) || (file.type && !ALLOWED_IMAGE_TYPES.has(file.type))) {
     return NextResponse.json(
-      { error: "Only PNG, JPEG, WebP, GIF, or SVG logos are allowed" },
+      { error: "Only PNG, JPEG, WebP, or GIF images are allowed" },
       { status: 400 },
     );
   }
 
   const filename = `${randomUUID()}${ext}`;
 
-  const url = await saveLogoFile({
+  const url = await saveImageFile({
     filename,
     userId: user.id,
     originalName: file.name,

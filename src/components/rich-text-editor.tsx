@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import Underline from "@tiptap/extension-underline";
@@ -12,10 +13,12 @@ import {
   Heading1,
   Heading2,
   Heading3,
+  ImageIcon,
   Italic,
   Link2,
   List,
   ListOrdered,
+  Loader2,
   Share2,
   Underline as UnderlineIcon,
 } from "lucide-react";
@@ -41,6 +44,19 @@ function toEditorHtml(content: string): string {
   return marked.parse(content, { async: false }) as string;
 }
 
+async function uploadEditorImage(file: File) {
+  const body = new FormData();
+  body.append("file", file);
+  const res = await fetch("/api/upload/image", { method: "POST", body });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error ?? "Upload failed");
+  return data.url as string;
+}
+
+function isImageFile(file: File) {
+  return file.type.startsWith("image/");
+}
+
 type RichTextEditorProps = {
   value: string;
   onChange: (html: string) => void;
@@ -58,6 +74,9 @@ export function RichTextEditor({
   const [embedUrl, setEmbedUrl] = useState("");
   const [linkOpen, setLinkOpen] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadImageRef = useRef<(file: File) => void>(() => {});
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -66,6 +85,13 @@ export function RichTextEditor({
         heading: { levels: [1, 2, 3] },
       }),
       Underline,
+      Image.configure({
+        inline: false,
+        allowBase64: false,
+        HTMLAttributes: {
+          class: "rounded-lg max-w-full h-auto",
+        },
+      }),
       Link.configure({
         openOnClick: false,
         autolink: true,
@@ -82,10 +108,50 @@ export function RichTextEditor({
         class:
           "prose prose-neutral dark:prose-invert max-w-none min-h-[240px] px-4 py-3 focus:outline-none",
       },
+      handlePaste(_view, event) {
+        const file = Array.from(event.clipboardData?.files ?? []).find(isImageFile);
+        if (!file) return false;
+        event.preventDefault();
+        uploadImageRef.current(file);
+        return true;
+      },
+      handleDrop(_view, event, _slice, moved) {
+        if (moved) return false;
+        const file = Array.from(event.dataTransfer?.files ?? []).find(isImageFile);
+        if (!file) return false;
+        event.preventDefault();
+        uploadImageRef.current(file);
+        return true;
+      },
     },
     onUpdate: ({ editor: current }) => {
       onChange(current.getHTML());
     },
+  });
+
+  async function insertImage(file: File) {
+    if (!editor || uploadingImage) return;
+
+    setUploadingImage(true);
+    try {
+      const url = await uploadEditorImage(file);
+      editor
+        .chain()
+        .focus()
+        .setImage({ src: url, alt: file.name })
+        .run();
+      toast.success("Image uploaded");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Upload failed");
+    } finally {
+      setUploadingImage(false);
+    }
+  }
+
+  useEffect(() => {
+    uploadImageRef.current = (file) => {
+      void insertImage(file);
+    };
   });
 
   function insertEmbed() {
@@ -232,6 +298,25 @@ export function RichTextEditor({
           <Share2 />
           <span className="text-xs font-medium">Embed</span>
         </ToolbarButton>
+        <ToolbarButton
+          onClick={() => fileInputRef.current?.click()}
+          label="Upload image"
+          disabled={uploadingImage}
+        >
+          {uploadingImage ? <Loader2 className="animate-spin" /> : <ImageIcon />}
+          <span className="text-xs font-medium">Image</span>
+        </ToolbarButton>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/png,image/jpeg,image/webp,image/gif,.png,.jpg,.jpeg,.webp,.gif"
+          className="hidden"
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            if (file) void insertImage(file);
+            event.target.value = "";
+          }}
+        />
       </div>
 
       <EditorContent editor={editor} />
@@ -313,11 +398,13 @@ function ToolbarButton({
   onClick,
   active,
   label,
+  disabled,
 }: {
   children: React.ReactNode;
   onClick: () => void;
   active?: boolean;
   label: string;
+  disabled?: boolean;
 }) {
   return (
     <Button
@@ -326,6 +413,7 @@ function ToolbarButton({
       size="sm"
       className="h-8 gap-1 px-2"
       onClick={onClick}
+      disabled={disabled}
       aria-label={label}
       title={label}
     >

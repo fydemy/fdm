@@ -85,8 +85,8 @@ model Application {
   websiteUrl      String?
   linkedin        String            @default("")
   discordUsername String            @default("")
-  proposalUrl     String
-  proposalName    String
+  pitchDeckUrl     String
+  pitchDeckName    String
   status          ApplicationStatus @default(PENDING)
   reviewNote      String?
   reviewedAt      DateTime?

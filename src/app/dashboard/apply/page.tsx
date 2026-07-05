@@ -141,14 +141,14 @@ export default function ApplyPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <h3 className="mb-2 text-sm font-medium">Proposal</h3>
+              <h3 className="mb-2 text-sm font-medium">Pitch deck</h3>
               <a
-                href={application.proposalUrl}
+                href={application.pitchDeckUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="text-sm text-primary underline"
               >
-                {application.proposalName}
+                {application.pitchDeckName}
               </a>
             </div>
 

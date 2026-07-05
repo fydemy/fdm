@@ -82,7 +82,7 @@ export function MarkdownContent({
 
 function renderRichHtml(content: string) {
   const clean = DOMPurify.sanitize(content, {
-    ADD_ATTR: ["data-social-embed", "target", "rel"],
+    ADD_ATTR: ["data-social-embed", "target", "rel", "src", "alt", "class"],
   });
 
   return parse(clean, {

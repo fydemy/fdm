@@ -115,16 +115,16 @@ export default function MentorApplicationDetailPage({
 
         <Card>
           <CardHeader>
-            <CardTitle>Proposal</CardTitle>
+            <CardTitle>Pitch deck</CardTitle>
           </CardHeader>
           <CardContent>
             <a
-              href={application.proposalUrl}
+              href={application.pitchDeckUrl}
               target="_blank"
               rel="noreferrer"
               className="text-sm text-primary underline"
             >
-              {application.proposalName}
+              {application.pitchDeckName}
             </a>
           </CardContent>
         </Card>

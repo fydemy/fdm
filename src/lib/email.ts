@@ -106,7 +106,7 @@ export async function sendApplicationRejectedEmail(input: {
     lines.push("", `Note from reviewer: ${input.note}`);
   }
 
-  lines.push("", "You are welcome to apply again with an updated proposal.");
+  lines.push("", "You are welcome to apply again with an updated pitch deck.");
 
   return sendEmail({
     to: input.to,

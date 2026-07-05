@@ -8,7 +8,7 @@ Open-source platform for product applications, reviewer decisions, public launch
 
 **Applicants**
 
-- Apply with product name, description, logo, proposal upload, and team members
+- Apply with product name, description, logo, pitch deck upload, and team members
 - Confirmation email (via Resend) to the applicant and every team member
 - After approval, publish launches (markdown, YouTube, social embeds)
 - Read materials published by reviewers
@@ -67,6 +67,8 @@ Copy `.env.example` to `.env` and fill in:
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
 | `RESEND_API_KEY` | Resend API key |
 | `RESEND_FROM_EMAIL` | From address, e.g. `Fydemy <onboarding@resend.dev>` |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server-only, for uploads) |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Google Analytics 4 ID (e.g. `G-XXXXXXXXXX`). Omit to disable. |
 
 Generate a secret:
@@ -112,6 +114,23 @@ http://localhost:3000/api/auth/callback/google
 
 Use your production origin in place of `localhost` when deploying.
 
+### Supabase Storage
+
+File uploads (pitch decks, logos, editor images) use [Supabase Storage](https://supabase.com/docs/guides/storage).
+
+1. Create a Supabase project and add `NEXT_PUBLIC_SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` to `.env`.
+2. In **Storage**, create three buckets:
+
+| Bucket | Public | Purpose |
+| --- | --- | --- |
+| `logos` | Yes | Product logos |
+| `images` | Yes | WYSIWYG inline images |
+| `pitchdecks` | No | Application pitch decks (served via `/api/pitchdecks/...` with auth) |
+
+For public buckets (`logos`, `images`), enable public access in the bucket settings or add a policy allowing public `SELECT`.
+
+Objects are stored as `{userId}/{filename}` within each bucket.
+
 ## Project structure
 
 ```
@@ -121,7 +140,6 @@ src/
   lib/                 # Auth, email, Prisma, tRPC, helpers
 prisma/
   schema.prisma        # Database schema
-storage/               # Local uploads (proposals, logos) — gitignored
 ```
 
 ## Scripts
