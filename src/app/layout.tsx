@@ -5,6 +5,7 @@ import TRPCLayout from "@/components/provider/trpc";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { siteConfig } from "@/lib/seo";
+import { GoogleAnalytics } from "@/components/google-analytics";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -75,6 +76,7 @@ export default function RootLayout({
             <Toaster />
           </TRPCLayout>
         </TooltipProvider>
+        <GoogleAnalytics />
       </body>
     </html>
   );

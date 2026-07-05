@@ -1,4 +1,4 @@
-const fallbackUrl = process.env.BETTER_AUTH_URL;
+const defaultUrl = "http://localhost:3000";
 
 export const siteConfig = {
   name: "Fydemy",
@@ -13,6 +13,6 @@ export const siteConfig = {
     linkedin: "https://www.linkedin.com/company/fydemy",
   },
   get url() {
-    return process.env.BETTER_AUTH_URL ?? fallbackUrl;
+    return process.env.BETTER_AUTH_URL ?? defaultUrl;
   },
 };
