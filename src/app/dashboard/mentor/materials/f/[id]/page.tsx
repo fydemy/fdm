@@ -6,7 +6,7 @@ import { MaterialFileView } from "@/components/material-file-view";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-export default function ReviewMaterialFilePage({
+export default function MentorMaterialFilePage({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -16,10 +16,10 @@ export default function ReviewMaterialFilePage({
 
   if (isLoading) return <Skeleton className="h-96" />;
 
-  if (!me?.isReviewer) {
+  if (!me?.isMentor) {
     return (
       <Alert>
-        <AlertTitle>Reviewer access only</AlertTitle>
+        <AlertTitle>Mentor access only</AlertTitle>
         <AlertDescription>
           You do not have permission to manage materials.
         </AlertDescription>
@@ -27,7 +27,5 @@ export default function ReviewMaterialFilePage({
     );
   }
 
-  return (
-    <MaterialFileView id={id} basePath="/dashboard/review/materials" />
-  );
+  return <MaterialFileView id={id} basePath="/dashboard/mentor/materials" />;
 }

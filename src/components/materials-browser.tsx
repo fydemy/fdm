@@ -8,6 +8,8 @@ import { RichTextEditor } from "@/components/rich-text-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { contentHasText } from "@/lib/embeds";
 import {
@@ -40,7 +42,7 @@ import { cn } from "@/lib/utils";
 
 type MaterialsBrowserProps = {
   basePath: string;
-  canEdit?: boolean;
+  editMode?: "none" | "full" | "mentor";
 };
 
 type AfterCloseAction =
@@ -49,7 +51,7 @@ type AfterCloseAction =
 
 export function MaterialsBrowser({
   basePath,
-  canEdit = false,
+  editMode = "none",
 }: MaterialsBrowserProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -66,12 +68,16 @@ export function MaterialsBrowser({
   const [renameTarget, setRenameTarget] = useState<{
     id: string;
     name: string;
+    type: "FOLDER" | "FILE";
+    mentorEditable?: boolean;
   } | null>(null);
   const [folderName, setFolderName] = useState("");
+  const [folderMentorEditable, setFolderMentorEditable] = useState(false);
   const [fileName, setFileName] = useState("");
   const [fileContent, setFileContent] = useState("");
   const [fileEditorKey, setFileEditorKey] = useState(0);
   const [renameName, setRenameName] = useState("");
+  const [renameMentorEditable, setRenameMentorEditable] = useState(false);
 
   const invalidate = async () => {
     await utils.material.list.invalidate();
@@ -152,6 +158,8 @@ export function MaterialsBrowser({
 
   const items = data?.items ?? [];
   const breadcrumbs = data?.breadcrumbs ?? [];
+  const canWriteHere = data?.canWriteHere ?? false;
+  const showFolderActions = editMode === "full";
 
   return (
     <div className="space-y-4">
@@ -182,13 +190,16 @@ export function MaterialsBrowser({
           </BreadcrumbList>
         </Breadcrumb>
 
-        {canEdit && (
+        {showFolderActions && (
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => setFolderOpen(true)}
+              onClick={() => {
+                setFolderMentorEditable(false);
+                setFolderOpen(true);
+              }}
             >
               <FolderPlus className="size-4" />
               New folder
@@ -199,13 +210,22 @@ export function MaterialsBrowser({
             </Button>
           </div>
         )}
+
+        {editMode === "mentor" && canWriteHere && (
+          <Button type="button" size="sm" onClick={() => setFileOpen(true)}>
+            <Plus className="size-4" />
+            New file
+          </Button>
+        )}
       </div>
 
       <div className="overflow-hidden rounded-xl border">
         <div className="grid grid-cols-[1fr_auto] gap-4 border-b bg-muted/40 px-4 py-2 text-xs font-medium tracking-wide text-muted-foreground uppercase sm:grid-cols-[1fr_140px_auto]">
           <span>Name</span>
           <span className="hidden sm:inline">Modified</span>
-          <span className="w-20 text-right">{canEdit ? "Actions" : ""}</span>
+          <span className="w-20 text-right">
+            {showFolderActions || editMode === "mentor" ? "Actions" : ""}
+          </span>
         </div>
 
         {items.length === 0 && (
@@ -241,6 +261,11 @@ export function MaterialsBrowser({
                     )}
                   />
                   <span className="truncate font-medium">{item.name}</span>
+                  {item.type === "FOLDER" && item.mentorEditable && (
+                    <Badge variant="secondary" className="shrink-0">
+                      Mentor
+                    </Badge>
+                  )}
                 </div>
                 <span className="hidden text-sm text-muted-foreground sm:inline">
                   {new Date(item.updatedAt).toLocaleDateString()}
@@ -250,7 +275,7 @@ export function MaterialsBrowser({
                   onClick={(event) => event.stopPropagation()}
                   onKeyDown={(event) => event.stopPropagation()}
                 >
-                  {canEdit && (
+                  {showFolderActions && (
                     <>
                       <Button
                         type="button"
@@ -258,8 +283,19 @@ export function MaterialsBrowser({
                         size="icon"
                         className="size-8 opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
                         onClick={() => {
-                          setRenameTarget({ id: item.id, name: item.name });
+                          setRenameTarget({
+                            id: item.id,
+                            name: item.name,
+                            type: item.type,
+                            mentorEditable:
+                              item.type === "FOLDER"
+                                ? item.mentorEditable
+                                : undefined,
+                          });
                           setRenameName(item.name);
+                          setRenameMentorEditable(
+                            item.type === "FOLDER" ? !!item.mentorEditable : false,
+                          );
                         }}
                       >
                         <Pencil className="size-4" />
@@ -315,6 +351,7 @@ export function MaterialsBrowser({
               createFolder.mutate({
                 name: folderName,
                 parentId: parentId ?? null,
+                mentorEditable: folderMentorEditable,
               });
             }}
           >
@@ -328,6 +365,15 @@ export function MaterialsBrowser({
                 required
               />
             </div>
+            <label className="flex items-center gap-2 text-sm">
+              <Checkbox
+                checked={folderMentorEditable}
+                onCheckedChange={(checked) =>
+                  setFolderMentorEditable(checked === true)
+                }
+              />
+              Allow mentors to edit contents
+            </label>
             <DialogFooter>
               <Button
                 type="button"
@@ -356,7 +402,9 @@ export function MaterialsBrowser({
           <DialogHeader>
             <DialogTitle>New file</DialogTitle>
             <DialogDescription>
-              Files are shared with every approved applicant.
+              {editMode === "mentor"
+                ? "Files are shared with approved founders."
+                : "Files are shared with every approved applicant."}
             </DialogDescription>
           </DialogHeader>
           <form
@@ -432,7 +480,13 @@ export function MaterialsBrowser({
             onSubmit={(event) => {
               event.preventDefault();
               if (!renameTarget) return;
-              rename.mutate({ id: renameTarget.id, name: renameName });
+              rename.mutate({
+                id: renameTarget.id,
+                name: renameName,
+                ...(renameTarget.type === "FOLDER"
+                  ? { mentorEditable: renameMentorEditable }
+                  : {}),
+              });
             }}
           >
             <div className="space-y-2">
@@ -445,6 +499,17 @@ export function MaterialsBrowser({
                 required
               />
             </div>
+            {renameTarget?.type === "FOLDER" && (
+              <label className="flex items-center gap-2 text-sm">
+                <Checkbox
+                  checked={renameMentorEditable}
+                  onCheckedChange={(checked) =>
+                    setRenameMentorEditable(checked === true)
+                  }
+                />
+                Allow mentors to edit contents
+              </label>
+            )}
             <DialogFooter>
               <Button
                 type="button"

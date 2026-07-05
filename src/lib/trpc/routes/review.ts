@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { t } from "../trpc";
 import { reviewerProcedure } from "../context";
 import { prisma } from "@/lib/prisma";
+import { getUserRole } from "@/lib/auth-helpers";
 import {
   sendApplicationApprovedEmail,
   sendApplicationRejectedEmail,
@@ -93,6 +94,20 @@ export const reviewRouter = t.router({
         },
         include: { members: true, user: true },
       });
+
+      if (input.status === "APPROVED") {
+        const applicant = await prisma.user.findUnique({
+          where: { id: updated.userId },
+          select: { role: true },
+        });
+
+        if (applicant && getUserRole(applicant.role) === "applicant") {
+          await prisma.user.update({
+            where: { id: updated.userId },
+            data: { role: "founder" },
+          });
+        }
+      }
 
       const recipients = [
         ...new Set([

@@ -4,6 +4,7 @@ import { applicationRouter } from "./routes/application";
 import { reviewRouter } from "./routes/review";
 import { launchRouter } from "./routes/launch";
 import { materialRouter } from "./routes/material";
+import { mentorRouter } from "./routes/mentor";
 import { userRouter } from "./routes/user";
 
 export const appRouter = t.router({
@@ -11,6 +12,7 @@ export const appRouter = t.router({
   user: userRouter,
   application: applicationRouter,
   review: reviewRouter,
+  mentor: mentorRouter,
   launch: launchRouter,
   material: materialRouter,
 });

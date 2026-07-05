@@ -67,7 +67,6 @@ Copy `.env.example` to `.env` and fill in:
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
 | `RESEND_API_KEY` | Resend API key |
 | `RESEND_FROM_EMAIL` | From address, e.g. `Fydemy <onboarding@resend.dev>` |
-| `REVIEWER_EMAILS` | Comma-separated emails with reviewer access |
 
 Generate a secret:
 
@@ -85,7 +84,22 @@ bun dev
 
 Visit [http://localhost:3000](http://localhost:3000), sign in with Google, and open `/dashboard`.
 
-Emails listed in `REVIEWER_EMAILS` (or users with `role = "reviewer"` in the database) can open `/dashboard/review`.
+### User roles
+
+Roles are stored on the `user` table (`applicant`, `founder`, `reviewer`, `mentor`):
+
+| Role | Access |
+| --- | --- |
+| `applicant` | Default for new users — apply and manage pending applications |
+| `founder` | Set automatically when an application is approved — launches and materials |
+| `reviewer` | Review applications, manage materials, feature launches (`/dashboard/review`) |
+| `mentor` | View approved applications and edit files in reviewer-labeled mentor folders (`/dashboard/mentor`) |
+
+Assign staff roles directly in the database, e.g. with Prisma Studio:
+
+```bash
+bunx prisma studio
+```
 
 ### Google OAuth
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { trpc } from "@/lib/trpc/client";
 import { ProductLogo } from "@/components/product-logo";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardDescription,
@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Star } from "lucide-react";
 
@@ -87,29 +86,21 @@ export default function ReviewLaunchesPage() {
                 </CardDescription>
               </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant={launch.featured ? "default" : "outline"}
-                size="icon"
-                disabled={setFeatured.isPending}
-                aria-label={launch.featured ? "Unfeature launch" : "Feature launch"}
-                title={launch.featured ? "Unfeature" : "Feature"}
-                onClick={() =>
-                  setFeatured.mutate({
-                    id: launch.id,
-                    featured: !launch.featured,
-                  })
-                }
-              >
-                <Star className="size-4" />
-              </Button>
-              <Link
-                href={`/dashboard/review/${launch.application.id}`}
-                className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
-              >
-                Open product
-              </Link>
-            </div>
+            <Button
+              variant={launch.featured ? "default" : "outline"}
+              size="icon"
+              disabled={setFeatured.isPending}
+              aria-label={launch.featured ? "Unfeature launch" : "Feature launch"}
+              title={launch.featured ? "Unfeature" : "Feature"}
+              onClick={() =>
+                setFeatured.mutate({
+                  id: launch.id,
+                  featured: !launch.featured,
+                })
+              }
+            >
+              <Star className="size-4" />
+            </Button>
           </CardHeader>
         </Card>
       ))}

@@ -24,6 +24,7 @@ const schema = z.object({
   websiteUrl: z
     .string()
     .refine((value) => !value || URL.canParse(value), "Enter a valid URL"),
+  linkedin: z.string().url("Valid LinkedIn URL required"),
   discordUsername: z
     .string()
     .min(2, "Discord username is required")
@@ -82,6 +83,7 @@ export function ApplicationForm({
       name: "",
       description: "",
       websiteUrl: "",
+      linkedin: "",
       discordUsername: "",
       members: [],
     },
@@ -188,7 +190,22 @@ export function ApplicationForm({
               )}
             </div>
 
-            <div className="space-y-2 md:col-span-2">
+            <div className="space-y-2">
+              <Label htmlFor="linkedin">LinkedIn</Label>
+              <Input
+                id="linkedin"
+                type="url"
+                placeholder="https://linkedin.com/in/..."
+                {...form.register("linkedin")}
+              />
+              {form.formState.errors.linkedin && (
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.linkedin.message}
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="discordUsername">Discord username</Label>
               <Input
                 id="discordUsername"

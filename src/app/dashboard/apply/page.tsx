@@ -120,6 +120,16 @@ export default function ApplyPage() {
                     {application.websiteUrl}
                   </a>
                 )}
+                {application.linkedin && (
+                  <a
+                    href={application.linkedin}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-1 inline-block text-sm text-primary underline"
+                  >
+                    LinkedIn
+                  </a>
+                )}
                 {application.discordUsername && (
                   <p className="mt-1 text-sm text-muted-foreground">
                     Discord: {application.discordUsername}

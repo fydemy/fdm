@@ -1,7 +1,7 @@
 import path from "path";
 import { mkdir, readFile, writeFile } from "fs/promises";
 import { prisma } from "@/lib/prisma";
-import { isReviewer } from "@/lib/auth-helpers";
+import { isMentor, isReviewer } from "@/lib/auth-helpers";
 
 export const PROPOSALS_DIR = path.join(process.cwd(), "storage", "proposals");
 
@@ -75,14 +75,14 @@ export async function canAccessProposal(input: {
         { proposalUrl: `/uploads/${input.filename}` },
       ],
     },
-    select: { userId: true },
+    select: { userId: true, status: true },
   });
 
   if (application) {
-    return (
-      application.userId === input.userId ||
-      isReviewer(input.email, input.role)
-    );
+    if (application.userId === input.userId) return true;
+    if (isReviewer(input.role)) return true;
+    if (isMentor(input.role) && application.status === "APPROVED") return true;
+    return false;
   }
 
   // Unsubmitted upload: only the sender who uploaded it.

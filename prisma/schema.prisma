@@ -19,7 +19,7 @@ model User {
   email         String        @unique
   emailVerified Boolean       @default(false)
   image         String?
-  role          String        @default("user")
+  role          String        @default("applicant")
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   accounts      Account[]
@@ -83,6 +83,7 @@ model Application {
   description     String
   logoUrl         String?
   websiteUrl      String?
+  linkedin        String            @default("")
   discordUsername String            @default("")
   proposalUrl     String
   proposalName    String
@@ -139,8 +140,9 @@ model MaterialItem {
   id          String         @id @default(cuid())
   name        String
   type        MaterialType
-  content     String?
-  parentId    String?
+  content        String?
+  mentorEditable Boolean        @default(false)
+  parentId       String?
   parent      MaterialItem?  @relation("MaterialTree", fields: [parentId], references: [id], onDelete: Cascade)
   children    MaterialItem[] @relation("MaterialTree")
   createdById String

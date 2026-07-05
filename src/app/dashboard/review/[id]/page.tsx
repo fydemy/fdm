@@ -133,6 +133,18 @@ export default function ReviewDetailPage({
           <CardContent className="text-sm">
             <div className="font-medium">{application.user.name}</div>
             <div className="text-muted-foreground">{application.user.email}</div>
+            {application.linkedin && (
+              <div className="mt-2">
+                <a
+                  href={application.linkedin}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary underline"
+                >
+                  LinkedIn
+                </a>
+              </div>
+            )}
             {application.discordUsername && (
               <div className="mt-2 text-muted-foreground">
                 Discord: {application.discordUsername}

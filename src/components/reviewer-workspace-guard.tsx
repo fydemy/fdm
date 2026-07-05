@@ -7,12 +7,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 function isWorkspacePath(pathname: string) {
   if (pathname.startsWith("/dashboard/review")) return false;
+  if (pathname.startsWith("/dashboard/mentor")) return false;
   return (
     pathname === "/dashboard" ||
     pathname.startsWith("/dashboard/apply") ||
     pathname.startsWith("/dashboard/launches") ||
     pathname.startsWith("/dashboard/materials")
   );
+}
+
+function staffHomeFor(me: { isReviewer: boolean; isMentor: boolean }) {
+  if (me.isReviewer) return "/dashboard/review";
+  if (me.isMentor) return "/dashboard/mentor";
+  return "/dashboard";
 }
 
 export function ReviewerWorkspaceGuard({
@@ -24,16 +31,15 @@ export function ReviewerWorkspaceGuard({
   const router = useRouter();
   const { data: me, isLoading } = trpc.user.me.useQuery();
   const onWorkspace = isWorkspacePath(pathname);
-  const shouldRedirect = !!me?.isReviewer && onWorkspace;
+  const shouldRedirect = !!me?.isStaff && onWorkspace;
 
   useEffect(() => {
-    if (shouldRedirect) {
-      router.replace("/dashboard/review");
+    if (shouldRedirect && me) {
+      router.replace(staffHomeFor(me));
     }
-  }, [shouldRedirect, router]);
+  }, [shouldRedirect, me, router]);
 
-  // Resolve role before showing applicant workspace routes to reviewers.
-  if (onWorkspace && (isLoading || me?.isReviewer)) {
+  if (onWorkspace && (isLoading || me?.isStaff)) {
     return <Skeleton className="h-96" />;
   }
 

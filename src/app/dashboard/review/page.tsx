@@ -75,8 +75,7 @@ export default function ReviewPage() {
       <Alert>
         <AlertTitle>Reviewer access only</AlertTitle>
         <AlertDescription>
-          Add your email to <code>REVIEWER_EMAILS</code> or set your user role to
-          reviewer.
+          Your account must have the reviewer role to access this area.
         </AlertDescription>
       </Alert>
     );

@@ -27,14 +27,9 @@ import { cn } from "@/lib/utils";
 type MaterialFileViewProps = {
   id: string;
   basePath: string;
-  canEdit?: boolean;
 };
 
-export function MaterialFileView({
-  id,
-  basePath,
-  canEdit = false,
-}: MaterialFileViewProps) {
+export function MaterialFileView({ id, basePath }: MaterialFileViewProps) {
   const router = useRouter();
   const utils = trpc.useUtils();
   const { data: file, isLoading, error } = trpc.material.get.useQuery({ id });
@@ -72,6 +67,9 @@ export function MaterialFileView({
     },
     onError: (err) => toast.error(err.message),
   });
+
+  const canEdit = file?.canEdit ?? false;
+  const canDelete = file?.canDelete ?? false;
 
   if (isLoading) return <Skeleton className="h-96" />;
 
@@ -152,19 +150,21 @@ export function MaterialFileView({
               <Pencil className="size-4" />
               Edit
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                if (confirm("Delete this file?")) {
-                  remove.mutate({ id: file.id });
-                }
-              }}
-            >
-              <Trash2 className="size-4" />
-              Delete
-            </Button>
+            {canDelete && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (confirm("Delete this file?")) {
+                    remove.mutate({ id: file.id });
+                  }
+                }}
+              >
+                <Trash2 className="size-4" />
+                Delete
+              </Button>
+            )}
           </div>
         )}
       </div>

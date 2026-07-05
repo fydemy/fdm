@@ -75,6 +75,20 @@ const reviewerNav: NavItem[] = [
   discordNavItem,
 ];
 
+const mentorNav: NavItem[] = [
+  {
+    title: "Applications",
+    url: "/dashboard/mentor",
+    icon: <ClipboardCheckIcon />,
+  },
+  {
+    title: "Materials",
+    url: "/dashboard/mentor/materials",
+    icon: <PackageIcon />,
+  },
+  discordNavItem,
+];
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = authClient.useSession();
   const { data: me } = trpc.user.me.useQuery();
@@ -85,7 +99,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }, []);
 
   const user = session?.user;
-  const isReviewer = mounted && !!me?.isReviewer;
+
+  const nav = React.useMemo(() => {
+    if (!me) return null;
+    if (me.isReviewer) return { items: reviewerNav, label: "Review" };
+    if (me.isMentor) return { items: mentorNav, label: "Mentor" };
+    return { items: applicantNav, label: "Workspace" };
+  }, [me]);
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -102,12 +122,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        {mounted && me ? (
-          isReviewer ? (
-            <NavMain items={reviewerNav} label="Review" />
-          ) : (
-            <NavMain items={applicantNav} label="Workspace" />
-          )
+        {mounted && nav ? (
+          <NavMain items={nav.items} label={nav.label} />
         ) : null}
       </SidebarContent>
       <SidebarFooter>
@@ -117,7 +133,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               name: user.name,
               email: user.email,
               avatar: user.image ?? me?.image,
-              roleLabel: isReviewer ? "Reviewer" : "Applicant",
+              roleLabel: me?.roleLabel ?? "Applicant",
             }}
           />
         ) : (

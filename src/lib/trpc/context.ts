@@ -2,7 +2,12 @@ import { headers } from "next/headers";
 import { t } from "./trpc";
 import { auth } from "@/lib/auth";
 import { TRPCError } from "@trpc/server";
-import { isReviewer } from "@/lib/auth-helpers";
+import {
+  canAccessApplicantWorkspace,
+  isMentor,
+  isReviewer,
+  isStaff,
+} from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 
 export const createTRPCContext = async (): Promise<TRPCContext> => {
@@ -53,18 +58,28 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
 });
 
 export const reviewerProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (!isReviewer(ctx.user.email, ctx.user.role)) {
+  if (!isReviewer(ctx.user.role)) {
     throw new TRPCError({ code: "FORBIDDEN", message: "Reviewer access required" });
   }
 
   return next({ ctx });
 });
 
+export const mentorProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (!isMentor(ctx.user.role)) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Mentor access required" });
+  }
+
+  return next({ ctx });
+});
+
 export const applicantProcedure = protectedProcedure.use(({ ctx, next }) => {
-  if (isReviewer(ctx.user.email, ctx.user.role)) {
+  if (!canAccessApplicantWorkspace(ctx.user.role)) {
     throw new TRPCError({
       code: "FORBIDDEN",
-      message: "Workspace access is not available to reviewers",
+      message: isStaff(ctx.user.role)
+        ? "Workspace access is not available to staff accounts"
+        : "Workspace access denied",
     });
   }
 

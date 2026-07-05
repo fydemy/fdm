@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { randomUUID } from "crypto";
 import { logoUrlFor, saveLogoFile } from "@/lib/logos";
-import { isReviewer } from "@/lib/auth-helpers";
+import { isStaff } from "@/lib/auth-helpers";
 import { prisma } from "@/lib/prisma";
 
 const MAX_SIZE = 2 * 1024 * 1024;
@@ -34,9 +34,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (isReviewer(user.email, user.role)) {
+  if (isStaff(user.role)) {
     return NextResponse.json(
-      { error: "Workspace access is not available to reviewers" },
+      { error: "Workspace access is not available to staff accounts" },
       { status: 403 },
     );
   }
