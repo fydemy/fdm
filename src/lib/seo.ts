@@ -1,4 +1,4 @@
-const fallbackUrl = "http://localhost:3000";
+const fallbackUrl = process.env.BETTER_AUTH_URL;
 
 export const siteConfig = {
   name: "Fydemy",
