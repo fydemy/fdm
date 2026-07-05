@@ -69,7 +69,7 @@ export async function generateMetadata({
     twitter: {
       title: launch.title,
       description,
-      ...(image ? { images: [logoUrl] } : {}),
+      ...(image ? { images: [image.url] } : {}),
     },
   };
 }
