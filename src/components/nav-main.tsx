@@ -18,6 +18,25 @@ export type NavItem = {
   external?: boolean;
 };
 
+function getActiveNavUrl(pathname: string, items: NavItem[]) {
+  let activeUrl: string | null = null;
+
+  for (const item of items) {
+    if (item.external) continue;
+
+    const matches =
+      item.url === "/dashboard"
+        ? pathname === "/dashboard"
+        : pathname === item.url || pathname.startsWith(`${item.url}/`);
+
+    if (matches && (!activeUrl || item.url.length > activeUrl.length)) {
+      activeUrl = item.url;
+    }
+  }
+
+  return activeUrl;
+}
+
 export function NavMain({
   items,
   label,
@@ -33,10 +52,7 @@ export function NavMain({
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => {
-            const active =
-              !item.external &&
-              (pathname === item.url ||
-                (item.url !== "/dashboard" && pathname.startsWith(item.url)));
+            const active = getActiveNavUrl(pathname, items) === item.url;
 
             return (
               <SidebarMenuItem key={item.title}>

@@ -1,23 +1,23 @@
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
-import { siteConfig } from "@/lib/seo";
 import { cn } from "@/lib/utils";
+import { ArrowRight } from "lucide-react";
 
 export function PublicSiteHeader() {
   return (
     <header className="border-b bg-background">
-      <div className="mx-auto flex h-16 max-w-4xl items-center justify-between gap-4 px-6">
+      <div className="mx-auto flex h-20 max-w-4xl items-center justify-between gap-4 px-6">
         <Link href="/" className="flex items-center">
           <img src="/logo.svg" alt="Fydemy" className="h-7 w-auto" />
         </Link>
-        <a
-          href={siteConfig.discordInviteUrl}
-          target="_blank"
-          rel="noreferrer"
-          className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
+        <Link
+          href="/launches"
+          className={cn(buttonVariants({
+            variant: "outline",
+          }))}
         >
-          Community
-        </a>
+          Browse <ArrowRight />
+        </Link>
       </div>
     </header>
   );

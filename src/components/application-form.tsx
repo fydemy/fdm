@@ -15,8 +15,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { siteConfig } from "@/lib/seo";
 import { toast } from "sonner";
-import { Loader2, Plus, Trash2, Upload } from "lucide-react";
+import { Info, Loader2, Plus, Trash2, Upload } from "lucide-react";
 
 const schema = z.object({
   name: z.string().min(1, "Product name is required"),
@@ -143,11 +145,24 @@ export function ApplicationForm({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Product application</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className="space-y-4">
+      <Alert className="border-primary/20 bg-primary/5">
+        <Info />
+        <AlertTitle>
+          {siteConfig.applicationEquityPercent}% equity on acceptance
+        </AlertTitle>
+        <AlertDescription>
+          By submitting this application, you agree to allocate{" "}
+          {siteConfig.applicationEquityPercent}% equity to {siteConfig.name} if
+          your team is accepted into the batch.
+        </AlertDescription>
+      </Alert>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Product application</CardTitle>
+        </CardHeader>
+        <CardContent>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2 md:col-span-2">
@@ -349,7 +364,8 @@ export function ApplicationForm({
             Submit application
           </Button>
         </form>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

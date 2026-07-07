@@ -23,8 +23,8 @@ type LaunchCardProps = {
 export function LaunchCard({ launch }: LaunchCardProps) {
   return (
     <Link href={`/launches/${launch.id}`} className="block">
-      <Card className="transition-colors hover:bg-muted/40">
-        <CardHeader className="flex flex-row items-start gap-3">
+      <Card className="p-0! rounded-none!">
+        <CardHeader className="flex flex-row items-start gap-3 p-0!">
           <ProductLogo
             src={launch.application.logoUrl}
             name={launch.application.name}

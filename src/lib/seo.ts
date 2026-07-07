@@ -4,6 +4,11 @@ export const siteConfig = {
   name: "Fydemy",
   description:
     "Build what they can't live without. Product launches from the Fydemy community.",
+  batchSeason: {
+    number: 3,
+    deadlineLabel: "end of July",
+  },
+  applicationEquityPercent: 1,
   discordInviteUrl: "https://discord.gg/7FBpTEXqVj",
   links: {
     events: "https://luma.com/fydemy",
