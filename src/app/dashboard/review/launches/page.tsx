@@ -71,7 +71,7 @@ export default function ReviewLaunchesPage() {
                 <div className="flex flex-wrap items-center gap-2">
                   <CardTitle>
                     <Link
-                      href={`/launches/${launch.id}`}
+                      href={`/launches/${launch.slug}`}
                       target="_blank"
                       className="hover:underline"
                     >

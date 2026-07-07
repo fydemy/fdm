@@ -3,10 +3,12 @@ import { TRPCError } from "@trpc/server";
 import { t } from "../trpc";
 import { publicProcedure, applicantProcedure } from "../context";
 import { prisma } from "@/lib/prisma";
+import { uniqueLaunchSlug } from "@/lib/slug";
 
 const launchListSelect = {
   id: true,
   title: true,
+  slug: true,
   featured: true,
   createdAt: true,
   application: {
@@ -61,10 +63,13 @@ export const launchRouter = t.router({
   }),
 
   getPublic: publicProcedure
-    .input(z.object({ id: z.string() }))
+    .input(z.object({ slug: z.string() }))
     .query(async ({ input }) => {
       const launch = await prisma.launch.findFirst({
-        where: { id: input.id, application: { status: "APPROVED" } },
+        where: {
+          OR: [{ slug: input.slug }, { id: input.slug }],
+          application: { status: "APPROVED" },
+        },
         select: launchDetailSelect,
       });
 
@@ -83,6 +88,7 @@ export const launchRouter = t.router({
       select: {
         id: true,
         title: true,
+        slug: true,
         featured: true,
         createdAt: true,
         application: {
@@ -108,6 +114,7 @@ export const launchRouter = t.router({
         select: {
           id: true,
           title: true,
+          slug: true,
           content: true,
           youtubeUrl: true,
           socialEmbeds: true,
@@ -137,10 +144,12 @@ export const launchRouter = t.router({
     )
     .mutation(async ({ ctx, input }) => {
       const application = await getApprovedApplication(ctx.user.id);
+      const slug = await uniqueLaunchSlug(input.title);
 
       return prisma.launch.create({
         data: {
           title: input.title,
+          slug,
           content: input.content,
           youtubeUrl: input.youtubeUrl || null,
           socialEmbeds: input.socialEmbeds,
@@ -176,10 +185,16 @@ export const launchRouter = t.router({
         throw new TRPCError({ code: "NOT_FOUND", message: "Launch not found" });
       }
 
+      const slug =
+        launch.title === input.title
+          ? launch.slug
+          : await uniqueLaunchSlug(input.title, input.id);
+
       return prisma.launch.update({
         where: { id: input.id },
         data: {
           title: input.title,
+          slug,
           content: input.content,
           youtubeUrl: input.youtubeUrl || null,
           socialEmbeds: input.socialEmbeds,

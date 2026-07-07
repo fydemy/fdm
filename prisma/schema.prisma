@@ -117,6 +117,7 @@ model Member {
 model Launch {
   id            String      @id @default(cuid())
   title         String
+  slug          String      @unique
   content       String
   youtubeUrl    String?
   socialEmbeds  String[]    @default([])

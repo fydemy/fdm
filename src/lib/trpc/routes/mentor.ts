@@ -11,6 +11,7 @@ const applicationInclude = {
     select: {
       id: true,
       title: true,
+      slug: true,
       featured: true,
       createdAt: true,
     },

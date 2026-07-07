@@ -97,7 +97,7 @@ export default function LaunchesPage() {
               </div>
               <div className="flex gap-2">
                 <Link
-                  href={`/launches/${launch.id}`}
+                  href={`/launches/${launch.slug}`}
                   target="_blank"
                   className={cn(buttonVariants({ variant: "outline", size: "icon" }))}
                 >

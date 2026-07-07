@@ -205,7 +205,7 @@ export default function ReviewDetailPage({
           {application.launches.map((launch) => (
             <div key={launch.id} className="rounded-xl border p-4">
               <Link
-                href={`/launches/${launch.id}`}
+                href={`/launches/${launch.slug}`}
                 target="_blank"
                 className="font-medium hover:underline"
               >

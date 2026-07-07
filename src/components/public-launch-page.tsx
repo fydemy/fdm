@@ -13,14 +13,14 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 import { ArrowLeft } from "lucide-react";
 
-export function PublicLaunchPage({ id }: { id: string }) {
+export function PublicLaunchPage({ slug }: { slug: string }) {
   const { data: launch, isLoading, error } = trpc.launch.getPublic.useQuery({
-    id,
+    slug,
   });
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <PublicSiteHeader />
+      <PublicSiteHeader title={launch?.slug ?? slug} />
 
       <main className="mx-auto w-full max-w-4xl flex-1 space-y-8 px-6 py-12">
         <Link

@@ -5,12 +5,12 @@ import { siteConfig } from "@/lib/seo";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const launches = await prisma.launch.findMany({
     where: { application: { status: "APPROVED" } },
-    select: { id: true, updatedAt: true },
+    select: { id: true, updatedAt: true, slug: true },
     orderBy: { createdAt: "desc" },
   });
 
   const launchEntries: MetadataRoute.Sitemap = launches.map((launch) => ({
-    url: `${siteConfig.url}/launches/${launch.id}`,
+    url: `${siteConfig.url}/launches/${launch.slug}`,
     lastModified: launch.updatedAt,
     changeFrequency: "weekly",
     priority: 0.7,

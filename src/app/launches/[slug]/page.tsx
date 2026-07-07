@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { siteConfig } from "@/lib/seo";
 
 type PageProps = {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 };
 
 function plainText(value: string, maxLength = 160) {
@@ -20,11 +20,15 @@ function plainText(value: string, maxLength = 160) {
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const { id } = await params;
+  const { slug } = await params;
   const launch = await prisma.launch.findFirst({
-    where: { id, application: { status: "APPROVED" } },
+    where: {
+      OR: [{ slug }, { id: slug }],
+      application: { status: "APPROVED" },
+    },
     select: {
       title: true,
+      slug: true,
       content: true,
       application: {
         select: { name: true, description: true, logoUrl: true },
@@ -51,7 +55,7 @@ export async function generateMetadata({
     title: launch.title,
     description,
     alternates: {
-      canonical: `/launches/${id}`,
+      canonical: `/launches/${launch.slug}`,
     },
     icons: logoUrl
       ? {
@@ -63,7 +67,7 @@ export async function generateMetadata({
       type: "article",
       title: launch.title,
       description,
-      url: `/launches/${id}`,
+      url: `/launches/${launch.slug}`,
       ...(image ? { images: [image] } : {}),
     },
     twitter: {
@@ -75,6 +79,6 @@ export async function generateMetadata({
 }
 
 export default async function Page({ params }: PageProps) {
-  const { id } = await params;
-  return <PublicLaunchPage id={id} />;
+  const { slug } = await params;
+  return <PublicLaunchPage slug={slug} />;
 }

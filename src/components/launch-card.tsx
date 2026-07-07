@@ -10,6 +10,7 @@ import {
 type LaunchCardProps = {
   launch: {
     id: string;
+    slug: string;
     title: string;
     createdAt: Date | string;
     application: {
@@ -22,7 +23,7 @@ type LaunchCardProps = {
 
 export function LaunchCard({ launch }: LaunchCardProps) {
   return (
-    <Link href={`/launches/${launch.id}`} className="block">
+    <Link href={`/launches/${launch.slug}`} className="block">
       <Card className="p-0! rounded-none!">
         <CardHeader className="flex flex-row items-start gap-3 p-0!">
           <ProductLogo

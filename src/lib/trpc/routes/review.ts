@@ -42,6 +42,7 @@ export const reviewRouter = t.router({
             select: {
               id: true,
               title: true,
+              slug: true,
               featured: true,
               createdAt: true,
             },
@@ -140,6 +141,7 @@ export const reviewRouter = t.router({
       select: {
         id: true,
         title: true,
+        slug: true,
         featured: true,
         createdAt: true,
         application: {
