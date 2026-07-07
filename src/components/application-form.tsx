@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { trpc } from "@/lib/trpc/client";
@@ -9,16 +9,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { siteConfig } from "@/lib/seo";
 import { toast } from "sonner";
-import { Info, Loader2, Plus, Trash2, Upload } from "lucide-react";
+import { Loader2, Plus, Trash2, Upload } from "lucide-react";
 
 const schema = z.object({
   name: z.string().min(1, "Product name is required"),
@@ -38,6 +38,9 @@ const schema = z.object({
       linkedin: z.string().url("Valid LinkedIn URL required"),
     }),
   ),
+  equityAccepted: z.boolean().refine((value) => value, {
+    message: `You must agree to allocate ${siteConfig.applicationEquityPercent}% equity on acceptance`,
+  }),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -88,6 +91,7 @@ export function ApplicationForm({
       linkedin: "",
       discordUsername: "",
       members: [],
+      equityAccepted: false,
     },
   });
 
@@ -137,7 +141,12 @@ export function ApplicationForm({
     }
 
     await create.mutateAsync({
-      ...values,
+      name: values.name,
+      description: values.description,
+      websiteUrl: values.websiteUrl,
+      linkedin: values.linkedin,
+      discordUsername: values.discordUsername,
+      members: values.members,
       logoUrl: logo?.url,
       pitchDeckUrl: pitchDeck.url,
       pitchDeckName: pitchDeck.name,
@@ -145,20 +154,7 @@ export function ApplicationForm({
   }
 
   return (
-    <div className="space-y-4">
-      <Alert className="border-primary/20 bg-primary/5">
-        <Info />
-        <AlertTitle>
-          {siteConfig.applicationEquityPercent}% equity on acceptance
-        </AlertTitle>
-        <AlertDescription>
-          By submitting this application, you agree to allocate{" "}
-          {siteConfig.applicationEquityPercent}% equity to {siteConfig.name} if
-          your team is accepted into the batch.
-        </AlertDescription>
-      </Alert>
-
-      <Card>
+    <Card>
         <CardHeader>
           <CardTitle>Product application</CardTitle>
         </CardHeader>
@@ -356,6 +352,34 @@ export function ApplicationForm({
             ))}
           </div>
 
+          <div className="space-y-2">
+            <div className="flex items-start gap-3">
+              <Controller
+                control={form.control}
+                name="equityAccepted"
+                render={({ field }) => (
+                  <Checkbox
+                    id="equityAccepted"
+                    checked={field.value}
+                    className="bg-secondary"
+                    onCheckedChange={(checked) => field.onChange(checked === true)}
+                    aria-invalid={Boolean(form.formState.errors.equityAccepted)}
+                  />
+                )}
+              />
+              <Label htmlFor="equityAccepted" className="font-normal leading-snug">
+                I agree to allocate <b>{siteConfig.applicationEquityPercent}</b>% equity
+                to {siteConfig.name} via SAFE if my team is accepted into the
+                batch.
+              </Label>
+            </div>
+            {form.formState.errors.equityAccepted && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.equityAccepted.message}
+              </p>
+            )}
+          </div>
+
           <Button
             type="submit"
             disabled={create.isPending || uploadingPitchDeck || uploadingLogo}
@@ -366,6 +390,5 @@ export function ApplicationForm({
         </form>
         </CardContent>
       </Card>
-    </div>
   );
 }
