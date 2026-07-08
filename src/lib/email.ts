@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 
 const from = process.env.RESEND_FROM_EMAIL ?? "Fydemy <onboarding@resend.dev>";
+const cc = process.env.RESEND_CC_EMAIL?.trim() || undefined;
 
 function getResend() {
   const apiKey = process.env.RESEND_API_KEY;
@@ -25,6 +26,7 @@ async function sendEmail({ to, subject, text }: SendEmailInput) {
   const { data, error } = await resend.emails.send({
     from,
     to,
+    ...(cc ? { cc } : {}),
     subject,
     text,
   });

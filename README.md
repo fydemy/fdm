@@ -67,6 +67,7 @@ Copy `.env.example` to `.env` and fill in:
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
 | `RESEND_API_KEY` | Resend API key |
 | `RESEND_FROM_EMAIL` | From address, e.g. `Fydemy <onboarding@resend.dev>` |
+| `RESEND_CC_EMAIL` | Optional CC address on every transactional email |
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server-only, for uploads) |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Google Analytics 4 ID (e.g. `G-XXXXXXXXXX`). Omit to disable. |
