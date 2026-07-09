@@ -28,14 +28,14 @@ Open-source platform for product applications, reviewer decisions, public launch
 
 ## Tech stack
 
-| Layer | Choice |
-| --- | --- |
+| Layer     | Choice                                        |
+| --------- | --------------------------------------------- |
 | Framework | Next.js 16 (App Router), React 19, TypeScript |
-| UI | shadcn/ui, Tailwind CSS |
-| API | tRPC 11 |
-| Database | PostgreSQL + Prisma |
-| Auth | better-auth (Google OAuth) |
-| Email | Resend |
+| UI        | shadcn/ui, Tailwind CSS                       |
+| API       | tRPC 11                                       |
+| Database  | PostgreSQL + Prisma                           |
+| Auth      | better-auth (Google OAuth)                    |
+| Email     | Resend                                        |
 
 ## Prerequisites
 
@@ -57,19 +57,19 @@ cp .env.example .env
 
 Copy `.env.example` to `.env` and fill in:
 
-| Variable | Purpose |
-| --- | --- |
-| `DATABASE_URL` | Postgres connection string (app) |
-| `DIRECT_URL` | Direct Postgres URL (Prisma migrations / push) |
-| `BETTER_AUTH_SECRET` | Random secret for session signing |
-| `BETTER_AUTH_URL` | Public app URL (e.g. `http://localhost:3000`) |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret |
-| `RESEND_API_KEY` | Resend API key |
-| `RESEND_FROM_EMAIL` | From address, e.g. `Fydemy <onboarding@resend.dev>` |
-| `RESEND_CC_EMAIL` | Optional CC address on every transactional email |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (server-only, for uploads) |
+| Variable                        | Purpose                                                       |
+| ------------------------------- | ------------------------------------------------------------- |
+| `DATABASE_URL`                  | Postgres connection string (app)                              |
+| `DIRECT_URL`                    | Direct Postgres URL (Prisma migrations / push)                |
+| `BETTER_AUTH_SECRET`            | Random secret for session signing                             |
+| `BETTER_AUTH_URL`               | Public app URL (e.g. `http://localhost:3000`)                 |
+| `GOOGLE_CLIENT_ID`              | Google OAuth client ID                                        |
+| `GOOGLE_CLIENT_SECRET`          | Google OAuth client secret                                    |
+| `RESEND_API_KEY`                | Resend API key                                                |
+| `RESEND_FROM_EMAIL`             | From address, e.g. `Fydemy <onboarding@resend.dev>`           |
+| `RESEND_CC_EMAIL`               | Optional CC address on every transactional email              |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL                                          |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Supabase service role key (server-only, for uploads)          |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Google Analytics 4 ID (e.g. `G-XXXXXXXXXX`). Omit to disable. |
 
 Generate a secret:
@@ -92,12 +92,12 @@ Visit [http://localhost:3000](http://localhost:3000), sign in with Google, and o
 
 Roles are stored on the `user` table (`applicant`, `founder`, `reviewer`, `mentor`):
 
-| Role | Access |
-| --- | --- |
-| `applicant` | Default for new users — apply and manage pending applications |
-| `founder` | Set automatically when an application is approved — launches and materials |
-| `reviewer` | Review applications, manage materials, feature launches (`/dashboard/review`) |
-| `mentor` | View approved applications and edit files in reviewer-labeled mentor folders (`/dashboard/mentor`) |
+| Role        | Access                                                                                             |
+| ----------- | -------------------------------------------------------------------------------------------------- |
+| `applicant` | Default for new users — apply and manage pending applications                                      |
+| `founder`   | Set automatically when an application is approved — launches and materials                         |
+| `reviewer`  | Review applications, manage materials, feature launches (`/dashboard/review`)                      |
+| `mentor`    | View approved applications and edit files in reviewer-labeled mentor folders (`/dashboard/mentor`) |
 
 Assign staff roles directly in the database, e.g. with Prisma Studio:
 
@@ -122,11 +122,11 @@ File uploads (pitch decks, logos, editor images) use [Supabase Storage](https://
 1. Create a Supabase project and add `NEXT_PUBLIC_SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` to `.env`.
 2. In **Storage**, create three buckets:
 
-| Bucket | Public | Purpose |
-| --- | --- | --- |
-| `logos` | Yes | Product logos |
-| `images` | Yes | WYSIWYG inline images |
-| `pitchdecks` | No | Application pitch decks (served via `/api/pitchdecks/...` with auth) |
+| Bucket       | Public | Purpose                                                              |
+| ------------ | ------ | -------------------------------------------------------------------- |
+| `logos`      | Yes    | Product logos                                                        |
+| `images`     | Yes    | WYSIWYG inline images                                                |
+| `pitchdecks` | No     | Application pitch decks (served via `/api/pitchdecks/...` with auth) |
 
 For public buckets (`logos`, `images`), enable public access in the bucket settings or add a policy allowing public `SELECT`.
 
@@ -145,12 +145,12 @@ prisma/
 
 ## Scripts
 
-| Command | Description |
-| --- | --- |
-| `bun dev` | Development server |
-| `bun run build` | Production build |
-| `bun start` | Start production server |
-| `bun run lint` | ESLint |
+| Command         | Description             |
+| --------------- | ----------------------- |
+| `bun dev`       | Development server      |
+| `bun run build` | Production build        |
+| `bun start`     | Start production server |
+| `bun run lint`  | ESLint                  |
 
 ## Contributing
 

@@ -56,17 +56,6 @@ export function HomePage() {
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <div className="flex min-h-dvh flex-col">
-        <div className="border-b bg-primary/5">
-          <div className="mx-auto max-w-4xl px-6 py-3 text-center text-sm">
-            <span className="font-semibold">
-              Batch Season {siteConfig.batchSeason.number} is coming
-            </span>
-            <span className="text-muted-foreground">
-              {" "}
-              — apply before the {siteConfig.batchSeason.deadlineLabel}
-            </span>
-          </div>
-        </div>
         <PublicSiteHeader />
 
         <section className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center space-y-10 px-6 py-12 text-center">
@@ -92,6 +81,17 @@ export function HomePage() {
             >
               {hasSession ? "Dashboard" : "Apply"} <ArrowRight />
             </Button>
+            <Link
+              href="/traction-or-die"
+              className={cn(
+                buttonVariants({
+                  variant: "outline",
+                  className: "rounded-full px-12 py-6",
+                }),
+              )}
+            >
+             🚀 Traction or Die
+            </Link>
             <Link
               href={siteConfig.discordInviteUrl}
               target="_blank"
