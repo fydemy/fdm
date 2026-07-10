@@ -6,6 +6,7 @@ import { launchRouter } from "./routes/launch";
 import { materialRouter } from "./routes/material";
 import { mentorRouter } from "./routes/mentor";
 import { userRouter } from "./routes/user";
+import { tractionOrDieRouter } from "./routes/traction-or-die";
 
 export const appRouter = t.router({
   hello: helloRouter,
@@ -15,6 +16,7 @@ export const appRouter = t.router({
   mentor: mentorRouter,
   launch: launchRouter,
   material: materialRouter,
+  tractionOrDie: tractionOrDieRouter,
 });
 
 export type AppRouter = typeof appRouter;

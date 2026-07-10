@@ -19,6 +19,23 @@ import { siteConfig } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 import { ArrowRight, Users } from "lucide-react";
 
+const testimonials = [
+  {
+    name: "Nabila Rahmadani",
+    image: "/profile/nabila.png",
+    role: "1M+ followers @Tiktok, Founder @CariKOL (formerly Buzzeryok)",
+    quote:
+      "Thanks so much for the full guide in the PPT; it answered several questions I had about the build that I’d been struggling with since yesterday 😭.",
+  },
+  {
+    name: "Anirudh Mannattil",
+    image: "/profile/anirudh.png",
+    role: "REP Student @NTU, CEO @CarbonCredible",
+    quote:
+      "We met all of the mentors over the past two weeks, and gained several valuable insights. Dennis and Oki posted about our sessions as well - thank you so much to both of you, and to Joenathan and Wahyu for meeting with us and supporting us!",
+  },
+] as const;
+
 const programTimeline = [
   {
     week: 0,
@@ -58,7 +75,7 @@ export function HomePage() {
       <div className="flex min-h-dvh flex-col">
         <PublicSiteHeader />
 
-        <section className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center space-y-10 px-6 py-12 text-center">
+        <section className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center space-y-10 px-6 py-33 text-center">
           <div className="max-w-lg space-y-3">
             <h1 className="text-4xl font-semibold tracking-tighter md:text-5xl">
               Build what they can't live without.
@@ -121,10 +138,46 @@ export function HomePage() {
               />
             </div>
           </div>
+
+          <div className="w-full space-y-4 text-left mt-24">
+            <h2 className="text-center text-sm text-muted-foreground">
+              What builders say
+            </h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {testimonials.map((testimonial) => (
+                <article
+                  key={testimonial.name}
+                  className="rounded-2xl border bg-card p-4 text-left shadow-sm"
+                >
+                  <div className="flex items-start gap-3">
+                    <img
+                      src={testimonial.image}
+                      alt={testimonial.name}
+                      className="size-10 shrink-0 rounded-full object-cover"
+                    />
+                    <div className="min-w-0 space-y-1">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                        <p className="font-semibold leading-none">
+                          {testimonial.name}
+                        </p>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {testimonial.role}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-sm leading-relaxed">
+                    {testimonial.quote}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </div>
         </section>
       </div>
 
-      <main className="mx-auto w-full max-w-4xl flex-1 space-y-24 px-6 py-20">
+      <main className="mx-auto w-full max-w-4xl flex-1 space-y-24 px-6 pb-20">
+       {!isLoading && (featured ?? []).length === 0 ? null : (
        <section className="space-y-10">
         <h2 className="text-2xl font-semibold tracking-tight">
           Featured
@@ -136,18 +189,13 @@ export function HomePage() {
             </div>
           )}
 
-          {!isLoading && (featured ?? []).length === 0 && (
-            <p className="text-center text-sm text-muted-foreground">
-              No featured launches yet. Check back soon, or browse all launches.
-            </p>
-          )}
-
           <div className="grid gap-4 md:grid-cols-2">
             {(featured ?? []).map((launch) => (
               <LaunchCard key={launch.id} launch={launch} />
             ))}
           </div>
        </section>
+       )}
 
         <section className="space-y-10">
             <h2 className="text-2xl font-semibold tracking-tight">

@@ -2,11 +2,14 @@ import type { Metadata } from "next";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { PublicSiteFooter } from "@/components/public-site-footer";
 import { TractionOrDieJoinButton } from "@/components/traction-or-die-join-button";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { siteConfig } from "@/lib/seo";
 
 const programTimeline = [
   {
     week: 0,
-    title: "100% refundable",
+    title: "200%++ refund",
     goal: "If in a month, your app gets traction and the revenue above $20 generated, we will refund you 100% of the payment.",
   },
   {
@@ -34,7 +37,7 @@ const programTimeline = [
 export const metadata: Metadata = {
   title: "Traction or Die",
   description:
-    "A focused program to ship traction fast — build distribution and execution discipline.",
+    "A focused program to ship traction fast, build distribution and execution discipline.",
   alternates: {
     canonical: "/traction-or-die",
   },
@@ -63,6 +66,9 @@ export default function Page() {
 
         <div className="flex flex-wrap gap-3">
           <TractionOrDieJoinButton />
+          <Link className={buttonVariants({ variant: "secondary", className: "rounded-full! px-12 py-6" })} href={siteConfig.discordInviteUrl} target="_blank">
+            Any Question? 
+          </Link>
         </div>
 
         <section className="space-y-10">

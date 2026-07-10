@@ -9,6 +9,7 @@ const titles: Record<string, string> = {
   "/dashboard/apply": "Application",
   "/dashboard/launches": "Launches",
   "/dashboard/materials": "Materials",
+  "/dashboard/traction-or-die": "Traction or Die",
   "/dashboard/review": "Review applications",
   "/dashboard/review/launches": "Launches",
   "/dashboard/review/materials": "Materials",

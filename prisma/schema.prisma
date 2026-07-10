@@ -26,6 +26,7 @@ model User {
   sessions      Session[]
   applications   Application[]
   materialItems  MaterialItem[]
+  tractionOrDieEnrollment TractionOrDieEnrollment?
 
   @@map("user")
 }
@@ -154,4 +155,16 @@ model MaterialItem {
   @@index([parentId])
   @@index([createdById])
   @@map("material_item")
+}
+
+model TractionOrDieEnrollment {
+  id              String   @id @default(cuid())
+  discordUsername String
+  transactionId   String
+  userId          String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("traction_or_die_enrollment")
 }
