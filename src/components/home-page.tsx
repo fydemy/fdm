@@ -141,7 +141,7 @@ export function HomePage() {
 
           <div className="w-full space-y-4 text-left mt-24">
             <h2 className="text-center text-sm text-muted-foreground">
-              What builders say
+              What Founders say
             </h2>
             <div className="grid gap-4 md:grid-cols-2">
               {testimonials.map((testimonial) => (
@@ -233,14 +233,6 @@ export function HomePage() {
                   No, we don&apos;t guarantee funding. Getting funded depends
                   100% on your product&apos;s traction and execution.
                 </p>
-                <p>
-                  What we guarantee is VC-Readiness. We take your raw code and
-                  spend 30 days wrapping it into global standards—giving you
-                  high-end demo videos, global launch assets, and a professional
-                  pitch deck. We are currently building and expanding our
-                  network of regional VC partners to put your products in front
-                  of them once you are ready.
-                </p>
               </AccordionContent>
             </AccordionItem>
 
@@ -250,9 +242,7 @@ export function HomePage() {
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground">
                 <p>
-                  No. We charge zero cash from student builders. We know you
-                  need every single rupiah or dollar to focus on your product.
-                  Instead, we operate on a Sweat Equity model.
+                The program is free, but we ask for a Rp 3,000,000 refundable deposit to confirm your spot. We’ve found that a deposit helps founders stay committed, show up consistently, and get more value—leading to a stronger, more focused cohort.
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -263,12 +253,7 @@ export function HomePage() {
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground">
                 <p>
-                  Sweat Equity means we invest our resources, premium AI
-                  inference credits, production crew (for your Apple-style demo
-                  videos), curated hacker spaces, and investor pipeline in
-                  exchange for a small, future ownership stake in your project.
-                  We only take a standard 1% advisory equity via a SAFE
-                  (Simple Agreement for Future Equity) framework.
+                  Sweat Equity means we invest our resources in mentors, cloud infrastructure, co-working venues across Indonesia, and our network of YC founders, MIT, Stanford, Harvard, and other top universities to help you build your product.
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -280,13 +265,7 @@ export function HomePage() {
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground">
                 <p>
-                  That is exactly what the SAFE framework is for. It is a
-                  Silicon Valley standard (pioneered by Y Combinator). By signing
-                  the SAFE on Day 1, you don&apos;t need to spin up a company
-                  right now. It simply states that if and when your project
-                  incorporates into a legal entity or receives its first
-                  institutional funding in the future, our 1% stake will
-                  automatically vest.
+                  We use FAST (Founder Advisor Standard Template) document that you can sign from day 1.
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -298,25 +277,7 @@ export function HomePage() {
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground">
                 <p>
-                  We invest in you (the builders), not just the initial code.
-                  If your team decides to pivot to a better architecture or a
-                  new product during or after the 1-month cohort, the 1% SAFE
-                  simply carries over to the new entity built by the same
-                  founding team.
-                </p>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="project-fails">
-              <AccordionTrigger>
-                What happens if our project fails after the 1-month sprint?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground">
-                <p>
-                  If the project goes sideways and stops, the SAFE becomes void.
-                  You owe us nothing. We take the risk together with you from
-                  day zero. We win when you win, and we lose when you lose.
-                  That&apos;s what having skin in the game means.
+                 If your team decides to pivot to a better architecture or a new product during or after the 1-month cohort, the 1% FAST simply carries over to the new entity built by the same founding team while the deposit is refunded.
                 </p>
               </AccordionContent>
             </AccordionItem>
@@ -331,8 +292,7 @@ export function HomePage() {
                   Yes, through our Community Talent Pool. While you cannot apply
                   as a startup founder without an MVP, you can register as an
                   &quot;Elite Builder&quot; in our tech ecosystem. We often
-                  match solo geniuses with existing teams in our cohort who need
-                  heavy infrastructure, Rust/Go, or Agentic AI expertise.
+                  match solo geniuses with existing teams in our cohort who need technical help. Just join our community and we'll help you find a team.
                 </p>
               </AccordionContent>
             </AccordionItem>

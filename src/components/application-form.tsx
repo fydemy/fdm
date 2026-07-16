@@ -369,7 +369,7 @@ export function ApplicationForm({
               />
               <Label htmlFor="equityAccepted" className="font-normal leading-snug">
                 I agree to allocate <b>{siteConfig.applicationEquityPercent}</b>% equity
-                to {siteConfig.name} via SAFE if my team is accepted into the
+                to {siteConfig.name} via FAST and Rp 3,000,000 refundable deposit if accepted into the
                 batch.
               </Label>
             </div>
