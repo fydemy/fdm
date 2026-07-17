@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc/client";
 import { ApplicationForm } from "@/components/application-form";
+import { DepositDialog } from "@/components/deposit-dialog";
 import { ProductLogo } from "@/components/product-logo";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
@@ -140,6 +141,28 @@ export default function ApplyPage() {
             <StatusBadge status={application.status} />
           </CardHeader>
           <CardContent className="space-y-6">
+            {application.status === "APPROVED" && (
+              <>
+                <div className="space-y-3 rounded-lg border bg-muted/20 p-4">
+                  <div>
+                    <h3 className="text-sm font-medium">
+                      Confirm your spot — deposit
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {application.depositTransactionId
+                        ? `Deposit submitted. Transaction ID: ${application.depositTransactionId} (pending verification).`
+                        : "Pay the Rp 3,010,000 refundable deposit to lock in your place in the batch."}
+                    </p>
+                  </div>
+                  <DepositDialog
+                    applicationId={application.id}
+                    depositSubmitted={Boolean(application.depositTransactionId)}
+                  />
+                </div>
+                <Separator />
+              </>
+            )}
+
             <div>
               <h3 className="mb-2 text-sm font-medium">Pitch deck</h3>
               <a

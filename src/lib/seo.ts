@@ -8,7 +8,6 @@ export const siteConfig = {
     number: 3,
     deadlineLabel: "end of July",
   },
-  applicationEquityPercent: 1,
   discordInviteUrl: "https://discord.gg/7FBpTEXqVj",
   links: {
     events: "https://luma.com/fydemy",

@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/card";
 import { siteConfig } from "@/lib/seo";
 import { toast } from "sonner";
-import { Loader2, Plus, Trash2, Upload } from "lucide-react";
+import { Loader2, MessageCircle, Plus, Trash2, Upload } from "lucide-react";
 
 const schema = z.object({
   name: z.string().min(1, "Product name is required"),
@@ -38,8 +38,8 @@ const schema = z.object({
       linkedin: z.string().url("Valid LinkedIn URL required"),
     }),
   ),
-  equityAccepted: z.boolean().refine((value) => value, {
-    message: `You must agree to allocate ${siteConfig.applicationEquityPercent}% equity on acceptance`,
+  depositAccepted: z.boolean().refine((value) => value, {
+    message: "You must agree to the refundable deposit on acceptance",
   }),
 });
 
@@ -60,7 +60,7 @@ export function ApplicationForm({
   const utils = trpc.useUtils();
   const create = trpc.application.create.useMutation({
     onSuccess: async () => {
-      toast.success("Application submitted — check your inbox");
+      toast.success("Application submitted, check your inbox");
 
       if (mustJoinDiscord) {
         // Notify parent before invalidating so the Discord gate stays mounted.
@@ -91,7 +91,7 @@ export function ApplicationForm({
       linkedin: "",
       discordUsername: "",
       members: [],
-      equityAccepted: false,
+      depositAccepted: false,
     },
   });
 
@@ -356,28 +356,42 @@ export function ApplicationForm({
             <div className="flex items-start gap-3">
               <Controller
                 control={form.control}
-                name="equityAccepted"
+                name="depositAccepted"
                 render={({ field }) => (
                   <Checkbox
-                    id="equityAccepted"
+                    id="depositAccepted"
                     checked={field.value}
                     className="bg-secondary"
                     onCheckedChange={(checked) => field.onChange(checked === true)}
-                    aria-invalid={Boolean(form.formState.errors.equityAccepted)}
+                    aria-invalid={Boolean(form.formState.errors.depositAccepted)}
                   />
                 )}
               />
-              <Label htmlFor="equityAccepted" className="font-normal leading-snug">
-                I agree to allocate <b>{siteConfig.applicationEquityPercent}</b>% equity
-                to {siteConfig.name} via FAST and Rp 3,000,000 refundable deposit if accepted into the
+              <Label htmlFor="depositAccepted" className="font-normal leading-snug">
+                I agree to the Rp 3,010,000 deposit (Rp 3,000,000 refundable +
+                Rp 10,000 non-refundable transfer fee) if accepted into the
                 batch.
               </Label>
             </div>
-            {form.formState.errors.equityAccepted && (
+            {form.formState.errors.depositAccepted && (
               <p className="text-sm text-destructive">
-                {form.formState.errors.equityAccepted.message}
+                {form.formState.errors.depositAccepted.message}
               </p>
             )}
+            <div className="flex items-start gap-3">
+              <MessageCircle className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+              <p className="text-sm leading-snug text-muted-foreground">
+                Join the Discord community:{" "}
+                <a
+                  href={siteConfig.discordInviteUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-medium text-primary underline"
+                >
+                  {siteConfig.discordInviteUrl}
+                </a>
+              </p>
+            </div>
           </div>
 
           <Button

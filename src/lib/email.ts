@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { siteConfig } from "@/lib/seo";
 
 const from = process.env.RESEND_FROM_EMAIL ?? "Fydemy <onboarding@resend.dev>";
 const cc = process.env.RESEND_CC_EMAIL?.trim() || undefined;
@@ -40,7 +41,7 @@ async function sendEmail({ to, subject, text }: SendEmailInput) {
 }
 
 function formatBody(lines: string[]) {
-  return [...lines, "", "— Fydemy team"].join("\n");
+  return [...lines, "", "Warm regards,", "The Fydemy Team"].join("\n");
 }
 
 export async function sendApplicationReceivedEmail(input: {
@@ -50,15 +51,18 @@ export async function sendApplicationReceivedEmail(input: {
 }) {
   return sendEmail({
     to: input.to,
-    subject: `Thanks for applying — ${input.productName}`,
+    subject: `Thanks for applying to Fydemy, ${input.productName}`,
     text: formatBody([
-      "Thanks for applying!",
+      "Thanks for applying to Fydemy!",
       "",
       `Hi ${input.applicantName},`,
       "",
-      `We received your application for ${input.productName}.`,
+      `We've received your application for ${input.productName}, and our team is excited to take a closer look. Our reviewers will go through your submission carefully and email you as soon as a decision has been made.`,
       "",
-      "Our reviewers will take a look and email you once a decision is made.",
+      "In the meantime, come join our Discord community and introduce yourself. It's the best place to meet other founders, ask questions, and get a feel for what we're building together:",
+      siteConfig.discordInviteUrl,
+      "",
+      "If any questions come up along the way, just reply to this email or reach out to us on Discord. We're glad to have you here.",
     ]),
   });
 }
@@ -69,23 +73,31 @@ export async function sendApplicationApprovedEmail(input: {
   applicantName: string;
   note?: string | null;
 }) {
+  const depositUrl = `${siteConfig.url}/dashboard/apply`;
+
   const lines = [
-    "Application approved",
+    "Congratulations, your application has been approved!",
     "",
     `Hi ${input.applicantName},`,
     "",
-    `Great news — your application for ${input.productName} has been approved.`,
+    `We're thrilled to let you know that your application for ${input.productName} has been approved. Welcome to the Fydemy batch! We can't wait to see what you build over the coming weeks.`,
     "",
-    "You can now publish launches and access materials from your dashboard.",
+    "To confirm your spot in the batch, we ask for a deposit of Rp 3,010,000. Rp 3,000,000 of that amount is fully refundable, and Rp 10,000 covers a one-time, non-refundable transfer fee.",
+    "",
+    "Head to your dashboard to complete the deposit. You'll see the QRIS to scan and a field to submit your transaction ID:",
+    depositUrl,
+    "",
+    "Once your deposit is in, you can publish launches and access program materials. If you haven't already, join us on Discord and say hello so we can get you plugged into the community:",
+    siteConfig.discordInviteUrl,
   ];
 
   if (input.note) {
-    lines.push("", `Note from reviewer: ${input.note}`);
+    lines.push("", `A note from your reviewer: ${input.note}`);
   }
 
   return sendEmail({
     to: input.to,
-    subject: `You're approved — ${input.productName}`,
+    subject: `You're approved! Welcome to Fydemy, ${input.productName}`,
     text: formatBody(lines),
   });
 }
@@ -97,22 +109,26 @@ export async function sendApplicationRejectedEmail(input: {
   note?: string | null;
 }) {
   const lines = [
-    "Application not approved",
+    "An update on your Fydemy application",
     "",
     `Hi ${input.applicantName},`,
     "",
-    `Thanks for applying with ${input.productName}. After review, we are unable to approve this application at this time.`,
+    `Thank you for taking the time to apply with ${input.productName}. After careful review, we're not able to move forward with your application at this time. Please know this was a difficult decision, and it doesn't take away from the effort you clearly put in.`,
   ];
 
   if (input.note) {
-    lines.push("", `Note from reviewer: ${input.note}`);
+    lines.push("", `A note from your reviewer: ${input.note}`);
   }
 
-  lines.push("", "You are welcome to apply again with an updated pitch deck.");
+  lines.push(
+    "",
+    "We'd genuinely welcome a future application with an updated pitch deck. In the meantime, we'd love for you to stay part of our Discord community, where you can keep learning and connecting with other builders:",
+    siteConfig.discordInviteUrl,
+  );
 
   return sendEmail({
     to: input.to,
-    subject: `Update on your application — ${input.productName}`,
+    subject: `An update on your application for ${input.productName}`,
     text: formatBody(lines),
   });
 }

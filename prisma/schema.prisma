@@ -91,6 +91,8 @@ model Application {
   status          ApplicationStatus @default(PENDING)
   reviewNote      String?
   reviewedAt      DateTime?
+  depositTransactionId String?
+  depositSubmittedAt   DateTime?
   userId          String
   user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   members         Member[]

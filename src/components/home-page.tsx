@@ -242,42 +242,18 @@ export function HomePage() {
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground">
                 <p>
-                The program is free, but we ask for a Rp 3,000,000 refundable deposit to confirm your spot. We’ve found that a deposit helps founders stay committed, show up consistently, and get more value—leading to a stronger, more focused cohort.
+                There&apos;s no cost to join the program itself. We only require a fully refundable Rp 3,000,000 deposit to reserve your place. In our experience, this small commitment keeps founders engaged, encourages them to show up consistently, and helps them get the most out of the program—resulting in a more dedicated and focused cohort.
                 </p>
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="sweat-equity">
+            <AccordionItem value="what-you-get">
               <AccordionTrigger>
-                What is Sweat Equity and how does it work here?
+                What do you invest to help us build?
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground">
                 <p>
-                  Sweat Equity means we invest our resources in mentors, cloud infrastructure, co-working venues across Indonesia, and our network of YC founders, MIT, Stanford, Harvard, and other top universities to help you build your product.
-                </p>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="safe-no-entity">
-              <AccordionTrigger>
-                My project is not a legal entity (PT/Pte Ltd) yet. How can we
-                sign an equity agreement?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground">
-                <p>
-                  We use FAST (Founder Advisor Standard Template) document that you can sign from day 1.
-                </p>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="pivot">
-              <AccordionTrigger>
-                1% sounds small, but what if we pivot or change our product
-                later?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground">
-                <p>
-                 If your team decides to pivot to a better architecture or a new product during or after the 1-month cohort, the 1% FAST simply carries over to the new entity built by the same founding team while the deposit is refunded.
+                  We invest our resources in mentors, cloud infrastructure, co-working venues across Indonesia, and our network of YC founders, MIT, Stanford, Harvard, and other top universities to help you build your product.
                 </p>
               </AccordionContent>
             </AccordionItem>
