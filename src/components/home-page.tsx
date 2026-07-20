@@ -177,6 +177,100 @@ export function HomePage() {
       </div>
 
       <main className="mx-auto w-full max-w-4xl flex-1 space-y-24 px-6 pb-20">
+        <section className="space-y-10">
+          <div className="space-y-2 text-center">
+            <h2 className="text-2xl font-semibold tracking-tight">Pricing</h2>
+            <p className="text-muted-foreground">
+              Choose the path that fits where you are.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="flex flex-col gap-6 rounded-xl border border-dashed py-6 text-left">
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold tracking-tight">
+                  Founding members
+                </h3>
+                <p className="text-3xl font-semibold tracking-tight">Free</p>
+                <p className="text-sm text-muted-foreground">
+                  Forever.
+                </p>
+              </div>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>Community access</li>
+                <li>SG project opportunities</li>
+                <li>Early access to new updates</li>
+              </ul>
+              <Button className="mt-auto w-fit rounded-full" variant="secondary" onClick={() => router.push(siteConfig.discordInviteUrl)}>
+                Join <ArrowRight />
+              </Button>
+            </div>
+
+            <div className="flex flex-col gap-6 rounded-xl border py-6 text-left">
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold tracking-tight">
+                  Batch Quarterly Application
+                </h3>
+                <p className="text-3xl font-semibold tracking-tight">Free</p>
+                <p className="text-sm text-muted-foreground">
+                  Rp 3,000,000/$167 refundable deposit on acceptance.
+                </p>
+              </div>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>2-month VC-standard sprint</li>
+                <li>1-on-1 mentors, media boost, and AI infra</li>
+                <li>Co-working space access</li>
+                <li>Exclusive community access to the alumni and top universities founders</li>
+                <li>Investor and partner access matchmaking</li>
+              </ul>
+              <Button
+                className="mt-auto w-fit rounded-full"
+                onClick={() =>
+                  hasSession
+                    ? router.push("/dashboard")
+                    : authClient.signIn.social({
+                        provider: "google",
+                        callbackURL: "/dashboard",
+                      })
+                }
+              >
+                {hasSession ? "Dashboard" : "Apply"} <ArrowRight />
+              </Button>
+            </div>
+
+            <div className="flex flex-col gap-6 rounded-xl border py-6 text-left">
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold tracking-tight">
+                  Traction or Die
+                </h3>
+                <p className="text-3xl font-semibold tracking-tight">
+                  Free
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Rp 360,000/$20 refundable deposit + Launch plan at Rakit.dev.
+                </p>
+              </div>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>1-month traction sprint</li>
+                <li>Daily updates and community pressure</li>
+                <li>Ship distribution or die trying</li>
+                <li>Starter plan at Rakit.dev and media boost</li>
+              </ul>
+              <Link
+                href="/traction-or-die"
+                className={cn(
+                  buttonVariants({
+                    variant: "outline",
+                    className: "mt-auto w-fit rounded-full",
+                  }),
+                )}
+              >
+                Traction or Die <ArrowRight />
+              </Link>
+            </div>
+          </div>
+        </section>
+
        {!isLoading && (featured ?? []).length === 0 ? null : (
        <section className="space-y-10">
         <h2 className="text-2xl font-semibold tracking-tight">
@@ -196,28 +290,6 @@ export function HomePage() {
           </div>
        </section>
        )}
-
-        <section className="space-y-10">
-            <h2 className="text-2xl font-semibold tracking-tight">
-              We're doing it in 4 steps.
-          </h2>
-
-          <ol className="relative space-y-8">
-            {programTimeline.map((item) => (
-              <li key={item.week} className="relative">
-                <div className="space-y-1 rounded-xl border bg-card">
-                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                    [{item.week}]
-                  </p>
-                  <h3 className="font-medium tracking-tight">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {item.goal}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </section>
 
         <section className="space-y-6">
           <h2 className="text-center text-2xl font-semibold tracking-tight">

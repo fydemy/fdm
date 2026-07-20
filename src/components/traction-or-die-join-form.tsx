@@ -71,7 +71,7 @@ export function TractionOrDieJoinForm() {
       <CardHeader>
         <CardTitle>Join Traction or Die</CardTitle>
         <CardDescription>
-          Join for <b>$20 / Rp 360K</b> and get 200%++ refund when you fulfill the <Link href="/traction-or-die" className="underline">Traction or Die</Link> program.
+          Join for <b>$20.6 / Rp 360K + (Rp 10,000, non-refundable/transaction fee)</b> and get the refund when you fulfill the <Link href="/traction-or-die" className="underline">Traction or Die</Link> program.
         </CardDescription>
       </CardHeader>
       <CardContent>
