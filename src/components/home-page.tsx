@@ -16,8 +16,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { siteConfig } from "@/lib/seo";
-import { cn } from "@/lib/utils";
-import { ArrowRight, Users } from "lucide-react";
+import { ArrowRight, MessageCircle } from "lucide-react";
 
 const testimonials = [
   {
@@ -88,35 +87,17 @@ export function HomePage() {
             <Button
               onClick={() =>
                 hasSession
-                  ? router.push("/dashboard")
+                  ? router.push("/dashboard/apply")
                   : authClient.signIn.social({
                     provider: "google",
-                    callbackURL: "/dashboard",
+                    callbackURL: "/dashboard/apply",
                   })
               }
               className="rounded-full px-12 py-6"
             >
               {hasSession ? "Dashboard" : "Apply"} <ArrowRight />
             </Button>
-            <Link
-              href="/traction-or-die"
-              className={cn(
-                buttonVariants({
-                  variant: "outline",
-                  className: "rounded-full px-12 py-6",
-                }),
-              )}
-            >
-             🚀 Traction or Die
-            </Link>
-            <Link
-              href={siteConfig.discordInviteUrl}
-              target="_blank"
-              rel="noreferrer"
-              className={cn(buttonVariants({ variant: "secondary", className: "rounded-full px-12 py-6" }))}
-            >
-              <Users /> Community
-            </Link>
+            <Link href="https://wa.me/6587470061" target="_blank" rel="noreferrer" className={buttonVariants({ variant: "secondary", className: "rounded-full! px-12 py-6" })}><MessageCircle /> Talk</Link>
           </div>
           <div>
             <h2 className="text-sm text-muted-foreground">Our Alumni</h2>
@@ -193,7 +174,7 @@ export function HomePage() {
                 </h3>
                 <p className="text-3xl font-semibold tracking-tight">Free</p>
                 <p className="text-sm text-muted-foreground">
-                  Forever.
+                  Get started here.
                 </p>
               </div>
               <ul className="space-y-2 text-sm text-muted-foreground">
@@ -209,11 +190,13 @@ export function HomePage() {
             <div className="flex flex-col gap-6 rounded-xl border py-6 text-left">
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold tracking-tight">
-                  Batch Quarterly Application
+                  Serious Founders
                 </h3>
                 <p className="text-3xl font-semibold tracking-tight">Free</p>
                 <p className="text-sm text-muted-foreground">
-                  Rp 3,000,000/$167 refundable deposit on acceptance.
+                  {siteConfig.batchDepositRequired
+                    ? "Rp 3,000,000/$167 refundable deposit on acceptance."
+                    : "Quarterly Acceleration"}
                 </p>
               </div>
               <ul className="space-y-2 text-sm text-muted-foreground">
@@ -227,10 +210,10 @@ export function HomePage() {
                 className="mt-auto w-fit rounded-full"
                 onClick={() =>
                   hasSession
-                    ? router.push("/dashboard")
+                    ? router.push("/dashboard/apply")
                     : authClient.signIn.social({
                         provider: "google",
-                        callbackURL: "/dashboard",
+                        callbackURL: "/dashboard/apply",
                       })
                 }
               >
@@ -241,32 +224,35 @@ export function HomePage() {
             <div className="flex flex-col gap-6 rounded-xl border py-6 text-left">
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold tracking-tight">
-                  Traction or Die
+                  High-Growth Builders
                 </h3>
                 <p className="text-3xl font-semibold tracking-tight">
                   Free
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Rp 360,000/$20 refundable deposit + Launch plan at Rakit.dev.
+                  Rp 360,000/$20 refundable deposit + Launch plan at Rakit.dev if pass.
                 </p>
               </div>
               <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>Starter plan at Rakit.dev and media boost</li>
                 <li>1-month traction sprint</li>
                 <li>Daily updates and community pressure</li>
-                <li>Ship distribution or die trying</li>
-                <li>Starter plan at Rakit.dev and media boost</li>
+                <li>Opportunity to be moved to a serious founder program</li>
               </ul>
-              <Link
-                href="/traction-or-die"
-                className={cn(
-                  buttonVariants({
-                    variant: "outline",
-                    className: "mt-auto w-fit rounded-full",
-                  }),
-                )}
+              <Button
+                variant="outline"
+                className="mt-auto w-fit rounded-full"
+                onClick={() =>
+                  hasSession
+                    ? router.push("/dashboard/traction-or-die")
+                    : authClient.signIn.social({
+                        provider: "google",
+                        callbackURL: "/dashboard/traction-or-die",
+                      })
+                }
               >
                 Traction or Die <ArrowRight />
-              </Link>
+              </Button>
             </div>
           </div>
         </section>
@@ -314,7 +300,9 @@ export function HomePage() {
               </AccordionTrigger>
               <AccordionContent className="text-muted-foreground">
                 <p>
-                There&apos;s no cost to join the program itself. We only require a fully refundable Rp 3,000,000 deposit to reserve your place. In our experience, this small commitment keeps founders engaged, encourages them to show up consistently, and helps them get the most out of the program—resulting in a more dedicated and focused cohort.
+                  {siteConfig.batchDepositRequired
+                    ? "There's no cost to join the program itself. We only require a fully refundable Rp 3,000,000 deposit to reserve your place. In our experience, this small commitment keeps founders engaged, encourages them to show up consistently, and helps them get the most out of the program—resulting in a more dedicated and focused cohort."
+                    : "No. The batch program is free to join. We know you need every rupiah to focus on your product, so there is no upfront fee or hidden cash cost."}
                 </p>
               </AccordionContent>
             </AccordionItem>

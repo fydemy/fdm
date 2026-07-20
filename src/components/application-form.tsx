@@ -38,9 +38,13 @@ const schema = z.object({
       linkedin: z.string().url("Valid LinkedIn URL required"),
     }),
   ),
-  depositAccepted: z.boolean().refine((value) => value, {
-    message: "You must agree to the refundable deposit on acceptance",
-  }),
+  ...(siteConfig.batchDepositRequired
+    ? {
+        depositAccepted: z.boolean().refine((value) => value, {
+          message: "You must agree to the refundable deposit on acceptance",
+        }),
+      }
+    : {}),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -91,7 +95,7 @@ export function ApplicationForm({
       linkedin: "",
       discordUsername: "",
       members: [],
-      depositAccepted: false,
+      ...(siteConfig.batchDepositRequired ? { depositAccepted: false } : {}),
     },
   });
 
@@ -353,30 +357,41 @@ export function ApplicationForm({
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-start gap-3">
-              <Controller
-                control={form.control}
-                name="depositAccepted"
-                render={({ field }) => (
-                  <Checkbox
-                    id="depositAccepted"
-                    checked={field.value}
-                    className="bg-secondary"
-                    onCheckedChange={(checked) => field.onChange(checked === true)}
-                    aria-invalid={Boolean(form.formState.errors.depositAccepted)}
+            {siteConfig.batchDepositRequired && (
+              <>
+                <div className="flex items-start gap-3">
+                  <Controller
+                    control={form.control}
+                    name="depositAccepted"
+                    render={({ field }) => (
+                      <Checkbox
+                        id="depositAccepted"
+                        checked={field.value}
+                        className="bg-secondary"
+                        onCheckedChange={(checked) =>
+                          field.onChange(checked === true)
+                        }
+                        aria-invalid={Boolean(
+                          form.formState.errors.depositAccepted,
+                        )}
+                      />
+                    )}
                   />
+                  <Label
+                    htmlFor="depositAccepted"
+                    className="font-normal leading-snug"
+                  >
+                    I agree to the Rp 3,010,000 deposit (Rp 3,000,000
+                    refundable + Rp 10,000 non-refundable transfer fee) if
+                    accepted into the batch.
+                  </Label>
+                </div>
+                {form.formState.errors.depositAccepted && (
+                  <p className="text-sm text-destructive">
+                    {form.formState.errors.depositAccepted.message}
+                  </p>
                 )}
-              />
-              <Label htmlFor="depositAccepted" className="font-normal leading-snug">
-                I agree to the Rp 3,010,000 deposit (Rp 3,000,000 refundable +
-                Rp 10,000 non-refundable transfer fee) if accepted into the
-                batch.
-              </Label>
-            </div>
-            {form.formState.errors.depositAccepted && (
-              <p className="text-sm text-destructive">
-                {form.formState.errors.depositAccepted.message}
-              </p>
+              </>
             )}
             <div className="flex items-start gap-3">
               <MessageCircle className="mt-0.5 size-4 shrink-0 text-muted-foreground" />

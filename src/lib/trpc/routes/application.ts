@@ -4,6 +4,7 @@ import { t } from "../trpc";
 import { applicantProcedure } from "../context";
 import { prisma } from "@/lib/prisma";
 import { sendApplicationReceivedEmail } from "@/lib/email";
+import { siteConfig } from "@/lib/seo";
 import {
   readPitchDeckMeta,
   resolvePitchDeckStoragePath,
@@ -145,6 +146,13 @@ export const applicationRouter = t.router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      if (!siteConfig.batchDepositRequired) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Batch deposit is not required at this time",
+        });
+      }
+
       const application = await prisma.application.findFirst({
         where: { id: input.applicationId, userId: ctx.user.id },
       });

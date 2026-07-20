@@ -73,8 +73,6 @@ export async function sendApplicationApprovedEmail(input: {
   applicantName: string;
   note?: string | null;
 }) {
-  const depositUrl = `${siteConfig.url}/dashboard/apply`;
-
   const lines = [
     "Congratulations, your application has been approved!",
     "",
@@ -82,14 +80,28 @@ export async function sendApplicationApprovedEmail(input: {
     "",
     `We're thrilled to let you know that your application for ${input.productName} has been approved. Welcome to the Fydemy batch! We can't wait to see what you build over the coming weeks.`,
     "",
-    "To confirm your spot in the batch, we ask for a deposit of Rp 3,010,000. Rp 3,000,000 of that amount is fully refundable, and Rp 10,000 covers a one-time, non-refundable transfer fee.",
-    "",
-    "Head to your dashboard to complete the deposit. You'll see the QRIS to scan and a field to submit your transaction ID:",
-    depositUrl,
-    "",
-    "Once your deposit is in, you can publish launches and access program materials. If you haven't already, join us on Discord and say hello so we can get you plugged into the community:",
-    siteConfig.discordInviteUrl,
   ];
+
+  if (siteConfig.batchDepositRequired) {
+    const depositUrl = `${siteConfig.url}/dashboard/apply`;
+    lines.push(
+      "To confirm your spot in the batch, we ask for a deposit of Rp 3,010,000. Rp 3,000,000 of that amount is fully refundable, and Rp 10,000 covers a one-time, non-refundable transfer fee.",
+      "",
+      "Head to your dashboard to complete the deposit. You'll see the QRIS to scan and a field to submit your transaction ID:",
+      depositUrl,
+      "",
+      "Once your deposit is in, you can publish launches and access program materials. If you haven't already, join us on Discord and say hello so we can get you plugged into the community:",
+      siteConfig.discordInviteUrl,
+    );
+  } else {
+    lines.push(
+      "Head to your dashboard to publish launches and access program materials:",
+      `${siteConfig.url}/dashboard/apply`,
+      "",
+      "If you haven't already, join us on Discord and say hello so we can get you plugged into the community:",
+      siteConfig.discordInviteUrl,
+    );
+  }
 
   if (input.note) {
     lines.push("", `A note from your reviewer: ${input.note}`);

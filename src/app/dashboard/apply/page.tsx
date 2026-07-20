@@ -141,7 +141,7 @@ export default function ApplyPage() {
             <StatusBadge status={application.status} />
           </CardHeader>
           <CardContent className="space-y-6">
-            {application.status === "APPROVED" && (
+            {application.status === "APPROVED" && siteConfig.batchDepositRequired && (
               <>
                 <div className="space-y-3 rounded-lg border bg-muted/20 p-4">
                   <div>
