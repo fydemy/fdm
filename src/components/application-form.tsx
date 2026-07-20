@@ -20,32 +20,36 @@ import { siteConfig } from "@/lib/seo";
 import { toast } from "sonner";
 import { Loader2, MessageCircle, Plus, Trash2, Upload } from "lucide-react";
 
-const schema = z.object({
-  name: z.string().min(1, "Product name is required"),
-  description: z.string().min(10, "Add a short description"),
-  websiteUrl: z
-    .string()
-    .refine((value) => !value || URL.canParse(value), "Enter a valid URL"),
-  linkedin: z.string().url("Valid LinkedIn URL required"),
-  discordUsername: z
-    .string()
-    .min(2, "Discord username is required")
-    .max(37, "Discord username is too long"),
-  members: z.array(
-    z.object({
-      name: z.string().min(1, "Name is required"),
-      email: z.string().email("Valid email required"),
-      linkedin: z.string().url("Valid LinkedIn URL required"),
-    }),
-  ),
-  ...(siteConfig.batchDepositRequired
-    ? {
-        depositAccepted: z.boolean().refine((value) => value, {
-          message: "You must agree to the refundable deposit on acceptance",
-        }),
-      }
-    : {}),
-});
+const schema = z
+  .object({
+    name: z.string().min(1, "Product name is required"),
+    description: z.string().min(10, "Add a short description"),
+    websiteUrl: z
+      .string()
+      .refine((value) => !value || URL.canParse(value), "Enter a valid URL"),
+    linkedin: z.string().url("Valid LinkedIn URL required"),
+    discordUsername: z
+      .string()
+      .min(2, "Discord username is required")
+      .max(37, "Discord username is too long"),
+    members: z.array(
+      z.object({
+        name: z.string().min(1, "Name is required"),
+        email: z.string().email("Valid email required"),
+        linkedin: z.string().url("Valid LinkedIn URL required"),
+      }),
+    ),
+    depositAccepted: z.boolean().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (siteConfig.batchDepositRequired && !data.depositAccepted) {
+      ctx.addIssue({
+        code: "custom",
+        message: "You must agree to the refundable deposit on acceptance",
+        path: ["depositAccepted"],
+      });
+    }
+  });
 
 type FormValues = z.infer<typeof schema>;
 
@@ -95,7 +99,7 @@ export function ApplicationForm({
       linkedin: "",
       discordUsername: "",
       members: [],
-      ...(siteConfig.batchDepositRequired ? { depositAccepted: false } : {}),
+      depositAccepted: false,
     },
   });
 
@@ -366,7 +370,7 @@ export function ApplicationForm({
                     render={({ field }) => (
                       <Checkbox
                         id="depositAccepted"
-                        checked={field.value}
+                        checked={field.value ?? false}
                         className="bg-secondary"
                         onCheckedChange={(checked) =>
                           field.onChange(checked === true)
