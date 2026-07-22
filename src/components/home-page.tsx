@@ -230,12 +230,14 @@ export function HomePage() {
                   Free
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Rp 360,000/$20 refundable deposit + Launch plan at Rakit.dev if pass.
+                  Rp 360,000/$20 (non-refundable) + Launch plan at Rakit.dev if
+                  pass.
                 </p>
               </div>
               <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>Minimum pass: ship and get traction</li>
                 <li>Starter plan at Rakit.dev and media boost</li>
-                <li>1-month traction sprint</li>
+                <li>1-month traction sprint in the exclusive community</li>
                 <li>Daily updates and community pressure</li>
                 <li>Opportunity to be moved to a serious founder program</li>
               </ul>
