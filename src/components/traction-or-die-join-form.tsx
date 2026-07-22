@@ -71,7 +71,7 @@ export function TractionOrDieJoinForm() {
       <CardHeader>
         <CardTitle>Join Traction or Die</CardTitle>
         <CardDescription>
-          Join for <b>$20 / Rp 360K</b> (non-refundable) to join the Traction
+          Join for <b>$50 / Rp 900,000</b> (non-refundable) to join the Traction
           or Die program. Minimum pass: ship and get traction.
         </CardDescription>
       </CardHeader>

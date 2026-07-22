@@ -186,6 +186,40 @@ export function HomePage() {
                 Join <ArrowRight />
               </Button>
             </div>
+            <div className="flex flex-col gap-6 rounded-xl border py-6 text-left">
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold tracking-tight">
+                  High-Growth Builders
+                </h3>
+                <p className="text-3xl font-semibold tracking-tight">
+                Rp 900,000 <span className="text-sm text-muted-foreground">/ $50</span>
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Launch plan at Rakit.dev and stays on the community if pass.
+                </p>
+              </div>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>Minimum pass: ship and get traction</li>
+                <li>Starter plan at Rakit.dev and media boost</li>
+                <li>1-month traction sprint in the exclusive community</li>
+                <li>Get kick out if don't pass within 1 month</li>
+                <li>Opportunity to be moved to a serious founder program</li>
+              </ul>
+              <Button
+                variant="outline"
+                className="mt-auto w-fit rounded-full"
+                onClick={() =>
+                  hasSession
+                    ? router.push("/dashboard/traction-or-die")
+                    : authClient.signIn.social({
+                        provider: "google",
+                        callbackURL: "/dashboard/traction-or-die",
+                      })
+                }
+              >
+                Traction or Die <ArrowRight />
+              </Button>
+            </div>
 
             <div className="flex flex-col gap-6 rounded-xl border py-6 text-left">
               <div className="space-y-2">
@@ -221,41 +255,6 @@ export function HomePage() {
               </Button>
             </div>
 
-            <div className="flex flex-col gap-6 rounded-xl border py-6 text-left">
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold tracking-tight">
-                  High-Growth Builders
-                </h3>
-                <p className="text-3xl font-semibold tracking-tight">
-                  Free
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Rp 360,000/$20 (non-refundable) + Launch plan at Rakit.dev if
-                  pass.
-                </p>
-              </div>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>Minimum pass: ship and get traction</li>
-                <li>Starter plan at Rakit.dev and media boost</li>
-                <li>1-month traction sprint in the exclusive community</li>
-                <li>Daily updates and community pressure</li>
-                <li>Opportunity to be moved to a serious founder program</li>
-              </ul>
-              <Button
-                variant="outline"
-                className="mt-auto w-fit rounded-full"
-                onClick={() =>
-                  hasSession
-                    ? router.push("/dashboard/traction-or-die")
-                    : authClient.signIn.social({
-                        provider: "google",
-                        callbackURL: "/dashboard/traction-or-die",
-                      })
-                }
-              >
-                Traction or Die <ArrowRight />
-              </Button>
-            </div>
           </div>
         </section>
 
