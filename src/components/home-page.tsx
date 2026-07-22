@@ -101,7 +101,7 @@ export function HomePage() {
           </div>
           <div>
             <h2 className="text-sm text-muted-foreground">Our Alumni</h2>
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-8">
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-x-8">
               <img
                 src="/logo/nus.png"
                 alt="NUS"
@@ -128,7 +128,7 @@ export function HomePage() {
               {testimonials.map((testimonial) => (
                 <article
                   key={testimonial.name}
-                  className="rounded-2xl border bg-card p-4 text-left shadow-sm"
+                  className="rounded-2xl border bg-card py-4 text-left shadow-sm"
                 >
                   <div className="flex items-start gap-3">
                     <img
@@ -170,7 +170,7 @@ export function HomePage() {
             <div className="flex flex-col gap-6 rounded-xl border border-dashed py-6 text-left">
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold tracking-tight">
-                  Founding members
+                  Founding Members
                 </h3>
                 <p className="text-3xl font-semibold tracking-tight">Free</p>
                 <p className="text-sm text-muted-foreground">

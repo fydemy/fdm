@@ -9,7 +9,7 @@ export const siteConfig = {
     deadlineLabel: "end of July",
   },
   /** Set to true to re-enable the batch deposit flow (form, email, dashboard). */
-  batchDepositRequired: false,
+  batchDepositRequired: true,
   discordInviteUrl: "https://discord.gg/7FBpTEXqVj",
   links: {
     events: "https://luma.com/fydemy",
