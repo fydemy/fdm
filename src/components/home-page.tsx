@@ -225,11 +225,11 @@ export function HomePage() {
                 </p>
               </div>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>Get all the benefits of Ship fast & robust</li>
+                <li>Get all the benefits of High-Growth Builders</li>
                 <li>1-on-1 mentoring sessions</li>
                 <li>Exclusive exchange program to access builders from MIT, Stanford, Harvard, and other top universities founders</li>
                 <li>Investor and partner access matchmaking</li>
-                <li>Lifetime alumni access and deferral option</li>
+                <li>Lifetime access as alumni with deferral option</li>
               </ul>
               <Button
                 className="mt-auto w-fit rounded-full"
