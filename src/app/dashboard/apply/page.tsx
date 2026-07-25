@@ -3,10 +3,9 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc/client";
 import { ApplicationForm } from "@/components/application-form";
-import { DepositDialog } from "@/components/deposit-dialog";
 import { ProductLogo } from "@/components/product-logo";
 import { StatusBadge } from "@/components/status-badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -17,7 +16,9 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { siteConfig } from "@/lib/seo";
+import { cn } from "@/lib/utils";
 import { ApplicationScreeningView } from "@/components/application-screening-view";
+import { ExternalLink } from "lucide-react";
 import { getApplicationSummary } from "@/lib/screening";
 import { ExternalLink } from "lucide-react";
 
@@ -143,15 +144,18 @@ export default function ApplyPage() {
                       Confirm your spot — deposit
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      {application.depositTransactionId
-                        ? `Deposit submitted. Transaction ID: ${application.depositTransactionId} (pending verification).`
-                        : "Pay the $300 deposit to lock in your place in the batch."}
+                      Pay the $300 deposit to lock in your place in the batch.
                     </p>
                   </div>
-                  <DepositDialog
-                    applicationId={application.id}
-                    depositSubmitted={Boolean(application.depositTransactionId)}
-                  />
+                  <a
+                    href={siteConfig.depositPaymentUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={cn(buttonVariants(), "w-fit")}
+                  >
+                    Pay $300 with Polar
+                    <ExternalLink className="size-4" />
+                  </a>
                 </div>
                 <Separator />
               </>

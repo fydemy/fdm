@@ -4,7 +4,6 @@ import { t } from "../trpc";
 import { applicantProcedure } from "../context";
 import { prisma } from "@/lib/prisma";
 import { sendApplicationReceivedEmail } from "@/lib/email";
-import { siteConfig } from "@/lib/seo";
 import {
   readPitchDeckMeta,
   resolvePitchDeckStoragePath,
@@ -167,47 +166,5 @@ export const applicationRouter = t.router({
       });
 
       return application;
-    }),
-
-  submitDeposit: applicantProcedure
-    .input(
-      z.object({
-        applicationId: z.string().min(1),
-        transactionId: z.string().min(3).max(120),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      if (!siteConfig.batchDepositRequired) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Batch deposit is not required at this time",
-        });
-      }
-
-      const application = await prisma.application.findFirst({
-        where: { id: input.applicationId, userId: ctx.user.id },
-      });
-
-      if (!application) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Application not found",
-        });
-      }
-
-      if (application.status !== "APPROVED") {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Only approved applications can submit a deposit",
-        });
-      }
-
-      return prisma.application.update({
-        where: { id: application.id },
-        data: {
-          depositTransactionId: input.transactionId.trim(),
-          depositSubmittedAt: new Date(),
-        },
-      });
     }),
 });

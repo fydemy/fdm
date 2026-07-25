@@ -83,17 +83,16 @@ export async function sendApplicationApprovedEmail(input: {
   ];
 
   if (siteConfig.batchDepositRequired) {
-    const depositUrl = `${siteConfig.url}/dashboard/apply`;
     lines.push(
       "To confirm your spot in the batch, we ask for a $300 deposit.",
       "",
       "Pay here:",
       siteConfig.depositPaymentUrl,
       "",
-      "Then head to your dashboard and submit your payment transaction ID:",
-      depositUrl,
+      "Once paid, you can publish launches and access program materials from your dashboard:",
+      `${siteConfig.url}/dashboard/apply`,
       "",
-      "Once your deposit is in, you can publish launches and access program materials. If you haven't already, join us on Discord and say hello so we can get you plugged into the community:",
+      "If you haven't already, join us on Discord and say hello so we can get you plugged into the community:",
       siteConfig.discordInviteUrl,
     );
   } else {
