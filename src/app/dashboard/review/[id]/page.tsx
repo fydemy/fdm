@@ -61,6 +61,15 @@ export default function ReviewDetailPage({
     onError: (error) => toast.error(error.message),
   });
 
+  const setFeePaid = trpc.review.setFeePaid.useMutation({
+    onSuccess: async (_, variables) => {
+      await utils.review.getApplication.invalidate({ id });
+      await utils.review.listApplications.invalidate();
+      toast.success(variables.feePaid ? "Marked fee as paid" : "Marked fee as unpaid");
+    },
+    onError: (error) => toast.error(error.message),
+  });
+
   if (meLoading || isLoading) return <Skeleton className="h-96" />;
 
   if (!me?.isReviewer) {
@@ -112,6 +121,16 @@ export default function ReviewDetailPage({
                 {REVIEW_STATUS_LABELS[reviewStatus]}
               </span>
             ) : null}
+            <span
+              className={cn(
+                "rounded-md border px-2 py-0.5 text-xs",
+                application.feePaid
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                  : "text-muted-foreground",
+              )}
+            >
+              {application.feePaid ? "Fee paid" : "Fee unpaid"}
+            </span>
           </div>
           <p className="text-muted-foreground">
             {getApplicationSummary(application.description)}
@@ -141,6 +160,32 @@ export default function ReviewDetailPage({
           </div>
         )}
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Fee</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-wrap items-center gap-3">
+          <p className="text-sm text-muted-foreground">
+            {application.feePaid
+              ? "Deposit / fee has been marked as paid."
+              : "Deposit / fee has not been paid yet."}
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={setFeePaid.isPending}
+            onClick={() =>
+              setFeePaid.mutate({
+                id: application.id,
+                feePaid: !application.feePaid,
+              })
+            }
+          >
+            Mark as {application.feePaid ? "unpaid" : "paid"}
+          </Button>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>

@@ -102,6 +102,32 @@ export const reviewRouter = t.router({
       });
     }),
 
+  setFeePaid: reviewerProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        feePaid: z.boolean(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const application = await prisma.application.findUnique({
+        where: { id: input.id },
+        select: { id: true },
+      });
+
+      if (!application) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Application not found",
+        });
+      }
+
+      return prisma.application.update({
+        where: { id: input.id },
+        data: { feePaid: input.feePaid },
+      });
+    }),
+
   decide: reviewerProcedure
     .input(
       z.object({

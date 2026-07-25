@@ -118,6 +118,7 @@ export default function ReviewPage() {
                   <TableHead>Applicant</TableHead>
                   <TableHead>Screening</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Fee</TableHead>
                   <TableHead>Launches</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -147,6 +148,9 @@ export default function ReviewPage() {
                     </TableCell>
                     <TableCell>
                       <StatusBadge status={application.status} />
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {application.feePaid ? "Paid" : "Unpaid"}
                     </TableCell>
                     <TableCell>{application._count.launches}</TableCell>
                     <TableCell className="space-x-2 text-right">

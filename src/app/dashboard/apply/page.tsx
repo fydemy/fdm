@@ -18,7 +18,6 @@ import { Separator } from "@/components/ui/separator";
 import { siteConfig } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 import { ApplicationScreeningView } from "@/components/application-screening-view";
-import { ExternalLink } from "lucide-react";
 import { getApplicationSummary } from "@/lib/screening";
 import { ExternalLink } from "lucide-react";
 
@@ -144,18 +143,22 @@ export default function ApplyPage() {
                       Confirm your spot — deposit
                     </h3>
                     <p className="text-sm text-muted-foreground">
-                      Pay the $300 deposit to lock in your place in the batch.
+                      {application.feePaid
+                        ? "Fee marked as paid."
+                        : "Pay the $300 deposit to lock in your place in the batch."}
                     </p>
                   </div>
-                  <a
-                    href={siteConfig.depositPaymentUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className={cn(buttonVariants(), "w-fit")}
-                  >
-                    Pay $300 with Polar
-                    <ExternalLink className="size-4" />
-                  </a>
+                  {!application.feePaid ? (
+                    <a
+                      href={siteConfig.depositPaymentUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={cn(buttonVariants(), "w-fit")}
+                    >
+                      Pay $300 with Polar
+                      <ExternalLink className="size-4" />
+                    </a>
+                  ) : null}
                 </div>
                 <Separator />
               </>
