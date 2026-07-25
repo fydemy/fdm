@@ -2,7 +2,7 @@ import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { siteConfig } from "@/lib/seo";
 import { cn } from "@/lib/utils";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MessageCircle } from "lucide-react";
 
 export function PublicSiteHeader({ title }: { title?: string }) {
   return (
@@ -27,16 +27,30 @@ export function PublicSiteHeader({ title }: { title?: string }) {
           {title ? (
             <p className="min-w-0 truncate text-sm font-medium">{title}</p>
           ) : (
-            <Link
-              href="/launches"
-              className={cn(
-                buttonVariants({
-                  variant: "outline",
-                }),
-              )}
-            >
-              Browse <ArrowRight />
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/launches"
+                className={cn(
+                  buttonVariants({
+                    variant: "outline",
+                  }),
+                )}
+              >
+                Browse <ArrowRight />
+              </Link>
+              <Link
+                href="https://wa.me/6587470061"
+                target="_blank"
+                rel="noreferrer"
+                className={cn(
+                  buttonVariants({
+                    variant: "outline",
+                  }),
+                )}
+              >
+                <MessageCircle /> Talk
+              </Link>
+            </div>
           )}
         </div>
       </header>

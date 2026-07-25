@@ -5,6 +5,7 @@ import Link from "next/link";
 import { trpc } from "@/lib/trpc/client";
 import { ProductLogo } from "@/components/product-logo";
 import { StatusBadge } from "@/components/status-badge";
+import { ApplicationScreeningView } from "@/components/application-screening-view";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { getApplicationSummary } from "@/lib/screening";
 import { ArrowLeft } from "lucide-react";
 
 export default function MentorApplicationDetailPage({
@@ -72,7 +74,9 @@ export default function MentorApplicationDetailPage({
           </h1>
           <StatusBadge status={application.status} />
         </div>
-        <p className="text-muted-foreground">{application.description}</p>
+        <p className="text-muted-foreground">
+          {getApplicationSummary(application.description)}
+        </p>
         {application.websiteUrl && (
           <a
             href={application.websiteUrl}
@@ -84,6 +88,15 @@ export default function MentorApplicationDetailPage({
           </a>
         )}
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Screening application</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ApplicationScreeningView description={application.description} />
+        </CardContent>
+      </Card>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>

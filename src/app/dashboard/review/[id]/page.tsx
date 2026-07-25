@@ -5,6 +5,8 @@ import Link from "next/link";
 import { trpc } from "@/lib/trpc/client";
 import { ProductLogo } from "@/components/product-logo";
 import { StatusBadge } from "@/components/status-badge";
+import { ApplicationScreeningView } from "@/components/application-screening-view";
+import { ScreeningEvaluationPanel } from "@/components/screening-evaluation-panel";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
@@ -25,6 +27,11 @@ import {
 } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  getApplicationSummary,
+  parseScreeningPayload,
+  REVIEW_STATUS_LABELS,
+} from "@/lib/screening";
 import { toast } from "sonner";
 import { ArrowLeft, Check, X } from "lucide-react";
 
@@ -76,6 +83,9 @@ export default function ReviewDetailPage({
     );
   }
 
+  const screening = parseScreeningPayload(application.description);
+  const reviewStatus = screening?.evaluation?.decision.review_status;
+
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -87,7 +97,7 @@ export default function ReviewDetailPage({
             <ArrowLeft className="size-4" />
             Back
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <ProductLogo
               src={application.logoUrl}
               name={application.name}
@@ -97,8 +107,15 @@ export default function ReviewDetailPage({
               {application.name}
             </h1>
             <StatusBadge status={application.status} />
+            {reviewStatus ? (
+              <span className="rounded-md border px-2 py-0.5 text-xs text-muted-foreground">
+                {REVIEW_STATUS_LABELS[reviewStatus]}
+              </span>
+            ) : null}
           </div>
-          <p className="text-muted-foreground">{application.description}</p>
+          <p className="text-muted-foreground">
+            {getApplicationSummary(application.description)}
+          </p>
           {application.websiteUrl && (
             <a
               href={application.websiteUrl}
@@ -133,10 +150,10 @@ export default function ReviewDetailPage({
           <CardContent className="text-sm">
             <div className="font-medium">{application.user.name}</div>
             <div className="text-muted-foreground">{application.user.email}</div>
-            {application.linkedin && (
+            {screening?.form.founder.founder_contact ? (
               <div className="mt-2">
                 <a
-                  href={application.linkedin}
+                  href={screening.form.founder.founder_contact}
                   target="_blank"
                   rel="noreferrer"
                   className="text-primary underline"
@@ -144,7 +161,7 @@ export default function ReviewDetailPage({
                   LinkedIn
                 </a>
               </div>
-            )}
+            ) : null}
             {application.discordUsername && (
               <div className="mt-2 text-muted-foreground">
                 Discord: {application.discordUsername}
@@ -169,6 +186,25 @@ export default function ReviewDetailPage({
           </CardContent>
         </Card>
       </div>
+
+      {screening ? (
+        <ScreeningEvaluationPanel
+          applicationId={application.id}
+          description={application.description}
+        />
+      ) : null}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Screening application</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ApplicationScreeningView
+            description={application.description}
+            showEvaluation
+          />
+        </CardContent>
+      </Card>
 
       {application.members.length > 0 && (
         <Card>

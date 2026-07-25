@@ -34,6 +34,10 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
+import {
+  parseScreeningPayload,
+  REVIEW_STATUS_LABELS,
+} from "@/lib/screening";
 import { Check, Eye, X } from "lucide-react";
 
 type StatusFilter = "ALL" | "PENDING" | "APPROVED" | "REJECTED";
@@ -112,14 +116,18 @@ export default function ReviewPage() {
                 <TableRow>
                   <TableHead>Product</TableHead>
                   <TableHead>Applicant</TableHead>
-                  <TableHead>Members</TableHead>
+                  <TableHead>Screening</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Launches</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {(applications ?? []).map((application) => (
+                {(applications ?? []).map((application) => {
+                  const evaluation = parseScreeningPayload(
+                    application.description,
+                  )?.evaluation;
+                  return (
                   <TableRow key={application.id}>
                     <TableCell className="font-medium">
                       {application.name}
@@ -130,7 +138,13 @@ export default function ReviewPage() {
                         {application.user.email}
                       </div>
                     </TableCell>
-                    <TableCell>{application.members.length}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {evaluation
+                        ? REVIEW_STATUS_LABELS[
+                            evaluation.decision.review_status
+                          ]
+                        : "—"}
+                    </TableCell>
                     <TableCell>
                       <StatusBadge status={application.status} />
                     </TableCell>
@@ -178,7 +192,8 @@ export default function ReviewPage() {
                       )}
                     </TableCell>
                   </TableRow>
-                ))}
+                );
+                })}
               </TableBody>
             </Table>
           )}

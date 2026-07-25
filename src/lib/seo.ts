@@ -6,10 +6,12 @@ export const siteConfig = {
     "Build what they can't live without. Product launches from the Fydemy community.",
   batchSeason: {
     number: 3,
-    deadlineLabel: "end of July",
+    deadlineLabel: "end of August",
   },
   /** Set to true to re-enable the batch deposit flow (form, email, dashboard). */
   batchDepositRequired: true,
+  depositPaymentUrl:
+    "https://buy.polar.sh/polar_cl_Tk3KQeZcS1xSvzm59NlN72gkayjYLObKLymF53xZwmS",
   discordInviteUrl: "https://discord.gg/7FBpTEXqVj",
   links: {
     events: "https://luma.com/fydemy",

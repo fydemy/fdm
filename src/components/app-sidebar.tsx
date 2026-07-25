@@ -23,7 +23,6 @@ import {
   MessageCircleIcon,
   PackageIcon,
   RocketIcon,
-  ZapIcon,
 } from "lucide-react";
 
 const discordNavItem: NavItem = {
@@ -53,11 +52,6 @@ const applicantNav: NavItem[] = [
     title: "Materials",
     url: "/dashboard/materials",
     icon: <PackageIcon />,
-  },
-  {
-    title: "Traction or Die",
-    url: "/dashboard/traction-or-die",
-    icon: <ZapIcon />,
   },
   discordNavItem,
 ];

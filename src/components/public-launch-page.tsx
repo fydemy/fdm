@@ -11,6 +11,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
+import { getApplicationSummary } from "@/lib/screening";
 import { ArrowLeft } from "lucide-react";
 
 export function PublicLaunchPage({ slug }: { slug: string }) {
@@ -79,7 +80,7 @@ export function PublicLaunchPage({ slug }: { slug: string }) {
                   )}
                   {launch.application.description && (
                     <p className="text-sm text-muted-foreground">
-                      {launch.application.description}
+                      {getApplicationSummary(launch.application.description)}
                     </p>
                   )}
                 </div>

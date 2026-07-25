@@ -8,6 +8,11 @@ import {
   sendApplicationApprovedEmail,
   sendApplicationRejectedEmail,
 } from "@/lib/email";
+import {
+  encodeScreeningPayload,
+  parseScreeningPayload,
+  screeningEvaluationSchema,
+} from "@/lib/screening";
 
 export const reviewRouter = t.router({
   listApplications: reviewerProcedure
@@ -56,6 +61,45 @@ export const reviewRouter = t.router({
       }
 
       return application;
+    }),
+
+  saveEvaluation: reviewerProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        evaluation: screeningEvaluationSchema,
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const application = await prisma.application.findUnique({
+        where: { id: input.id },
+      });
+
+      if (!application) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Application not found",
+        });
+      }
+
+      const payload = parseScreeningPayload(application.description);
+      if (!payload) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message:
+            "This application has no structured screening data to evaluate",
+        });
+      }
+
+      return prisma.application.update({
+        where: { id: input.id },
+        data: {
+          description: encodeScreeningPayload({
+            ...payload,
+            evaluation: input.evaluation,
+          }),
+        },
+      });
     }),
 
   decide: reviewerProcedure

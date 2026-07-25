@@ -17,6 +17,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { siteConfig } from "@/lib/seo";
+import { ApplicationScreeningView } from "@/components/application-screening-view";
+import { getApplicationSummary } from "@/lib/screening";
 import { ExternalLink } from "lucide-react";
 
 export default function ApplyPage() {
@@ -110,7 +112,9 @@ export default function ApplyPage() {
               />
               <div>
                 <CardTitle>{application.name}</CardTitle>
-                <CardDescription>{application.description}</CardDescription>
+                <CardDescription>
+                  {getApplicationSummary(application.description)}
+                </CardDescription>
                 {application.websiteUrl && (
                   <a
                     href={application.websiteUrl}
@@ -119,16 +123,6 @@ export default function ApplyPage() {
                     className="mt-1 inline-block text-sm text-primary underline"
                   >
                     {application.websiteUrl}
-                  </a>
-                )}
-                {application.linkedin && (
-                  <a
-                    href={application.linkedin}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-1 inline-block text-sm text-primary underline"
-                  >
-                    LinkedIn
                   </a>
                 )}
                 {application.discordUsername && (
@@ -151,7 +145,7 @@ export default function ApplyPage() {
                     <p className="text-sm text-muted-foreground">
                       {application.depositTransactionId
                         ? `Deposit submitted. Transaction ID: ${application.depositTransactionId} (pending verification).`
-                        : "Pay the Rp 3,010,000 refundable deposit to lock in your place in the batch."}
+                        : "Pay the $300 deposit to lock in your place in the batch."}
                     </p>
                   </div>
                   <DepositDialog
@@ -162,6 +156,13 @@ export default function ApplyPage() {
                 <Separator />
               </>
             )}
+
+            <div>
+              <h3 className="mb-3 text-sm font-medium">Screening details</h3>
+              <ApplicationScreeningView description={application.description} />
+            </div>
+
+            <Separator />
 
             <div>
               <h3 className="mb-2 text-sm font-medium">Pitch deck</h3>

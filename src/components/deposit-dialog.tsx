@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { trpc } from "@/lib/trpc/client";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -15,10 +15,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { siteConfig } from "@/lib/seo";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
-
-const qrisImage = "/logo/qris.png";
+import { ExternalLink, Loader2 } from "lucide-react";
 
 const schema = z.object({
   transactionId: z
@@ -73,20 +73,23 @@ export function DepositDialog({
           <DialogHeader>
             <DialogTitle>Confirm your spot</DialogTitle>
             <DialogDescription>
-              Pay the Rp 3,010,000 deposit (Rp 3,000,000 refundable + Rp 10,000
-              non-refundable transfer fee), then paste your transaction ID
-              below.
+              Pay the $300 deposit via Polar, then paste your payment receipt
+              or transaction ID below.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label>Payable with GoPay, QRIS, DBS PayLah</Label>
-              <img
-                src={qrisImage}
-                alt="QRIS payment code"
-                className="w-56 aspect-square object-contain"
-              />
-            </div>
+            <a
+              href={siteConfig.depositPaymentUrl}
+              target="_blank"
+              rel="noreferrer"
+              className={cn(
+                buttonVariants({ variant: "secondary" }),
+                "w-full",
+              )}
+            >
+              Pay $300 with Polar
+              <ExternalLink className="size-4" />
+            </a>
 
             <div className="space-y-2">
               <Label htmlFor="transactionId">Transaction ID</Label>

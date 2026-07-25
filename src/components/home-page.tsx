@@ -16,13 +16,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { siteConfig } from "@/lib/seo";
-import { ArrowRight, MessageCircle } from "lucide-react";
+import { ArrowRight, Code2 } from "lucide-react";
 
 const testimonials = [
   {
     name: "Nabila Rahmadani",
     image: "/profile/nabila.png",
-    role: "1M+ followers @Tiktok, Founder @CariKOL (formerly Buzzeryok)",
+    role: "100K+ followers, Founder @CariKOL (formerly Buzzeryok)",
     quote:
       "Thanks so much for the full guide in the PPT; it answered several questions I had about the build that I’d been struggling with since yesterday 😭.",
   },
@@ -80,7 +80,7 @@ export function HomePage() {
               Build what they can't live without.
             </h1>
             <p className="text-lg text-muted-foreground">
-              1 mo. acc. Make it VC-standard products.
+              Don't build alone. 😭
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-3">
@@ -97,7 +97,17 @@ export function HomePage() {
             >
               {hasSession ? "Dashboard" : "Apply"} <ArrowRight />
             </Button>
-            <Link href="https://wa.me/6587470061" target="_blank" rel="noreferrer" className={buttonVariants({ variant: "secondary", className: "rounded-full! px-12 py-6" })}><MessageCircle /> Talk</Link>
+            <Link
+              href={siteConfig.discordInviteUrl}
+              target="_blank"
+              rel="noreferrer"
+              className={buttonVariants({
+                variant: "secondary",
+                className: "rounded-full! px-12 py-6",
+              })}
+            >
+              Join Community
+            </Link>
           </div>
           <div>
             <h2 className="text-sm text-muted-foreground">Our Alumni</h2>
@@ -120,10 +130,8 @@ export function HomePage() {
             </div>
           </div>
 
-          <div className="w-full space-y-4 text-left mt-24">
-            <h2 className="text-center text-sm text-muted-foreground">
-              What Founders say
-            </h2>
+          <div className="w-full space-y-16 text-left mt-24">
+            <h2 className="text-2xl font-semibold tracking-tight">⤵️ What Founders say?</h2>
             <div className="grid gap-4 md:grid-cols-2">
               {testimonials.map((testimonial) => (
                 <article
@@ -158,33 +166,29 @@ export function HomePage() {
       </div>
 
       <main className="mx-auto w-full max-w-4xl flex-1 space-y-24 px-6 pb-20">
-        <section className="space-y-10">
-          <div className="space-y-2 text-center">
-            <h2 className="text-2xl font-semibold tracking-tight">Pricing</h2>
-            <p className="text-muted-foreground">
-              Choose the path that fits where you are.
-            </p>
-          </div>
+        <section className="space-y-16">
+          <h2 className="text-2xl font-semibold tracking-tight">📦 Pricing</h2>
 
           <div className="grid gap-4 md:grid-cols-3">
             <div className="flex flex-col gap-6 rounded-xl border border-dashed py-6 text-left">
               <div className="space-y-2">
                 <h3 className="text-lg font-semibold tracking-tight">
-                  Founding Members
+                  Ship fast & robust
                 </h3>
-                <p className="text-3xl font-semibold tracking-tight">Free</p>
+                <p className="text-3xl font-semibold tracking-tight">$99</p>
                 <p className="text-sm text-muted-foreground">
-                  Get started here.
+                  Trim your ship process from <b>weeks to minutes</b>.
                 </p>
               </div>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>Community access</li>
-                <li>SG project opportunities</li>
-                <li>Early access to new updates</li>
+                <li>Used by Software Engineers @TikTok, PayPal, those who understand fundamentals and 3+ years of experience</li>
+                <li>Includes global payment gateway, automate boring stuff (SEO, Backend, etc)</li>
+                <li>Lifetime updates</li>
+                <li>Priority support</li>
               </ul>
-              <Button className="mt-auto w-fit rounded-full" variant="secondary" onClick={() => router.push(siteConfig.discordInviteUrl)}>
-                Join <ArrowRight />
-              </Button>
+              <Link href="https://buy.polar.sh/polar_cl_1Q65p8mRHXOe9DnEplslNeYqof5pDPfyBFj980gwyJj" target="_blank" rel="noreferrer" className={buttonVariants({ variant: "secondary", className: "mt-auto w-fit rounded-full" })}>
+                <Code2 /> Get now 
+              </Link>
             </div>
             <div className="flex flex-col gap-6 rounded-xl border py-6 text-left">
               <div className="space-y-2">
@@ -192,33 +196,22 @@ export function HomePage() {
                   High-Growth Builders
                 </h3>
                 <p className="text-3xl font-semibold tracking-tight">
-                Rp 900,000 <span className="text-sm text-muted-foreground">/ $50</span>
+                  $150
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Launch plan at Rakit.dev and stays on the community if pass.
+                  Get the <b>preasure & resources</b> of shipping from the peer alumni & founders.
                 </p>
               </div>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>Minimum pass: ship and get traction</li>
-                <li>Starter plan at Rakit.dev and media boost</li>
-                <li>1-month traction sprint in the exclusive community</li>
-                <li>Get kick out if don't pass within 1 month</li>
-                <li>Opportunity to be moved to a serious founder program</li>
+                <li>Claude AI resources for your development and vibe coding</li>
+                <li><a href="https://rakit.dev" target="_blank" rel="noreferrer" className="underline font-bold">Rakit, AI App Builder</a> Launch Plan</li>
+                <li>Get the Ship fast & robust benefits</li>
+                <li>Ship and get traction or kick out from exclusive community within 1 month</li>
+                <li>Gamified 1 month calendar roadmap journey</li>
               </ul>
-              <Button
-                variant="outline"
-                className="mt-auto w-fit rounded-full"
-                onClick={() =>
-                  hasSession
-                    ? router.push("/dashboard/traction-or-die")
-                    : authClient.signIn.social({
-                        provider: "google",
-                        callbackURL: "/dashboard/traction-or-die",
-                      })
-                }
-              >
-                Traction or Die <ArrowRight />
-              </Button>
+              <Link href="https://buy.polar.sh/polar_cl_9TTcukj3Owi05kuQAfl0fGrIoSjGZTBzjQP9r4LLrK7" target="_blank" rel="noreferrer" className={buttonVariants({ variant: "secondary", className: "mt-auto w-fit rounded-full" })}>
+                Join now <ArrowRight />
+              </Link>
             </div>
 
             <div className="flex flex-col gap-6 rounded-xl border py-6 text-left">
@@ -226,19 +219,17 @@ export function HomePage() {
                 <h3 className="text-lg font-semibold tracking-tight">
                   Serious Founders
                 </h3>
-                <p className="text-3xl font-semibold tracking-tight">Free</p>
+                <p className="text-3xl font-semibold tracking-tight">$300 <span className="text-sm font-normal text-muted-foreground">Upon acceptance</span></p>
                 <p className="text-sm text-muted-foreground">
-                  {siteConfig.batchDepositRequired
-                    ? "Rp 3,000,000/$167 refundable deposit on acceptance."
-                    : "Quarterly Acceleration"}
+                  Get real 1-on-1 mentoring from <b>VC-backed Founders</b>.
                 </p>
               </div>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>2-month VC-standard sprint</li>
-                <li>1-on-1 mentors, media boost, and AI infra</li>
-                <li>Co-working space access</li>
-                <li>Exclusive community access to the alumni and top universities founders</li>
+                <li>Get all the benefits of Ship fast & robust</li>
+                <li>1-on-1 mentoring sessions</li>
+                <li>Exclusive exchange program to access builders from MIT, Stanford, Harvard, and other top universities founders</li>
                 <li>Investor and partner access matchmaking</li>
+                <li>Lifetime alumni access and deferral option</li>
               </ul>
               <Button
                 className="mt-auto w-fit rounded-full"
@@ -259,9 +250,9 @@ export function HomePage() {
         </section>
 
        {!isLoading && (featured ?? []).length === 0 ? null : (
-       <section className="space-y-10">
+       <section className="space-y-16">
         <h2 className="text-2xl font-semibold tracking-tight">
-          Featured
+          ⭐️ Featured Startups
         </h2>
         {isLoading && (
             <div className="grid gap-4 md:grid-cols-2">
@@ -278,9 +269,9 @@ export function HomePage() {
        </section>
        )}
 
-        <section className="space-y-6">
-          <h2 className="text-center text-2xl font-semibold tracking-tight">
-            FAQ
+        <section className="space-y-16">
+          <h2 className="text-2xl font-semibold tracking-tight">
+            ❓ FAQ
           </h2>
           <Accordion>
             <AccordionItem value="vc-funding">
@@ -291,30 +282,6 @@ export function HomePage() {
                 <p>
                   No, we don&apos;t guarantee funding. Getting funded depends
                   100% on your product&apos;s traction and execution.
-                </p>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="upfront-fee">
-              <AccordionTrigger>
-                Is there any upfront fee or hidden cash cost to join?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground">
-                <p>
-                  {siteConfig.batchDepositRequired
-                    ? "There's no cost to join the program itself. We only require a fully refundable Rp 3,000,000 deposit to reserve your place. In our experience, this small commitment keeps founders engaged, encourages them to show up consistently, and helps them get the most out of the program—resulting in a more dedicated and focused cohort."
-                    : "No. The batch program is free to join. We know you need every rupiah to focus on your product, so there is no upfront fee or hidden cash cost."}
-                </p>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="what-you-get">
-              <AccordionTrigger>
-                What do you invest to help us build?
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground">
-                <p>
-                  We invest our resources in mentors, cloud infrastructure, co-working venues across Indonesia, and our network of YC founders, MIT, Stanford, Harvard, and other top universities to help you build your product.
                 </p>
               </AccordionContent>
             </AccordionItem>

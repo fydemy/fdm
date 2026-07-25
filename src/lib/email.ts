@@ -85,9 +85,12 @@ export async function sendApplicationApprovedEmail(input: {
   if (siteConfig.batchDepositRequired) {
     const depositUrl = `${siteConfig.url}/dashboard/apply`;
     lines.push(
-      "To confirm your spot in the batch, we ask for a deposit of Rp 3,010,000. Rp 3,000,000 of that amount is fully refundable, and Rp 10,000 covers a one-time, non-refundable transfer fee.",
+      "To confirm your spot in the batch, we ask for a $300 deposit.",
       "",
-      "Head to your dashboard to complete the deposit. You'll see the QRIS to scan and a field to submit your transaction ID:",
+      "Pay here:",
+      siteConfig.depositPaymentUrl,
+      "",
+      "Then head to your dashboard and submit your payment transaction ID:",
       depositUrl,
       "",
       "Once your deposit is in, you can publish launches and access program materials. If you haven't already, join us on Discord and say hello so we can get you plugged into the community:",

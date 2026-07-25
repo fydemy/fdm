@@ -12,8 +12,7 @@ function isWorkspacePath(pathname: string) {
     pathname === "/dashboard" ||
     pathname.startsWith("/dashboard/apply") ||
     pathname.startsWith("/dashboard/launches") ||
-    pathname.startsWith("/dashboard/materials") ||
-    pathname.startsWith("/dashboard/traction-or-die")
+    pathname.startsWith("/dashboard/materials")
   );
 }
 

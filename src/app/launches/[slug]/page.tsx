@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PublicLaunchPage } from "@/components/public-launch-page";
 import { prisma } from "@/lib/prisma";
+import { getApplicationSummary } from "@/lib/screening";
 import { siteConfig } from "@/lib/seo";
 
 type PageProps = {
@@ -44,7 +45,9 @@ export async function generateMetadata({
   }
 
   const description =
-    plainText(launch.application.description || launch.content) ||
+    plainText(
+      getApplicationSummary(launch.application.description) || launch.content,
+    ) ||
     `${launch.title} by ${launch.application.name} on ${siteConfig.name}`;
   const logoUrl = launch.application.logoUrl ?? undefined;
   const image = logoUrl
