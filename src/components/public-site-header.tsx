@@ -4,18 +4,34 @@ import { siteConfig } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 import { ArrowRight, MessageCircle } from "lucide-react";
 
+function BannerMessages({ "aria-hidden": ariaHidden }: { "aria-hidden"?: boolean }) {
+  return (
+    <span aria-hidden={ariaHidden} className="inline-flex">
+      <span className="mx-8 inline-flex items-center gap-1">
+        <span>
+          🚀 Batch S{siteConfig.batchSeason.number} is closed at the
+        </span>
+        <span className="font-semibold text-foreground">
+          {siteConfig.batchSeason.deadlineLabel}
+        </span>
+        <span>. Apply anytime for the next season!</span>
+      </span>
+      <span className="mx-8 inline-flex items-center gap-1">
+        <span>🤑 Limited time offer: Use code</span>
+        <span className="font-semibold text-foreground">FORYOU</span>
+        <span>to get 50% off!</span>
+      </span>
+    </span>
+  );
+}
+
 export function PublicSiteHeader({ title }: { title?: string }) {
   return (
     <div className="border-b bg-background">
-      <div className="bg-primary/5">
-        <div className="mx-auto max-w-4xl px-6 py-3 text-center text-sm">
-          <span className="font-semibold">
-            Batch Season {siteConfig.batchSeason.number} is coming
-          </span>
-          <span className="text-muted-foreground">
-            {" "}
-            — apply before the {siteConfig.batchSeason.deadlineLabel}
-          </span>
+      <div className="overflow-hidden bg-primary/5">
+        <div className="flex w-max animate-marquee whitespace-nowrap py-3 text-sm text-muted-foreground">
+          <BannerMessages />
+          <BannerMessages aria-hidden />
         </div>
       </div>
 

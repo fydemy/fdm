@@ -169,7 +169,6 @@ export function HomePage() {
         <section className="space-y-16">
           <div className="space-y-4">
             <h2 className="text-2xl font-semibold tracking-tight">📦 Pricing</h2>
-            <p>Use code <b>FORYOU</b> to get 50% off for 10 people only.</p>
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">
@@ -180,9 +179,9 @@ export function HomePage() {
                 </h3>
                 <p className="flex flex-wrap items-baseline gap-2 text-3xl font-semibold tracking-tight">
                   <span className="text-xl font-normal text-muted-foreground line-through">
-                    $99
+                    $100
                   </span>
-                  $49.50
+                  $50
                   <span className="text-sm font-normal text-muted-foreground">
                     50% off
                   </span>
@@ -216,15 +215,15 @@ export function HomePage() {
                   </span>
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Get the <b>preasure & resources</b> of shipping from the peer alumni & founders.
+                  Get the <b>preasure</b> of shipping from alumni and mentors.
                 </p>
               </div>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>Claude AI resources for your development and vibe coding</li>
-                <li><a href="https://rakit.dev" target="_blank" rel="noreferrer" className="underline font-bold">Rakit, AI App Builder</a> Launch Plan</li>
                 <li>Get the Ship fast & robust benefits</li>
-                <li>Ship and get traction or kick out from exclusive community within 1 month</li>
-                <li>Gamified 1 month calendar roadmap journey</li>
+                <li>Ship and get traction or kick out from an exclusive community after 1 month</li>
+                <li>Gamified 1 month roadmap calendar journey</li>
+                <li>Get 1 month of AI resources for development</li>
+                <li>Increase acceptance rate of the Serious Founders program</li>
               </ul>
               <Link href="https://buy.polar.sh/polar_cl_9TTcukj3Owi05kuQAfl0fGrIoSjGZTBzjQP9r4LLrK7" target="_blank" rel="noreferrer" className={buttonVariants({ variant: "secondary", className: "mt-auto w-fit rounded-full" })}>
                 Join now <ArrowRight />
@@ -260,7 +259,7 @@ export function HomePage() {
                 <li>1-on-1 mentoring sessions</li>
                 <li>Exclusive exchange program to access builders from MIT, Stanford, Harvard, and other top universities founders</li>
                 <li>Investor and partner access matchmaking</li>
-                <li>Lifetime access as alumni with deferral option</li>
+                <li>Lifetime access as alumni</li>
               </ul>
               <Button
                 className="mt-auto w-fit rounded-full"
