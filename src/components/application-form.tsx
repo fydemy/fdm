@@ -519,7 +519,9 @@ export function ApplicationForm({
                     htmlFor="depositAccepted"
                     className="font-normal leading-snug"
                   >
-                    I agree to the $300 payment if accepted into the program.
+                    I agree to the <span className="line-through">$300</span>{" "}
+                    <span className="font-medium">$150</span> payment (50% off)
+                    if accepted into the program.
                   </Label>
                 </div>
                 {form.formState.errors.depositAccepted && (

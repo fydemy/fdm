@@ -84,7 +84,7 @@ export async function sendApplicationApprovedEmail(input: {
 
   if (siteConfig.batchDepositRequired) {
     lines.push(
-      "To confirm your spot in the batch, we ask for a $300 deposit.",
+      "To confirm your spot in the batch, we ask for a $150 deposit (50% off the usual $300).",
       "",
       "Pay here:",
       siteConfig.depositPaymentUrl,

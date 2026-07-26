@@ -142,11 +142,17 @@ export default function ApplyPage() {
                     <h3 className="text-sm font-medium">
                       Confirm your spot — deposit
                     </h3>
-                    <p className="text-sm text-muted-foreground">
-                      {application.feePaid
-                        ? "Fee marked as paid."
-                        : "Pay the $300 deposit to lock in your place in the batch."}
-                    </p>
+                    {application.feePaid ? (
+                      <p className="text-sm text-muted-foreground">
+                        Fee marked as paid.
+                      </p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        Pay the <span className="line-through">$300</span>{" "}
+                        <span className="font-medium text-foreground">$150</span>{" "}
+                        deposit (50% off) to lock in your place in the batch.
+                      </p>
+                    )}
                   </div>
                   {!application.feePaid ? (
                     <a
@@ -155,7 +161,8 @@ export default function ApplyPage() {
                       rel="noreferrer"
                       className={cn(buttonVariants(), "w-fit")}
                     >
-                      Pay $300 with Polar
+                      Pay <span className="line-through opacity-70">$300</span>{" "}
+                      $150 with Polar
                       <ExternalLink className="size-4" />
                     </a>
                   ) : null}

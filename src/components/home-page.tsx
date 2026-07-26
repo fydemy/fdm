@@ -167,7 +167,10 @@ export function HomePage() {
 
       <main className="mx-auto w-full max-w-4xl flex-1 space-y-24 px-6 pb-20">
         <section className="space-y-16">
-          <h2 className="text-2xl font-semibold tracking-tight">📦 Pricing</h2>
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold tracking-tight">📦 Pricing</h2>
+            <p>Use code <b>FORYOU</b> to get 50% off for 10 people only.</p>
+          </div>
 
           <div className="grid gap-4 md:grid-cols-3">
             <div className="flex flex-col gap-6 rounded-xl border border-dashed py-6 text-left">
@@ -175,7 +178,15 @@ export function HomePage() {
                 <h3 className="text-lg font-semibold tracking-tight">
                   Ship fast & robust
                 </h3>
-                <p className="text-3xl font-semibold tracking-tight">$99</p>
+                <p className="flex flex-wrap items-baseline gap-2 text-3xl font-semibold tracking-tight">
+                  <span className="text-xl font-normal text-muted-foreground line-through">
+                    $99
+                  </span>
+                  $49.50
+                  <span className="text-sm font-normal text-muted-foreground">
+                    50% off
+                  </span>
+                </p>
                 <p className="text-sm text-muted-foreground">
                   Trim your ship process from <b>weeks to minutes</b>.
                 </p>
@@ -195,8 +206,14 @@ export function HomePage() {
                 <h3 className="text-lg font-semibold tracking-tight">
                   High-Growth Builders
                 </h3>
-                <p className="text-3xl font-semibold tracking-tight">
-                  $150
+                <p className="flex flex-wrap items-baseline gap-2 text-3xl font-semibold tracking-tight">
+                  <span className="text-xl font-normal text-muted-foreground line-through">
+                    $150
+                  </span>
+                  $75
+                  <span className="text-sm font-normal text-muted-foreground">
+                    50% off
+                  </span>
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Get the <b>preasure & resources</b> of shipping from the peer alumni & founders.
@@ -219,7 +236,15 @@ export function HomePage() {
                 <h3 className="text-lg font-semibold tracking-tight">
                   Serious Founders
                 </h3>
-                <p className="text-3xl font-semibold tracking-tight">$300 <span className="text-sm font-normal text-muted-foreground">Upon acceptance</span></p>
+                <p className="flex flex-wrap items-baseline gap-2 text-3xl font-semibold tracking-tight">
+                  <span className="text-xl font-normal text-muted-foreground line-through">
+                    $300
+                  </span>
+                  $150
+                  <span className="text-sm font-normal text-muted-foreground">
+                    50% off · Upon acceptance
+                  </span>
+                </p>
                 <p className="text-sm text-muted-foreground">
                   Get real 1-on-1 mentoring from <b>VC-backed Founders</b>.
                 </p>
