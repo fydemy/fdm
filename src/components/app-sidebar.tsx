@@ -89,6 +89,15 @@ const mentorNav: NavItem[] = [
   discordNavItem,
 ];
 
+const partnerNav: NavItem[] = [
+  {
+    title: "Applications",
+    url: "/dashboard/partner",
+    icon: <ClipboardCheckIcon />,
+  },
+  discordNavItem,
+];
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data: session } = authClient.useSession();
   const { data: me } = trpc.user.me.useQuery();
@@ -104,6 +113,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     if (!me) return null;
     if (me.isReviewer) return { items: reviewerNav, label: "Review" };
     if (me.isMentor) return { items: mentorNav, label: "Mentor" };
+    if (me.isPartner) return { items: partnerNav, label: "Partner" };
     return { items: applicantNav, label: "Workspace" };
   }, [me]);
 

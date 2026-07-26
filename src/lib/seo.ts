@@ -9,7 +9,7 @@ export const siteConfig = {
     deadlineLabel: "end of August",
   },
   /** Set to true to re-enable the batch deposit flow (form, email, dashboard). */
-  batchDepositRequired: true,
+  batchDepositRequired: false,
   depositPaymentUrl:
     "https://buy.polar.sh/polar_cl_Tk3KQeZcS1xSvzm59NlN72gkayjYLObKLymF53xZwmS",
   discordInviteUrl: "https://discord.gg/7FBpTEXqVj",

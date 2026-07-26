@@ -332,7 +332,7 @@ export const applicantFormSchema = z
       customer_acquisition_channel: z.enum(ACQUISITION_CHANNELS),
       acquisition_channel_other: optionalText,
       interview_count: nonNegInt,
-      interview_as_of: nonEmpty("Interview as-of date is required"),
+      interview_as_of: optionalText,
       interview_learnings: nonEmpty(
         "Share what you learned from interviews",
       ),
@@ -349,12 +349,10 @@ export const applicantFormSchema = z
       lois_as_of: optionalText,
       lois_evidence: optionalText,
       active_users_count: nonNegInt,
-      active_users_as_of: nonEmpty("Active users as-of date is required"),
+      active_users_as_of: optionalText,
       active_users_evidence: optionalText,
       paying_customers_count: nonNegInt,
-      paying_customers_as_of: nonEmpty(
-        "Paying customers as-of date is required",
-      ),
+      paying_customers_as_of: optionalText,
       paying_customers_evidence: optionalText,
       retention_percent: percentOptional,
       retention_as_of: optionalText,
@@ -364,7 +362,7 @@ export const applicantFormSchema = z
       revenue_retention: optionalText,
       north_star_metric: nonEmpty("North-star metric is required"),
       north_star_value: nonEmpty("North-star value is required"),
-      north_star_as_of: nonEmpty("North-star as-of date is required"),
+      north_star_as_of: optionalText,
       north_star_why: nonEmpty(
         "Explain why this is the most important metric",
       ),
@@ -377,7 +375,7 @@ export const applicantFormSchema = z
       transaction_reporting_period: optionalText,
       current_mrr: nonNegNumber,
       mrr_currency: z.enum(CURRENCIES),
-      mrr_as_of: nonEmpty("MRR as-of date is required"),
+      mrr_as_of: optionalText,
       mrr_evidence: optionalText,
     }),
     fundraising: z.object({
@@ -391,7 +389,7 @@ export const applicantFormSchema = z
       equity_valuation_type: optionalEnum(EQUITY_VALUATION_TYPES),
       capital_raised_to_date: nonNegNumber,
       capital_raised_currency: z.enum(CURRENCIES),
-      capital_raised_as_of: nonEmpty("Capital raised as-of date is required"),
+      capital_raised_as_of: optionalText,
       prior_investors_grants: optionalText,
       runway_months: nonNegInt.optional(),
       use_of_funds: optionalText,
@@ -428,17 +426,6 @@ export const applicantFormSchema = z
         code: "custom",
         message: `Add at least ${requiredTeammates} cofounder${requiredTeammates === 1 ? "" : "s"} when number of founders is ${data.founder.founder_count}`,
         path: ["founder", "team_members"],
-      });
-    }
-
-    if (
-      isPartTime(data.founder.full_time_status) &&
-      !data.founder.part_time_full_time_date?.trim()
-    ) {
-      ctx.addIssue({
-        code: "custom",
-        message: "Expected full-time date is required for part-time founders",
-        path: ["founder", "part_time_full_time_date"],
       });
     }
 
@@ -593,13 +580,6 @@ export const applicantFormSchema = z
 
     const pilots = data.validation.pilots_count;
     if (pilots !== undefined && !Number.isNaN(pilots) && pilots > 0) {
-      if (!data.validation.pilots_as_of?.trim()) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Pilots as-of date is required when pilots > 0",
-          path: ["validation", "pilots_as_of"],
-        });
-      }
       if (!data.validation.pilots_compensation) {
         ctx.addIssue({
           code: "custom",
@@ -639,13 +619,6 @@ export const applicantFormSchema = z
 
     const lois = data.validation.lois_count;
     if (lois !== undefined && !Number.isNaN(lois) && lois > 0) {
-      if (!data.validation.lois_as_of?.trim()) {
-        ctx.addIssue({
-          code: "custom",
-          message: "LOIs as-of date is required when LOIs > 0",
-          path: ["validation", "lois_as_of"],
-        });
-      }
       requireEvidence(
         ctx,
         lois,
@@ -674,13 +647,6 @@ export const applicantFormSchema = z
       data.validation.retention_percent !== undefined &&
       !Number.isNaN(data.validation.retention_percent)
     ) {
-      if (!data.validation.retention_as_of?.trim()) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Retention as-of date is required",
-          path: ["validation", "retention_as_of"],
-        });
-      }
       if (!data.validation.retention_measurement_window?.trim()) {
         ctx.addIssue({
           code: "custom",
@@ -796,13 +762,6 @@ export const applicantFormSchema = z
           code: "custom",
           message: "Target check size currency is required when raising",
           path: ["fundraising", "target_check_size_currency"],
-        });
-      }
-      if (!data.fundraising.target_close_date?.trim()) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Target close date is required when raising",
-          path: ["fundraising", "target_close_date"],
         });
       }
       if (

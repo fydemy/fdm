@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 function isWorkspacePath(pathname: string) {
   if (pathname.startsWith("/dashboard/review")) return false;
   if (pathname.startsWith("/dashboard/mentor")) return false;
+  if (pathname.startsWith("/dashboard/partner")) return false;
   return (
     pathname === "/dashboard" ||
     pathname.startsWith("/dashboard/apply") ||
@@ -16,9 +17,14 @@ function isWorkspacePath(pathname: string) {
   );
 }
 
-function staffHomeFor(me: { isReviewer: boolean; isMentor: boolean }) {
+function staffHomeFor(me: {
+  isReviewer: boolean;
+  isMentor: boolean;
+  isPartner: boolean;
+}) {
   if (me.isReviewer) return "/dashboard/review";
   if (me.isMentor) return "/dashboard/mentor";
+  if (me.isPartner) return "/dashboard/partner";
   return "/dashboard";
 }
 

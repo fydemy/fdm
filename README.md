@@ -90,7 +90,7 @@ Visit [http://localhost:3000](http://localhost:3000), sign in with Google, and o
 
 ### User roles
 
-Roles are stored on the `user` table (`applicant`, `founder`, `reviewer`, `mentor`):
+Roles are stored on the `user` table (`applicant`, `founder`, `reviewer`, `mentor`, `partner`):
 
 | Role        | Access                                                                                             |
 | ----------- | -------------------------------------------------------------------------------------------------- |
@@ -98,6 +98,7 @@ Roles are stored on the `user` table (`applicant`, `founder`, `reviewer`, `mento
 | `founder`   | Set automatically when an application is approved — launches and materials                         |
 | `reviewer`  | Review applications, manage materials, feature launches (`/dashboard/review`)                      |
 | `mentor`    | View approved applications and edit files in reviewer-labeled mentor folders (`/dashboard/mentor`) |
+| `partner`   | Read-only view of all applications (`/dashboard/partner`)                                          |
 
 Assign staff roles directly in the database, e.g. with Prisma Studio:
 

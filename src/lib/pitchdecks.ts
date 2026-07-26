@@ -1,6 +1,6 @@
 import path from "path";
 import { prisma } from "@/lib/prisma";
-import { isMentor, isReviewer } from "@/lib/auth-helpers";
+import { isMentor, isPartner, isReviewer } from "@/lib/auth-helpers";
 import {
   STORAGE_BUCKETS,
   assertSafeStoragePath,
@@ -54,6 +54,7 @@ export async function canAccessPitchDeck(input: {
   if (application) {
     if (application.userId === input.userId) return true;
     if (isReviewer(input.role)) return true;
+    if (isPartner(input.role)) return true;
     if (isMentor(input.role) && application.status === "APPROVED") return true;
     return false;
   }

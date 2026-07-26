@@ -5,6 +5,7 @@ import { TRPCError } from "@trpc/server";
 import {
   canAccessApplicantWorkspace,
   isMentor,
+  isPartner,
   isReviewer,
   isStaff,
 } from "@/lib/auth-helpers";
@@ -68,6 +69,14 @@ export const reviewerProcedure = protectedProcedure.use(({ ctx, next }) => {
 export const mentorProcedure = protectedProcedure.use(({ ctx, next }) => {
   if (!isMentor(ctx.user.role)) {
     throw new TRPCError({ code: "FORBIDDEN", message: "Mentor access required" });
+  }
+
+  return next({ ctx });
+});
+
+export const partnerProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (!isPartner(ctx.user.role)) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Partner access required" });
   }
 
   return next({ ctx });

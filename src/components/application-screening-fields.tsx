@@ -32,7 +32,6 @@ import {
   instrumentNeedsValuation,
   isCurrentlyRaising,
   isIdeaStage,
-  isPartTimeFounder,
   showTransactionMetrics,
   type ApplicantForm,
 } from "@/lib/screening";
@@ -103,7 +102,6 @@ export function ApplicationScreeningFields({
   decisionMakerOptions?: Array<{ value: string; label: string }>;
 }) {
   const errors = form.formState.errors.screening;
-  const fullTimeStatus = form.watch("screening.founder.full_time_status");
   const sector = form.watch("screening.company.sector");
   const subsector = form.watch("screening.company.subsector");
   const legalStatus = form.watch("screening.company.legal_status");
@@ -251,21 +249,6 @@ export function ApplicationScreeningFields({
             </select>
             <FieldError message={errors?.founder?.full_time_status?.message} />
           </div>
-          {isPartTimeFounder(fullTimeStatus) ? (
-            <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="part_time_full_time_date">
-                Expected date each part-time founder becomes full-time
-              </Label>
-              <Input
-                id="part_time_full_time_date"
-                type="date"
-                {...form.register("screening.founder.part_time_full_time_date")}
-              />
-              <FieldError
-                message={errors?.founder?.part_time_full_time_date?.message}
-              />
-            </div>
-          ) : null}
         </div>
         {founderExtras}
       </section>
@@ -784,15 +767,6 @@ export function ApplicationScreeningFields({
             />
             <FieldError message={errors?.validation?.interview_count?.message} />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="interview_as_of">As of</Label>
-            <Input
-              id="interview_as_of"
-              type="date"
-              {...form.register("screening.validation.interview_as_of")}
-            />
-            <FieldError message={errors?.validation?.interview_as_of?.message} />
-          </div>
           <div className="space-y-2 md:col-span-3">
             <Label htmlFor="interview_learnings">
               What you learned from interviews
@@ -822,15 +796,6 @@ export function ApplicationScreeningFields({
               {...form.register("screening.validation.pilots_count")}
             />
             <FieldError message={errors?.validation?.pilots_count?.message} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="pilots_as_of">As of</Label>
-            <Input
-              id="pilots_as_of"
-              type="date"
-              {...form.register("screening.validation.pilots_as_of")}
-            />
-            <FieldError message={errors?.validation?.pilots_as_of?.message} />
           </div>
           {Number(pilotsCount) > 0 ? (
             <>
@@ -930,21 +895,6 @@ export function ApplicationScreeningFields({
                   ))}
                 </select>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="pilots_expected_conversion_date">
-                  Expected conversion date{" "}
-                  <span className="font-normal text-muted-foreground">
-                    (optional)
-                  </span>
-                </Label>
-                <Input
-                  id="pilots_expected_conversion_date"
-                  type="date"
-                  {...form.register(
-                    "screening.validation.pilots_expected_conversion_date",
-                  )}
-                />
-              </div>
               <div className="space-y-2 md:col-span-3">
                 <Label htmlFor="pilots_evidence">
                   Evidence (link or short note)
@@ -975,15 +925,6 @@ export function ApplicationScreeningFields({
               {...form.register("screening.validation.lois_count")}
             />
             <FieldError message={errors?.validation?.lois_count?.message} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="lois_as_of">As of</Label>
-            <Input
-              id="lois_as_of"
-              type="date"
-              {...form.register("screening.validation.lois_as_of")}
-            />
-            <FieldError message={errors?.validation?.lois_as_of?.message} />
           </div>
           {Number(loisCount) > 0 ? (
             <div className="space-y-2 md:col-span-3">
@@ -1016,17 +957,6 @@ export function ApplicationScreeningFields({
               message={errors?.validation?.active_users_count?.message}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="active_users_as_of">As of</Label>
-            <Input
-              id="active_users_as_of"
-              type="date"
-              {...form.register("screening.validation.active_users_as_of")}
-            />
-            <FieldError
-              message={errors?.validation?.active_users_as_of?.message}
-            />
-          </div>
           {Number(activeUsers) > 0 ? (
             <div className="space-y-2 md:col-span-3">
               <Label htmlFor="active_users_evidence">
@@ -1055,17 +985,6 @@ export function ApplicationScreeningFields({
             />
             <FieldError
               message={errors?.validation?.paying_customers_count?.message}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="paying_customers_as_of">As of</Label>
-            <Input
-              id="paying_customers_as_of"
-              type="date"
-              {...form.register("screening.validation.paying_customers_as_of")}
-            />
-            <FieldError
-              message={errors?.validation?.paying_customers_as_of?.message}
             />
           </div>
           {Number(payingCustomers) > 0 ? (
@@ -1102,15 +1021,6 @@ export function ApplicationScreeningFields({
             <FieldError
               message={errors?.validation?.retention_percent?.message}
             />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="retention_as_of">As of</Label>
-            <Input
-              id="retention_as_of"
-              type="date"
-              {...form.register("screening.validation.retention_as_of")}
-            />
-            <FieldError message={errors?.validation?.retention_as_of?.message} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="retention_measurement_window">
@@ -1285,17 +1195,6 @@ export function ApplicationScreeningFields({
               message={errors?.validation?.north_star_value?.message}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="north_star_as_of">As of</Label>
-            <Input
-              id="north_star_as_of"
-              type="date"
-              {...form.register("screening.validation.north_star_as_of")}
-            />
-            <FieldError
-              message={errors?.validation?.north_star_as_of?.message}
-            />
-          </div>
           <div className="space-y-2 md:col-span-3">
             <Label htmlFor="north_star_why">
               Why this is the most important metric
@@ -1353,15 +1252,6 @@ export function ApplicationScreeningFields({
               ))}
             </select>
             <FieldError message={errors?.validation?.mrr_currency?.message} />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="mrr_as_of">As of</Label>
-            <Input
-              id="mrr_as_of"
-              type="date"
-              {...form.register("screening.validation.mrr_as_of")}
-            />
-            <FieldError message={errors?.validation?.mrr_as_of?.message} />
           </div>
           {Number(currentMrr) > 0 ? (
             <div className="space-y-2 md:col-span-3">
@@ -1447,17 +1337,6 @@ export function ApplicationScreeningFields({
           </select>
           <FieldError
             message={errors?.fundraising?.capital_raised_currency?.message}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="capital_raised_as_of">Capital raised as of</Label>
-          <Input
-            id="capital_raised_as_of"
-            type="date"
-            {...form.register("screening.fundraising.capital_raised_as_of")}
-          />
-          <FieldError
-            message={errors?.fundraising?.capital_raised_as_of?.message}
           />
         </div>
         <div className="space-y-2 md:col-span-2">
@@ -1656,17 +1535,6 @@ export function ApplicationScreeningFields({
                 message={
                   errors?.fundraising?.target_check_size_currency?.message
                 }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="target_close_date">Target close date</Label>
-              <Input
-                id="target_close_date"
-                type="date"
-                {...form.register("screening.fundraising.target_close_date")}
-              />
-              <FieldError
-                message={errors?.fundraising?.target_close_date?.message}
               />
             </div>
             <div className="space-y-2">
