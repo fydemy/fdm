@@ -9,6 +9,7 @@ import { PublicSiteFooter } from "@/components/public-site-footer";
 import { LaunchCard } from "@/components/launch-card";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, Logo, ProfileImage } from "@/components/ui/optimized-image";
 import {
   Accordion,
   AccordionContent,
@@ -16,7 +17,52 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { siteConfig } from "@/lib/seo";
-import { ArrowRight, Code2 } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Code2 } from "lucide-react";
+
+const mentors = [
+  {
+    name: "Arsyi R. Fatah",
+    role: "Boardy, Antler",
+    image: "/profile/mentor/arsyi.jpeg",
+    linkedin: "https://www.linkedin.com/in/arsyifatah/",
+  },
+  {
+    name: "M. Daffa",
+    role: "Kredivo, Tiket.com",
+    image: "/profile/mentor/daffa.jpeg",
+    linkedin: "https://www.linkedin.com/in/m-daffa-badran-thoriq/",
+  },
+  {
+    name: "Joenathan Haganta",
+    role: "Highbrow Inc.",
+    image: "/profile/mentor/joenathan.webp",
+    linkedin: "https://www.linkedin.com/in/joenathan-haganta-ginting/",
+  },
+  {
+    name: "Riza Herzego",
+    role: "Akal (Hasan VC)",
+    image: "/profile/mentor/riza.jpeg",
+    linkedin: "https://www.linkedin.com/in/rizaherzego/",
+  },
+  {
+    name: "Dennis",
+    role: "Software Engineer",
+    image: "/profile/mentor/dennis.jpeg",
+    linkedin: "https://www.linkedin.com/in/dennis/",
+  },
+  {
+    name: "Oki",
+    role: "Product Manager",
+    image: "/profile/mentor/oki.png",
+    linkedin: "https://www.linkedin.com/in/oki/",
+  },
+  {
+    name: "Wahyu",
+    role: "UX Designer",
+    image: "/profile/mentor/wahyu.jpeg",
+    linkedin: "https://www.linkedin.com/in/wahyu/",
+  },
+] as const;
 
 const testimonials = [
   {
@@ -112,37 +158,85 @@ export function HomePage() {
           <div>
             <h2 className="text-sm text-muted-foreground">Our Alumni</h2>
             <div className="mt-4 flex flex-wrap items-center justify-center gap-x-8">
-              <img
+              <Logo
                 src="/logo/nus.png"
-                alt="NUS"
+                name="NUS"
                 className="h-24 w-auto"
               />
-              <img
+              <Logo
                 src="/logo/ntu.png"
-                alt="NTU"
+                name="NTU"
                 className="h-30 w-auto"
               />
-              <img
+              <Logo
                 src="/logo/ui.webp"
-                alt="UI"
+                name="UI"
                 className="h-14 w-auto"
               />
             </div>
           </div>
 
-          <div className="w-full space-y-16 text-left mt-24">
+          <div className="w-full space-y-24 text-left">
+            <div className="space-y-6">
+              <h2 className="text-2xl font-semibold tracking-tight">
+                Mentors
+              </h2>
+              <div className="grid w-full grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+                {mentors.slice(0, 4).map((mentor) => (
+                  <article
+                    key={mentor.name}
+                    className="relative aspect-[4/5] overflow-hidden rounded-xl"
+                  >
+                    <ProfileImage
+                      src={mentor.image}
+                      name={mentor.name}
+                      className="size-full"
+                    />
+                    <div className="absolute inset-x-0 bottom-0 overflow-hidden">
+                      <div className="flex items-end justify-between gap-2 bg-black/40 px-3 py-3 backdrop-blur-md">
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold text-white">
+                            {mentor.name}
+                          </p>
+                          <p className="truncate text-xs text-white/80">
+                            {mentor.role}
+                          </p>
+                        </div>
+                        <a
+                          href={mentor.linkedin}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label={`${mentor.name} on LinkedIn`}
+                          className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-white/15 text-white transition-colors hover:bg-white/25"
+                        >
+                          <ArrowUpRight className="size-4" />
+                        </a>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+              <Link
+                href="/mentors"
+                className="inline-flex items-center justify-center rounded-full bg-secondary px-6 py-3 text-sm font-medium transition-colors hover:bg-secondary/80"
+              >
+                View All Mentors <ArrowRight className="ml-2 size-4" />
+              </Link>
+            </div>
+            <div className="space-y-6">
             <h2 className="text-2xl font-semibold tracking-tight">⤵️ What Founders say?</h2>
             <div className="grid gap-4 md:grid-cols-2">
               {testimonials.map((testimonial) => (
                 <article
                   key={testimonial.name}
-                  className="rounded-2xl border bg-card py-4 text-left shadow-sm"
+                  className="p-6 bg-secondary rounded-xl rounded-tl-none"
                 >
-                  <div className="flex items-start gap-3">
-                    <img
+                  <div className="flex gap-6">
+                    <Avatar
                       src={testimonial.image}
-                      alt={testimonial.name}
-                      className="size-10 shrink-0 rounded-full object-cover"
+                      name={testimonial.name}
+                      size="md"
+                      className="size-10 shrink-0"
                     />
                     <div className="min-w-0 space-y-1">
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
@@ -155,21 +249,20 @@ export function HomePage() {
                       </p>
                     </div>
                   </div>
-                  <p className="mt-3 text-sm leading-relaxed">
+                  <p className="mt-3 ml-16 text-sm leading-relaxed">
                     {testimonial.quote}
                   </p>
                 </article>
               ))}
             </div>
           </div>
+          </div>
         </section>
       </div>
 
       <main className="mx-auto w-full max-w-4xl flex-1 space-y-24 px-6 pb-20">
-        <section className="space-y-16">
-          <div className="space-y-4">
-            <h2 className="text-2xl font-semibold tracking-tight">📦 Pricing</h2>
-          </div>
+        <section className="space-y-6">
+          <h2 className="text-2xl font-semibold tracking-tight">📦 Pricing</h2>
 
           <div className="grid gap-4 md:grid-cols-3">
             <div className="flex flex-col gap-6 rounded-xl border border-dashed py-6 text-left">

@@ -9,6 +9,7 @@ import {
   saveImageFile,
 } from "@/lib/images";
 import { prisma } from "@/lib/prisma";
+import { compressUploadedImage } from "@/lib/image-processor";
 
 const MAX_SIZE = 5 * 1024 * 1024;
 

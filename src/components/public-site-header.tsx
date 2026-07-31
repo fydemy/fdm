@@ -3,6 +3,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { siteConfig } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 import { ArrowRight, MessageCircle } from "lucide-react";
+import { Logo } from "@/components/ui/optimized-image";
 
 function BannerMessages({ "aria-hidden": ariaHidden }: { "aria-hidden"?: boolean }) {
   return (
@@ -38,7 +39,11 @@ export function PublicSiteHeader({ title }: { title?: string }) {
       <header>
         <div className="mx-auto flex h-20 max-w-4xl items-center justify-between gap-4 px-6">
           <Link href="/" className="flex shrink-0 items-center">
-            <img src="/logo.svg" alt="Fydemy" className="h-7 w-auto" />
+            <Logo
+                src="/logo.svg"
+                name="Fydemy"
+                className="h-7 w-auto"
+              />
           </Link>
           {title ? (
             <p className="min-w-0 truncate text-sm font-medium">{title}</p>

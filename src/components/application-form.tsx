@@ -29,6 +29,7 @@ import {
 import { siteConfig } from "@/lib/seo";
 import { toast } from "sonner";
 import { Loader2, MessageCircle, Plus, Trash2, Upload } from "lucide-react";
+import { ProductLogo } from "@/components/product-logo";
 
 const schema = z
   .object({
@@ -286,10 +287,11 @@ export function ApplicationForm({
                     </div>
                     {logo && (
                       <div className="flex items-center gap-3">
-                        <img
+                        <ProductLogo
                           src={logo.url}
-                          alt="Product logo preview"
-                          className="size-12 rounded-lg object-cover ring-1 ring-border"
+                          name="Product logo"
+                          size="md"
+                          className="size-12"
                         />
                         <p className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Upload className="size-4" />

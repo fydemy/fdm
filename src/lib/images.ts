@@ -21,6 +21,37 @@ export const ALLOWED_IMAGE_TYPES = new Set([
   "image/gif",
 ]);
 
+// Add ResponsiveImageInfo type for better typing
+export interface ResponsiveImageInfo {
+  src: string;
+  width: number;
+  quality?: number;
+}
+
+// Function to generate responsive image URLs
+export function generateResponsiveImageUrls(baseUrl: string): {
+  src: string;
+  srcSet: string;
+  sizes: string;
+} {
+  // Generate srcSet for different screen sizes
+  const responsiveSizes = [
+    { width: 400, suffix: '-sm' },
+    { width: 800, suffix: '-md' },
+    { width: 1200, suffix: '-lg' },
+  ];
+  
+  const srcSetEntries = responsiveSizes.map(({ width, suffix }) => 
+    `${baseUrl.replace(/(\.[^.]+)$/, `${suffix}$1`)} ${width}w`
+  );
+  
+  return {
+    src: baseUrl,
+    srcSet: srcSetEntries.join(', '),
+    sizes: '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'
+  };
+}
+
 export async function saveImageFile(input: {
   filename: string;
   userId: string;

@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { OptimizedImage } from "@/components/ui/optimized-image";
 
 type ProductLogoProps = {
   src?: string | null;
@@ -8,9 +9,9 @@ type ProductLogoProps = {
 };
 
 const sizeClass = {
-  sm: "size-8 text-xs",
-  md: "size-10 text-sm",
-  lg: "size-14 text-base",
+  sm: { width: 32, height: 32 },
+  md: { width: 40, height: 40 },
+  lg: { width: 56, height: 56 },
 } as const;
 
 export function ProductLogo({
@@ -21,15 +22,19 @@ export function ProductLogo({
 }: ProductLogoProps) {
   if (!src) return null;
 
+  const { width, height } = sizeClass[size];
+
   return (
-    <img
+    <OptimizedImage
       src={src}
       alt={`${name} logo`}
+      width={width}
+      height={height}
       className={cn(
         "shrink-0 rounded-lg object-cover ring-1 ring-border",
-        sizeClass[size],
         className,
       )}
+      sizes="(max-width: 768px) 32px, 40px"
     />
   );
 }

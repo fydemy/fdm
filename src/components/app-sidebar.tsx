@@ -16,6 +16,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { siteConfig } from "@/lib/seo";
+import { Logo } from "@/components/ui/optimized-image";
 import {
   ClipboardCheckIcon,
   FileTextIcon,
@@ -126,7 +127,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="h-auto! py-2 data-[slot=sidebar-menu-button]:p-1.5!"
               render={<Link href="/" />}
             >
-              <img src="/logo.svg" alt="Fydemy" className="h-7 w-auto" />
+              <Logo
+                src="/logo.svg"
+                name="Fydemy"
+                className="h-7 w-auto"
+              />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
