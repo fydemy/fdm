@@ -26,15 +26,23 @@ function BannerMessages({ "aria-hidden": ariaHidden }: { "aria-hidden"?: boolean
   );
 }
 
-export function PublicSiteHeader({ title }: { title?: string }) {
+export function PublicSiteHeader({
+  title,
+  hideMarquee = false,
+}: {
+  title?: string;
+  hideMarquee?: boolean;
+}) {
   return (
     <div className="border-b bg-background">
-      <div className="overflow-hidden bg-primary/5">
-        <div className="flex w-max animate-marquee whitespace-nowrap py-3 text-sm text-muted-foreground">
-          <BannerMessages />
-          <BannerMessages aria-hidden />
+      {!hideMarquee ? (
+        <div className="overflow-hidden bg-primary/5">
+          <div className="flex w-max animate-marquee whitespace-nowrap py-3 text-sm text-muted-foreground">
+            <BannerMessages />
+            <BannerMessages aria-hidden />
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <header>
         <div className="mx-auto flex h-20 max-w-4xl items-center justify-between gap-4 px-6">
