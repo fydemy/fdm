@@ -66,6 +66,7 @@ type RichTextEditorProps = {
   onChange: (html: string) => void;
   placeholder?: string;
   className?: string;
+  enableBoard?: boolean;
 };
 
 export function RichTextEditor({
@@ -73,6 +74,7 @@ export function RichTextEditor({
   onChange,
   placeholder = "Write your launch post…",
   className,
+  enableBoard = true,
 }: RichTextEditorProps) {
   const [embedOpen, setEmbedOpen] = useState(false);
   const [embedUrl, setEmbedUrl] = useState("");
@@ -101,7 +103,7 @@ export function RichTextEditor({
         inline: false,
         allowBase64: false,
         HTMLAttributes: {
-          class: "rounded-lg max-w-full h-auto",
+          class: "max-w-full h-auto",
         },
       }),
       Link.configure({
@@ -113,13 +115,13 @@ export function RichTextEditor({
       }),
       Placeholder.configure({ placeholder }),
       SocialEmbed,
-      NotionBoard,
+      ...(enableBoard ? [NotionBoard] : []),
     ],
     content: toEditorHtml(value),
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm prose-neutral dark:prose-invert max-w-none min-h-[240px] px-4 py-3 text-sm focus:outline-none",
+          "prose prose-sm prose-neutral dark:prose-invert max-w-none min-h-[240px] px-4 py-3 text-sm prose-img:rounded-none focus:outline-none",
       },
       handlePaste(_view, event) {
         const file = Array.from(event.clipboardData?.files ?? []).find(isImageFile);
@@ -312,15 +314,17 @@ export function RichTextEditor({
           <Share2 />
           <span className="text-xs font-medium">Embed</span>
         </ToolbarButton>
-        <ToolbarButton
-          onClick={() =>
-            editor.chain().focus().setNotionBoard().createParagraphNear().run()
-          }
-          label="Notion board"
-        >
-          <Columns3 />
-          <span className="text-xs font-medium">Board</span>
-        </ToolbarButton>
+        {enableBoard ? (
+          <ToolbarButton
+            onClick={() =>
+              editor.chain().focus().setNotionBoard().createParagraphNear().run()
+            }
+            label="Notion board"
+          >
+            <Columns3 />
+            <span className="text-xs font-medium">Board</span>
+          </ToolbarButton>
+        ) : null}
         <ToolbarButton
           onClick={() => fileInputRef.current?.click()}
           label="Upload image"

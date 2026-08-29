@@ -12,7 +12,6 @@ const applicationInclude = {
       id: true,
       title: true,
       slug: true,
-      featured: true,
       createdAt: true,
     },
     orderBy: { createdAt: "desc" as const },

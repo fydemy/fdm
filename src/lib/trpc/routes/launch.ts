@@ -9,7 +9,6 @@ const launchListSelect = {
   id: true,
   title: true,
   slug: true,
-  featured: true,
   createdAt: true,
   application: {
     select: {
@@ -54,14 +53,6 @@ export const launchRouter = t.router({
     });
   }),
 
-  listFeatured: publicProcedure.query(async () => {
-    return prisma.launch.findMany({
-      where: { featured: true, application: { status: "APPROVED" } },
-      select: launchListSelect,
-      orderBy: { createdAt: "desc" },
-    });
-  }),
-
   getPublic: publicProcedure
     .input(z.object({ slug: z.string() }))
     .query(async ({ input }) => {
@@ -89,7 +80,6 @@ export const launchRouter = t.router({
         id: true,
         title: true,
         slug: true,
-        featured: true,
         createdAt: true,
         application: {
           select: {
@@ -118,7 +108,6 @@ export const launchRouter = t.router({
           content: true,
           youtubeUrl: true,
           socialEmbeds: true,
-          featured: true,
           createdAt: true,
         },
       });

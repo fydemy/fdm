@@ -94,7 +94,7 @@ export function MaterialsBrowser({
       toast.success(action.message);
       void invalidate();
       if (action.type === "open-file") {
-        router.push(`${basePath}/f/${action.fileId}`);
+        router.push(`${basePath}/${action.fileId}`);
       }
     }, 0);
   };
@@ -150,13 +150,15 @@ export function MaterialsBrowser({
     if (item.type === "FOLDER") {
       router.push(folderHref(item.id));
     } else {
-      router.push(`${basePath}/f/${item.id}`);
+      router.push(`${basePath}/${item.id}`);
     }
   };
 
   if (isLoading) return <Skeleton className="h-96" />;
 
   const items = data?.items ?? [];
+  const breadcrumbs = data?.breadcrumbs ?? [];
+  const folderTitle = breadcrumbs.at(-1)?.name ?? "Workspace";
   const canWriteHere = data?.canWriteHere ?? false;
   const showFolderActions = editMode === "full";
   const canAddFolder = showFolderActions;
@@ -167,8 +169,9 @@ export function MaterialsBrowser({
 
   return (
     <div className="space-y-6 mt-12">
-      {canAddFile && (
-        <div className="flex justify-end">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <h1 className="text-2xl font-semibold tracking-tight">{folderTitle}</h1>
+        {canAddFile && (
           <DropdownMenu>
             <DropdownMenuTrigger render={<Button size="sm" />}>
               Add
@@ -193,8 +196,8 @@ export function MaterialsBrowser({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
-      )}
+        )}
+      </div>
 
       {items.length === 0 ? (
         <p className="rounded-xl border px-4 py-12 text-center text-sm text-muted-foreground">

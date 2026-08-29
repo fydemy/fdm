@@ -22,7 +22,6 @@ Open-source platform for product applications, reviewer decisions, public launch
 
 **Public site**
 
-- Featured launches on the home page
 - Browse and view individual launch pages
 - SEO-friendly metadata, sitemap, and robots
 

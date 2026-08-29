@@ -29,11 +29,11 @@ export function MarkdownContent({
   return (
     <div className="space-y-6 py-12">
       {isHtmlContent(content) ? (
-        <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none text-sm prose-headings:scroll-mt-20 prose-a:text-primary">
+        <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none text-sm prose-img:rounded-none prose-headings:scroll-mt-20 prose-a:text-primary">
           {renderRichHtml(content)}
         </div>
       ) : (
-        <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none text-sm prose-headings:scroll-mt-20 prose-a:text-primary">
+        <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none text-sm prose-img:rounded-none prose-headings:scroll-mt-20 prose-a:text-primary">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
         </div>
       )}

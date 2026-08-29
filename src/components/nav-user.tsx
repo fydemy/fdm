@@ -85,9 +85,10 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={() => {
-                authClient.signOut();
+              onClick={async () => {
+                await authClient.signOut();
                 router.push("/");
+                router.refresh();
               }}
             >
               <LogOutIcon />

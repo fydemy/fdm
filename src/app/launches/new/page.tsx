@@ -1,31 +1,32 @@
 "use client";
 
-import { use } from "react";
+import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
-import { MaterialFileView } from "@/components/material-file-view";
+import { LaunchForm } from "@/components/launch-form";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-export default function MaterialFilePage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = use(params);
+export default function NewLaunchPage() {
+  const router = useRouter();
   const { data, isLoading } = trpc.application.me.useQuery();
+  const approved = data?.approved;
 
   if (isLoading) return <Skeleton className="h-96" />;
 
-  if (!data?.approved) {
+  if (!approved) {
     return (
       <Alert>
         <AlertTitle>Approval required</AlertTitle>
         <AlertDescription>
-          Materials from reviewers appear here after your application is approved.
+          Launches unlock after a reviewer approves your application.
         </AlertDescription>
       </Alert>
     );
   }
 
-  return <MaterialFileView id={id} basePath="/dashboard/materials" />;
+  return (
+    <div className="mx-auto mt-12 w-full max-w-3xl space-y-6">
+      <LaunchForm onDone={() => router.push("/launches")} />
+    </div>
+  );
 }

@@ -48,7 +48,6 @@ export const reviewRouter = t.router({
               id: true,
               title: true,
               slug: true,
-              featured: true,
               createdAt: true,
             },
             orderBy: { createdAt: "desc" },
@@ -212,7 +211,6 @@ export const reviewRouter = t.router({
         id: true,
         title: true,
         slug: true,
-        featured: true,
         createdAt: true,
         application: {
           select: {
@@ -229,34 +227,5 @@ export const reviewRouter = t.router({
     });
   }),
 
-  setLaunchFeatured: reviewerProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        featured: z.boolean(),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      const launch = await prisma.launch.findUnique({
-        where: { id: input.id },
-        include: { application: { select: { status: true } } },
-      });
-
-      if (!launch) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "Launch not found" });
-      }
-
-      if (launch.application.status !== "APPROVED") {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Only launches from approved products can be featured",
-        });
-      }
-
-      return prisma.launch.update({
-        where: { id: input.id },
-        data: { featured: input.featured },
-      });
-    }),
 });
 

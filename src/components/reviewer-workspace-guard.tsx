@@ -4,28 +4,18 @@ import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { Skeleton } from "@/components/ui/skeleton";
+import { staffHomePath } from "@/lib/auth-helpers";
 
 function isWorkspacePath(pathname: string) {
   if (pathname.startsWith("/dashboard/review")) return false;
   if (pathname.startsWith("/dashboard/mentor")) return false;
   if (pathname.startsWith("/dashboard/partner")) return false;
   return (
+    pathname === "/" ||
     pathname === "/dashboard" ||
-    pathname.startsWith("/dashboard/apply") ||
-    pathname.startsWith("/dashboard/launches") ||
-    pathname.startsWith("/dashboard/materials")
+    pathname.startsWith("/apply") ||
+    pathname.startsWith("/launches/new")
   );
-}
-
-function staffHomeFor(me: {
-  isReviewer: boolean;
-  isMentor: boolean;
-  isPartner: boolean;
-}) {
-  if (me.isReviewer) return "/dashboard/review";
-  if (me.isMentor) return "/dashboard/mentor";
-  if (me.isPartner) return "/dashboard/partner";
-  return "/dashboard";
 }
 
 export function ReviewerWorkspaceGuard({
@@ -41,7 +31,7 @@ export function ReviewerWorkspaceGuard({
 
   useEffect(() => {
     if (shouldRedirect && me) {
-      router.replace(staffHomeFor(me));
+      router.replace(staffHomePath(me.role));
     }
   }, [shouldRedirect, me, router]);
 

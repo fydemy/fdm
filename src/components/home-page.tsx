@@ -3,12 +3,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import { trpc } from "@/lib/trpc/client";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { PublicSiteFooter } from "@/components/public-site-footer";
-import { LaunchCard } from "@/components/launch-card";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, Logo, ProfileImage } from "@/components/ui/optimized-image";
 import {
   Accordion,
@@ -112,7 +109,6 @@ const programTimeline = [
 export function HomePage() {
   const router = useRouter();
   const { data: session } = authClient.useSession();
-  const { data: featured, isLoading } = trpc.launch.listFeatured.useQuery();
   const hasSession = Boolean(session?.user);
 
   return (
@@ -133,10 +129,10 @@ export function HomePage() {
             <Button
               onClick={() =>
                 hasSession
-                  ? router.push("/dashboard/apply")
+                  ? router.push("/apply")
                   : authClient.signIn.social({
                     provider: "google",
-                    callbackURL: "/dashboard/apply",
+                    callbackURL: "/apply",
                   })
               }
               className="rounded-full px-12 py-6"
@@ -358,10 +354,10 @@ export function HomePage() {
                 className="mt-auto w-fit rounded-full"
                 onClick={() =>
                   hasSession
-                    ? router.push("/dashboard/apply")
+                    ? router.push("/apply")
                     : authClient.signIn.social({
                         provider: "google",
-                        callbackURL: "/dashboard/apply",
+                        callbackURL: "/apply",
                       })
                 }
               >
@@ -371,26 +367,6 @@ export function HomePage() {
 
           </div>
         </section>
-
-       {!isLoading && (featured ?? []).length === 0 ? null : (
-       <section className="space-y-16">
-        <h2 className="text-2xl font-semibold tracking-tight">
-          ⭐️ Featured Startups
-        </h2>
-        {isLoading && (
-            <div className="grid gap-4 md:grid-cols-2">
-              <Skeleton className="h-28" />
-              <Skeleton className="h-28" />
-            </div>
-          )}
-
-          <div className="grid gap-4 md:grid-cols-2">
-            {(featured ?? []).map((launch) => (
-              <LaunchCard key={launch.id} launch={launch} />
-            ))}
-          </div>
-       </section>
-       )}
 
         <section className="space-y-16">
           <h2 className="text-2xl font-semibold tracking-tight">

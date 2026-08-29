@@ -6,7 +6,6 @@ import { PublicSiteHeader } from "@/components/public-site-header";
 import { PublicSiteFooter } from "@/components/public-site-footer";
 import { ProductLogo } from "@/components/product-logo";
 import { MarkdownContent } from "@/components/markdown-content";
-import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -23,7 +22,7 @@ export function PublicLaunchPage({ slug }: { slug: string }) {
     <div className="flex min-h-screen flex-col bg-background">
       <PublicSiteHeader title={launch?.slug ?? slug} />
 
-      <main className="mx-auto w-full max-w-4xl flex-1 space-y-8 px-6 py-12">
+      <main className="mx-auto w-full max-w-3xl flex-1 space-y-8 px-6 py-12">
         <Link
           href="/launches"
           className={cn(
@@ -49,12 +48,9 @@ export function PublicLaunchPage({ slug }: { slug: string }) {
         {launch && (
           <article className="space-y-6">
             <header className="space-y-4">
-              <div className="flex flex-wrap items-center gap-2">
-                {launch.featured && <Badge>Featured</Badge>}
-                <span className="text-sm text-muted-foreground">
-                  {new Date(launch.createdAt).toLocaleDateString()}
-                </span>
-              </div>
+              <span className="text-sm text-muted-foreground">
+                {new Date(launch.createdAt).toLocaleDateString()}
+              </span>
               <div className="flex items-start gap-4">
                 <ProductLogo
                   src={launch.application.logoUrl}

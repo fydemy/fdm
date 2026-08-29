@@ -9,12 +9,6 @@ import { RichTextEditor } from "@/components/rich-text-editor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { contentHasText } from "@/lib/embeds";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -131,6 +125,7 @@ const formFields = (
               value={field.value}
               onChange={field.onChange}
               placeholder="Share what you launched…"
+              enableBoard={false}
             />
           )}
         />
@@ -148,16 +143,5 @@ const formFields = (
     </form>
   );
 
-  if (initial) {
-    return formFields;
-  }
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Launch details</CardTitle>
-      </CardHeader>
-      <CardContent>{formFields}</CardContent>
-    </Card>
-  );
+  return formFields;
 }

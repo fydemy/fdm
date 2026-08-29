@@ -27,7 +27,7 @@ export default function ApplyPage() {
   const [pendingDiscordJoin, setPendingDiscordJoin] = useState(false);
 
   if (isLoading) {
-    return <Skeleton className="h-96" />;
+    return <Skeleton className="mx-auto mt-12 h-96 w-full max-w-3xl" />;
   }
 
   const applications = data?.applications ?? [];
@@ -36,7 +36,7 @@ export default function ApplyPage() {
 
   if (pendingDiscordJoin) {
     return (
-      <div className="space-y-6">
+      <div className="mx-auto mt-12 w-full max-w-3xl space-y-6">
         <h1 className="text-2xl font-semibold tracking-tight">Apply</h1>
         <Card>
           <CardHeader>
@@ -68,7 +68,7 @@ export default function ApplyPage() {
 
   if (isFirstApplication || showForm) {
     return (
-      <div className="space-y-6">
+      <div className="mx-auto mt-12 w-full max-w-3xl space-y-6">
         <h1 className="text-2xl font-semibold tracking-tight">Apply</h1>
         <ApplicationForm
           requireDiscordJoin={isFirstApplication}
@@ -85,7 +85,7 @@ export default function ApplyPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto mt-12 w-full max-w-3xl space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Applications</h1>

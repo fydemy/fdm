@@ -25,8 +25,8 @@ function getActiveNavUrl(pathname: string, items: NavItem[]) {
     if (item.external) continue;
 
     const matches =
-      item.url === "/dashboard"
-        ? pathname === "/dashboard"
+      item.url === "/"
+        ? pathname === "/"
         : pathname === item.url || pathname.startsWith(`${item.url}/`);
 
     if (matches && (!activeUrl || item.url.length > activeUrl.length)) {

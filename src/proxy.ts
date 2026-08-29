@@ -4,7 +4,7 @@ import { betterFetch } from "@better-fetch/fetch";
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const protectedRoutes = ["/dashboard"];
+  const protectedRoutes = ["/dashboard", "/workspace", "/apply", "/launches/new"];
 
   const isProtectedRoute = protectedRoutes.some((route) =>
     pathname.startsWith(route),
@@ -29,5 +29,13 @@ export default async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: [
+    "/dashboard/:path*",
+    "/workspace",
+    "/workspace/:path*",
+    "/apply",
+    "/apply/:path*",
+    "/launches/new",
+    "/launches/new/:path*",
+  ],
 };

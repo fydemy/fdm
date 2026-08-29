@@ -1,9 +1,13 @@
+"use client";
+
 import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { siteConfig } from "@/lib/seo";
 import { cn } from "@/lib/utils";
-import { ArrowRight, MessageCircle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Logo } from "@/components/ui/optimized-image";
+import { authClient } from "@/lib/auth-client";
 
 function BannerMessages({ "aria-hidden": ariaHidden }: { "aria-hidden"?: boolean }) {
   return (
@@ -33,6 +37,10 @@ export function PublicSiteHeader({
   title?: string;
   hideMarquee?: boolean;
 }) {
+  const router = useRouter();
+  const { data: session } = authClient.useSession();
+  const hasSession = Boolean(session?.user);
+
   return (
     <div className="border-b bg-background">
       {!hideMarquee ? (
@@ -65,20 +73,23 @@ export function PublicSiteHeader({
                   }),
                 )}
               >
-                Browse <ArrowRight />
+                Portfolio
               </Link>
-              <Link
-                href="https://wa.me/6587470061"
-                target="_blank"
-                rel="noreferrer"
-                className={cn(
-                  buttonVariants({
-                    variant: "outline",
-                  }),
-                )}
-              >
-                <MessageCircle /> Talk
-              </Link>
+              <div className="w-fit rounded-full bg-gradient-to-tl from-blue-600 to-transparent p-0.5">
+                <Button
+                  onClick={() =>
+                    hasSession
+                      ? router.push("/apply")
+                      : authClient.signIn.social({
+                          provider: "google",
+                          callbackURL: "/apply",
+                        })
+                  }
+                  className="rounded-full"
+                >
+                  {hasSession ? "Dashboard" : "Apply Now"}
+                </Button>
+              </div>
             </div>
           )}
         </div>

@@ -1,18 +1,26 @@
 "use client";
 
 import { Suspense } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import {
   MaterialsSiteBreadcrumb,
   getMaterialsRoute,
 } from "@/components/materials-site-breadcrumb";
 
 const titles: Record<string, string> = {
-  "/dashboard": "Overview",
-  "/dashboard/apply": "Application",
-  "/dashboard/launches": "Launches",
+  "/apply": "Application",
+  "/launches": "Launches",
   "/dashboard/review": "Review applications",
   "/dashboard/review/launches": "Launches",
 };
@@ -23,6 +31,24 @@ function getTitle(pathname: string) {
   if (pathname.startsWith("/dashboard/mentor")) return "Mentors";
   if (pathname.startsWith("/dashboard/partner")) return "Partners";
   return "Dashboard";
+}
+
+function LaunchesNewBreadcrumb() {
+  return (
+    <Breadcrumb>
+      <BreadcrumbList className="text-base font-medium tracking-tight text-foreground">
+        <BreadcrumbItem>
+          <BreadcrumbLink render={<Link href="/launches" />}>
+            Launches
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage>New</BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
+  );
 }
 
 export function SiteHeader() {
@@ -40,11 +66,13 @@ export function SiteHeader() {
         {materials ? (
           <Suspense
             fallback={
-              <h1 className="text-base font-medium tracking-tight">Materials</h1>
+              <h1 className="text-base font-medium tracking-tight">Workspace</h1>
             }
           >
             <MaterialsSiteBreadcrumb />
           </Suspense>
+        ) : pathname === "/launches/new" ? (
+          <LaunchesNewBreadcrumb />
         ) : (
           <h1 className="text-base font-medium tracking-tight">
             {getTitle(pathname)}

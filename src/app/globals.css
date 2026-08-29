@@ -193,9 +193,10 @@
   margin-top: 0.75em;
 }
 
-.tiptap img {
+.tiptap img,
+.prose img {
   display: block;
   max-width: 100%;
   height: auto;
-  border-radius: 0.5rem;
+  border-radius: 0;
 }

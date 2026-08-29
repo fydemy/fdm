@@ -13,20 +13,19 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-const MATERIALS_ROUTES = [
-  "/dashboard/review/materials",
-  "/dashboard/mentor/materials",
-  "/dashboard/materials",
-] as const;
+const WORKSPACE_ROUTES = ["/workspace"] as const;
 
 export function getMaterialsRoute(pathname: string) {
-  return MATERIALS_ROUTES.find((route) => pathname.startsWith(route)) ?? null;
+  return WORKSPACE_ROUTES.find((route) => pathname.startsWith(route)) ?? null;
 }
 
 function fileIdFromPath(pathname: string, basePath: string) {
-  const prefix = `${basePath}/f/`;
+  if (pathname === basePath) return null;
+  const prefix = `${basePath}/`;
   if (!pathname.startsWith(prefix)) return null;
-  const id = pathname.slice(prefix.length).split("/")[0];
+  let rest = pathname.slice(prefix.length);
+  if (rest.startsWith("f/")) rest = rest.slice(2);
+  const id = rest.split("/")[0];
   return id || null;
 }
 
@@ -48,7 +47,7 @@ export function MaterialsSiteBreadcrumb() {
 
   if (!basePath) {
     return (
-      <h1 className="text-base font-medium tracking-tight">Materials</h1>
+      <h1 className="text-base font-medium tracking-tight">Workspace</h1>
     );
   }
 
@@ -63,7 +62,7 @@ export function MaterialsSiteBreadcrumb() {
 
   if (loading && breadcrumbs.length === 0 && !currentName) {
     return (
-      <h1 className="text-base font-medium tracking-tight">Materials</h1>
+      <h1 className="text-base font-medium tracking-tight">Workspace</h1>
     );
   }
 
@@ -72,10 +71,10 @@ export function MaterialsSiteBreadcrumb() {
       <BreadcrumbList className="text-base font-medium tracking-tight text-foreground">
         <BreadcrumbItem>
           {breadcrumbs.length === 0 && !currentName ? (
-            <BreadcrumbPage>Materials</BreadcrumbPage>
+            <BreadcrumbPage>Workspace</BreadcrumbPage>
           ) : (
             <BreadcrumbLink render={<Link href={folderHref(null)} />}>
-              Materials
+              Workspace
             </BreadcrumbLink>
           )}
         </BreadcrumbItem>

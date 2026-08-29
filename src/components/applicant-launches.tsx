@@ -8,7 +8,6 @@ import { ProductLogo } from "@/components/product-logo";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -24,7 +23,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { ExternalLink, Pencil, Plus, Trash2 } from "lucide-react";
 
-export default function LaunchesPage() {
+export function ApplicantLaunches() {
   const { data, isLoading } = trpc.application.me.useQuery();
   const approved = data?.approved;
   const { data: launches } = trpc.launch.listMine.useQuery(undefined, {
@@ -61,17 +60,14 @@ export default function LaunchesPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto mt-12 w-full max-w-3xl space-y-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">Launches</h1>
         </div>
-        <Link
-          href="/dashboard/launches/new"
-          className={cn(buttonVariants())}
-        >
+        <Link href="/launches/new" className={cn(buttonVariants())}>
           <Plus className="size-4" />
-          New launch
+          New
         </Link>
       </div>
 
@@ -90,9 +86,6 @@ export default function LaunchesPage() {
                 />
                 <div>
                   <CardTitle>{launch.title}</CardTitle>
-                  <CardDescription>
-                    {new Date(launch.createdAt).toLocaleString()}
-                  </CardDescription>
                 </div>
               </div>
               <div className="flex gap-2">

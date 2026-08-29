@@ -20,7 +20,6 @@ import { Logo } from "@/components/ui/optimized-image";
 import {
   ClipboardCheckIcon,
   FileTextIcon,
-  LayoutDashboardIcon,
   MessageCircleIcon,
   PackageIcon,
   RocketIcon,
@@ -35,23 +34,18 @@ const discordNavItem: NavItem = {
 
 const applicantNav: NavItem[] = [
   {
-    title: "Overview",
-    url: "/dashboard",
-    icon: <LayoutDashboardIcon />,
-  },
-  {
     title: "Applications",
-    url: "/dashboard/apply",
+    url: "/apply",
     icon: <FileTextIcon />,
   },
   {
     title: "Launches",
-    url: "/dashboard/launches",
+    url: "/launches",
     icon: <RocketIcon />,
   },
   {
-    title: "Materials",
-    url: "/dashboard/materials",
+    title: "Workspace",
+    url: "/workspace",
     icon: <PackageIcon />,
   },
   discordNavItem,
@@ -65,12 +59,12 @@ const reviewerNav: NavItem[] = [
   },
   {
     title: "Launches",
-    url: "/dashboard/review/launches",
+    url: "/launches",
     icon: <RocketIcon />,
   },
   {
-    title: "Materials",
-    url: "/dashboard/review/materials",
+    title: "Workspace",
+    url: "/workspace",
     icon: <PackageIcon />,
   },
   discordNavItem,
@@ -83,8 +77,8 @@ const mentorNav: NavItem[] = [
     icon: <ClipboardCheckIcon />,
   },
   {
-    title: "Materials",
-    url: "/dashboard/mentor/materials",
+    title: "Workspace",
+    url: "/workspace",
     icon: <PackageIcon />,
   },
   discordNavItem,

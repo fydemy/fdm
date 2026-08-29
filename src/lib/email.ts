@@ -90,7 +90,7 @@ export async function sendApplicationApprovedEmail(input: {
       siteConfig.depositPaymentUrl,
       "",
       "Once paid, you can publish launches and access program materials from your dashboard:",
-      `${siteConfig.url}/dashboard/apply`,
+      `${siteConfig.url}/apply`,
       "",
       "If you haven't already, join us on Discord and say hello so we can get you plugged into the community:",
       siteConfig.discordInviteUrl,
@@ -98,7 +98,7 @@ export async function sendApplicationApprovedEmail(input: {
   } else {
     lines.push(
       "Head to your dashboard to publish launches and access program materials:",
-      `${siteConfig.url}/dashboard/apply`,
+      `${siteConfig.url}/apply`,
       "",
       "If you haven't already, join us on Discord and say hello so we can get you plugged into the community:",
       siteConfig.discordInviteUrl,
