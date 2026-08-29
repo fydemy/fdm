@@ -48,6 +48,13 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
   --animate-marquee: marquee 28s linear infinite;
+  --animate-gradient-ring: gradient-ring 4s linear infinite;
+}
+
+@property --ring-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
 }
 
 @keyframes marquee {
@@ -59,8 +66,24 @@
   }
 }
 
+@keyframes gradient-ring {
+  to {
+    --ring-angle: 360deg;
+  }
+}
+
+.animate-gradient-ring {
+  background: conic-gradient(
+    from var(--ring-angle),
+    transparent 0deg,
+    var(--ring-color, #9333ea) 55deg,
+    transparent 130deg
+  );
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee {
+  .animate-marquee,
+  .animate-gradient-ring {
     animation: none;
   }
 }

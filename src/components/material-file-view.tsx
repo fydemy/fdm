@@ -1,28 +1,24 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
-import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { MarkdownContent } from "@/components/markdown-content";
 import { RichTextEditor } from "@/components/rich-text-editor";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { contentHasText } from "@/lib/embeds";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { toast } from "sonner";
-import { ArrowLeft, FileText, Loader2, Pencil, Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { EllipsisVertical, Loader2, Pencil, Trash2 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type MaterialFileViewProps = {
   id: string;
@@ -71,101 +67,68 @@ export function MaterialFileView({ id, basePath }: MaterialFileViewProps) {
   const canEdit = file?.canEdit ?? false;
   const canDelete = file?.canDelete ?? false;
 
-  if (isLoading) return <Skeleton className="h-96" />;
-
-  if (error || !file) {
+  if (isLoading) {
     return (
-      <Alert>
-        <AlertTitle>File not found</AlertTitle>
-        <AlertDescription>
-          This file may have been deleted or you do not have access.
-        </AlertDescription>
-      </Alert>
+      <div className="mx-auto w-full max-w-3xl">
+        <Skeleton className="h-96" />
+      </div>
     );
   }
 
-  const folderHref = (folderId: string | null) =>
-    folderId ? `${basePath}?folder=${folderId}` : basePath;
-
-  const parentHref = folderHref(file.parentId);
+  if (error || !file) {
+    return (
+      <div className="mx-auto w-full max-w-3xl">
+        <Alert>
+          <AlertTitle>File not found</AlertTitle>
+          <AlertDescription>
+            This file may have been deleted or you do not have access.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto w-full max-w-3xl space-y-6 mt-12">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="space-y-3">
-          <Link
-            href={parentHref}
-            className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
-          >
-            <ArrowLeft className="size-4" />
-            Back
-          </Link>
-
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink render={<Link href={folderHref(null)} />}>
-                  Materials
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-              {file.breadcrumbs.map((crumb) => (
-                <Fragment key={crumb.id}>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbLink render={<Link href={folderHref(crumb.id)} />}>
-                      {crumb.name}
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                </Fragment>
-              ))}
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{file.name}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-
-          <div className="flex items-center gap-2">
-            <FileText className="size-5 text-blue-500" />
-            <h1 className="text-2xl font-semibold tracking-tight">{file.name}</h1>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Updated {new Date(file.updatedAt).toLocaleString()}
-          </p>
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight">{file.name}</h1>
         </div>
 
         {canEdit && !editing && (
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setName(file.name);
-                setContent(file.content ?? "");
-                setEditorKey((key) => key + 1);
-                setEditing(true);
-              }}
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={<Button type="button" variant="ghost" size="icon" />}
             >
-              <Pencil className="size-4" />
-              Edit
-            </Button>
-            {canDelete && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
+              <EllipsisVertical className="size-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
                 onClick={() => {
-                  if (confirm("Delete this file?")) {
-                    remove.mutate({ id: file.id });
-                  }
+                  setName(file.name);
+                  setContent(file.content ?? "");
+                  setEditorKey((key) => key + 1);
+                  setEditing(true);
                 }}
               >
-                <Trash2 className="size-4" />
-                Delete
-              </Button>
-            )}
-          </div>
+                <Pencil className="size-4" />
+                Edit
+              </DropdownMenuItem>
+              {canDelete && (
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => {
+                    if (confirm("Delete this file?")) {
+                      remove.mutate({ id: file.id });
+                    }
+                  }}
+                >
+                  <Trash2 className="size-4" />
+                  Delete
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
       </div>
 
@@ -221,9 +184,7 @@ export function MaterialFileView({ id, basePath }: MaterialFileViewProps) {
           </div>
         </form>
       ) : (
-        <div className="rounded-xl border p-6">
-          <MarkdownContent content={file.content ?? ""} />
-        </div>
+        <MarkdownContent content={file.content ?? ""} />
       )}
     </div>
   );

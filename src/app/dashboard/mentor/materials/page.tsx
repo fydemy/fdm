@@ -23,14 +23,7 @@ function MentorMaterialsContent() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Materials</h1>
-        <p className="text-sm text-muted-foreground">
-          You can create and edit files inside folders reviewers mark for mentors.
-        </p>
-      </div>
-
+    <div className="mx-auto w-full max-w-3xl space-y-8">
       <MaterialsBrowser basePath="/dashboard/mentor/materials" editMode="mentor" />
     </div>
   );

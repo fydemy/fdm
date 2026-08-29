@@ -142,8 +142,9 @@ model MaterialItem {
   id          String         @id @default(cuid())
   name        String
   type        MaterialType
-  content        String?
-  mentorEditable Boolean        @default(false)
+  content           String?
+  mentorEditable    Boolean        @default(false)
+  applicantEditable Boolean        @default(false)
   parentId       String?
   parent      MaterialItem?  @relation("MaterialTree", fields: [parentId], references: [id], onDelete: Cascade)
   children    MaterialItem[] @relation("MaterialTree")

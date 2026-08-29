@@ -5,6 +5,8 @@ import DOMPurify from "isomorphic-dompurify";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { SocialEmbedFrame } from "@/components/social-embed-frame";
+import { MaterialBoardViews } from "@/components/material-board-views";
+import { decodeBoardPayload } from "@/lib/material-board";
 import {
   getSocialEmbedSrc,
   getYoutubeEmbedUrl,
@@ -25,13 +27,13 @@ export function MarkdownContent({
   const youtubeEmbed = getYoutubeEmbedUrl(youtubeUrl);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 py-12">
       {isHtmlContent(content) ? (
-        <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-a:text-primary">
+        <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none text-sm prose-headings:scroll-mt-20 prose-a:text-primary">
           {renderRichHtml(content)}
         </div>
       ) : (
-        <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:scroll-mt-20 prose-a:text-primary">
+        <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none text-sm prose-headings:scroll-mt-20 prose-a:text-primary">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
         </div>
       )}
@@ -82,7 +84,15 @@ export function MarkdownContent({
 
 function renderRichHtml(content: string) {
   const clean = DOMPurify.sanitize(content, {
-    ADD_ATTR: ["data-social-embed", "target", "rel", "src", "alt", "class"],
+    ADD_ATTR: [
+      "data-social-embed",
+      "data-notion-board",
+      "target",
+      "rel",
+      "src",
+      "alt",
+      "class",
+    ],
   });
 
   return parse(clean, {
@@ -90,9 +100,22 @@ function renderRichHtml(content: string) {
       if (!isElement(domNode) || domNode.name !== "div") return;
 
       const url = domNode.attribs?.["data-social-embed"];
-      if (!url) return;
+      if (url) {
+        return <SocialEmbedFrame url={url} className="not-prose my-4" />;
+      }
 
-      return <SocialEmbedFrame url={url} className="not-prose my-4" />;
+      const payload = domNode.attribs?.["data-notion-board"];
+      if (payload) {
+        return (
+          <div className="not-prose my-4 rounded-xl border bg-background">
+            <MaterialBoardViews
+              board={decodeBoardPayload(payload)}
+              canEdit={false}
+              onChange={() => {}}
+            />
+          </div>
+        );
+      }
     },
   });
 }

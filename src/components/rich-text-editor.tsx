@@ -10,6 +10,7 @@ import Underline from "@tiptap/extension-underline";
 import { marked } from "marked";
 import {
   Bold,
+  Columns3,
   Heading1,
   Heading2,
   Heading3,
@@ -23,6 +24,7 @@ import {
   Underline as UnderlineIcon,
 } from "lucide-react";
 import { SocialEmbed } from "@/components/social-embed-extension";
+import { NotionBoard } from "@/components/notion-board-extension";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -34,6 +36,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { authClient } from "@/lib/auth-client";
+import { BoardEditorUserContext } from "@/components/board-editor-user";
 import { getEmbedInfo, isHtmlContent } from "@/lib/embeds";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -77,6 +81,14 @@ export function RichTextEditor({
   const [uploadingImage, setUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadImageRef = useRef<(file: File) => void>(() => {});
+  const { data: session } = authClient.useSession();
+  const boardUser = session?.user
+    ? {
+        id: session.user.id,
+        name: session.user.name,
+        image: session.user.image ?? null,
+      }
+    : null;
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -101,12 +113,13 @@ export function RichTextEditor({
       }),
       Placeholder.configure({ placeholder }),
       SocialEmbed,
+      NotionBoard,
     ],
     content: toEditorHtml(value),
     editorProps: {
       attributes: {
         class:
-          "prose prose-neutral dark:prose-invert max-w-none min-h-[240px] px-4 py-3 focus:outline-none",
+          "prose prose-sm prose-neutral dark:prose-invert max-w-none min-h-[240px] px-4 py-3 text-sm focus:outline-none",
       },
       handlePaste(_view, event) {
         const file = Array.from(event.clipboardData?.files ?? []).find(isImageFile);
@@ -214,6 +227,7 @@ export function RichTextEditor({
   }
 
   return (
+    <BoardEditorUserContext.Provider value={boardUser}>
     <div className={cn("overflow-hidden rounded-xl bg-muted/30", className)}>
       <div className="flex flex-wrap items-center gap-1 bg-muted/50 p-2">
         <ToolbarButton
@@ -297,6 +311,15 @@ export function RichTextEditor({
         <ToolbarButton onClick={() => setEmbedOpen(true)} label="Embed post">
           <Share2 />
           <span className="text-xs font-medium">Embed</span>
+        </ToolbarButton>
+        <ToolbarButton
+          onClick={() =>
+            editor.chain().focus().setNotionBoard().createParagraphNear().run()
+          }
+          label="Notion board"
+        >
+          <Columns3 />
+          <span className="text-xs font-medium">Board</span>
         </ToolbarButton>
         <ToolbarButton
           onClick={() => fileInputRef.current?.click()}
@@ -390,6 +413,7 @@ export function RichTextEditor({
         </DialogContent>
       </Dialog>
     </div>
+    </BoardEditorUserContext.Provider>
   );
 }
 

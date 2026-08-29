@@ -23,9 +23,7 @@ function MaterialsContent() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight">Materials</h1>
-
+    <div className="mx-auto w-full max-w-3xl space-y-8">
       <MaterialsBrowser basePath="/dashboard/materials" />
     </div>
   );

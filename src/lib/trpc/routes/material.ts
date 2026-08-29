@@ -8,6 +8,7 @@ import {
 } from "../context";
 import { prisma } from "@/lib/prisma";
 import {
+  canAccessApplicantWorkspace,
   getUserRole,
   isMentor,
   isReviewer,
@@ -31,34 +32,50 @@ async function assertCanReadMaterials(user: { id: string; role: string }) {
   }
 }
 
-async function isInMentorEditableTree(folderId: string | null) {
+async function isInEditableTree(
+  folderId: string | null,
+  flag: "mentorEditable" | "applicantEditable",
+) {
   let currentId = folderId;
 
   while (currentId) {
     const folder = await prisma.materialItem.findUnique({
       where: { id: currentId },
-      select: { parentId: true, mentorEditable: true, type: true },
+      select: {
+        parentId: true,
+        mentorEditable: true,
+        applicantEditable: true,
+        type: true,
+      },
     });
 
     if (!folder || folder.type !== "FOLDER") return false;
-    if (folder.mentorEditable) return true;
+    if (folder[flag]) return true;
     currentId = folder.parentId;
   }
 
   return false;
 }
 
-async function canWriteInFolder(user: { role: string }, parentId: string | null) {
+async function canWriteInFolder(
+  user: { id: string; role: string },
+  parentId: string | null,
+) {
   if (isReviewer(user.role)) return true;
-  if (!isMentor(user.role)) return false;
+  if (isMentor(user.role)) {
+    if (!parentId) return false;
+    return isInEditableTree(parentId, "mentorEditable");
+  }
   if (!parentId) return false;
-  return isInMentorEditableTree(parentId);
+  if (!canAccessApplicantWorkspace(user.role)) return false;
+  return isInEditableTree(parentId, "applicantEditable");
 }
 
-async function canEditFile(user: { role: string }, fileParentId: string | null) {
-  if (isReviewer(user.role)) return true;
-  if (!isMentor(user.role)) return false;
-  return isInMentorEditableTree(fileParentId);
+async function canEditFile(
+  user: { id: string; role: string },
+  fileParentId: string | null,
+) {
+  return canWriteInFolder(user, fileParentId);
 }
 
 async function getBreadcrumbs(folderId: string | null) {
@@ -115,6 +132,7 @@ export const materialRouter = t.router({
           name: true,
           type: true,
           mentorEditable: true,
+          applicantEditable: true,
           createdAt: true,
           updatedAt: true,
         },
@@ -171,6 +189,7 @@ export const materialRouter = t.router({
         name: z.string().min(1).max(200),
         parentId: z.string().nullable().optional(),
         mentorEditable: z.boolean().optional(),
+        applicantEditable: z.boolean().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -191,6 +210,7 @@ export const materialRouter = t.router({
           type: "FOLDER",
           parentId,
           mentorEditable: input.mentorEditable ?? false,
+          applicantEditable: input.applicantEditable ?? false,
           createdById: ctx.user.id,
         },
       });
@@ -273,6 +293,7 @@ export const materialRouter = t.router({
         id: z.string(),
         name: z.string().min(1).max(200),
         mentorEditable: z.boolean().optional(),
+        applicantEditable: z.boolean().optional(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -290,6 +311,9 @@ export const materialRouter = t.router({
           name: input.name.trim(),
           ...(item.type === "FOLDER" && input.mentorEditable !== undefined
             ? { mentorEditable: input.mentorEditable }
+            : {}),
+          ...(item.type === "FOLDER" && input.applicantEditable !== undefined
+            ? { applicantEditable: input.applicantEditable }
             : {}),
         },
       });

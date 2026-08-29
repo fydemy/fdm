@@ -1,7 +1,6 @@
 "use client";
 
-import { Fragment, useRef, useState } from "react";
-import Link from "next/link";
+import { useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { RichTextEditor } from "@/components/rich-text-editor";
@@ -13,14 +12,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import { contentHasText } from "@/lib/embeds";
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -30,15 +21,21 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import {
+  ChevronDown,
+  EllipsisVertical,
   FileText,
   Folder,
   FolderPlus,
   Loader2,
   Pencil,
-  Plus,
   Trash2,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type MaterialsBrowserProps = {
   basePath: string;
@@ -70,14 +67,17 @@ export function MaterialsBrowser({
     name: string;
     type: "FOLDER" | "FILE";
     mentorEditable?: boolean;
+    applicantEditable?: boolean;
   } | null>(null);
   const [folderName, setFolderName] = useState("");
   const [folderMentorEditable, setFolderMentorEditable] = useState(false);
+  const [folderApplicantEditable, setFolderApplicantEditable] = useState(false);
   const [fileName, setFileName] = useState("");
   const [fileContent, setFileContent] = useState("");
   const [fileEditorKey, setFileEditorKey] = useState(0);
   const [renameName, setRenameName] = useState("");
   const [renameMentorEditable, setRenameMentorEditable] = useState(false);
+  const [renameApplicantEditable, setRenameApplicantEditable] = useState(false);
 
   const invalidate = async () => {
     await utils.material.list.invalidate();
@@ -157,180 +157,169 @@ export function MaterialsBrowser({
   if (isLoading) return <Skeleton className="h-96" />;
 
   const items = data?.items ?? [];
-  const breadcrumbs = data?.breadcrumbs ?? [];
   const canWriteHere = data?.canWriteHere ?? false;
   const showFolderActions = editMode === "full";
+  const canAddFolder = showFolderActions;
+  const canAddFile =
+    showFolderActions ||
+    (editMode === "mentor" && canWriteHere) ||
+    (editMode === "none" && canWriteHere);
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              {breadcrumbs.length !== 0 && (
-                <BreadcrumbLink render={<Link href={folderHref(null)} />}>
-                  Materials
-                </BreadcrumbLink>
+    <div className="space-y-6 mt-12">
+      {canAddFile && (
+        <div className="flex justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger render={<Button size="sm" />}>
+              Add
+              <ChevronDown className="size-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {canAddFolder && (
+                <DropdownMenuItem
+                  onClick={() => {
+                    setFolderMentorEditable(false);
+                    setFolderApplicantEditable(false);
+                    setFolderOpen(true);
+                  }}
+                >
+                  <FolderPlus className="size-4" />
+                  Folder
+                </DropdownMenuItem>
               )}
-            </BreadcrumbItem>
-            {breadcrumbs.map((crumb, index) => (
-              <Fragment key={crumb.id}>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  {index === breadcrumbs.length - 1 ? (
-                    <BreadcrumbPage>{crumb.name}</BreadcrumbPage>
-                  ) : (
-                    <BreadcrumbLink render={<Link href={folderHref(crumb.id)} />}>
-                      {crumb.name}
-                    </BreadcrumbLink>
-                  )}
-                </BreadcrumbItem>
-              </Fragment>
-            ))}
-          </BreadcrumbList>
-        </Breadcrumb>
-
-        {showFolderActions && (
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setFolderMentorEditable(false);
-                setFolderOpen(true);
-              }}
-            >
-              <FolderPlus className="size-4" />
-              New folder
-            </Button>
-            <Button type="button" size="sm" onClick={() => setFileOpen(true)}>
-              <Plus className="size-4" />
-              New file
-            </Button>
-          </div>
-        )}
-
-        {editMode === "mentor" && canWriteHere && (
-          <Button type="button" size="sm" onClick={() => setFileOpen(true)}>
-            <Plus className="size-4" />
-            New file
-          </Button>
-        )}
-      </div>
-
-      <div className="overflow-hidden rounded-xl border">
-        <div className="grid grid-cols-[1fr_auto] gap-4 border-b bg-muted/40 px-4 py-2 text-xs font-medium tracking-wide text-muted-foreground uppercase sm:grid-cols-[1fr_140px_auto]">
-          <span>Name</span>
-          <span className="hidden sm:inline">Modified</span>
-          <span className="w-20 text-right">
-            {showFolderActions || editMode === "mentor" ? "Actions" : ""}
-          </span>
+              <DropdownMenuItem onClick={() => setFileOpen(true)}>
+                <FileText className="size-4" />
+                File
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
+      )}
 
-        {items.length === 0 && (
-          <p className="px-4 py-10 text-center text-sm text-muted-foreground">
-            This folder is empty.
-          </p>
-        )}
-
-        <ul className="divide-y">
+      {items.length === 0 ? (
+        <p className="rounded-xl border px-4 py-12 text-center text-sm text-muted-foreground">
+          This folder is empty.
+        </p>
+      ) : (
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 py-12">
           {items.map((item) => {
             const Icon = item.type === "FOLDER" ? Folder : FileText;
             return (
-              <li
-                key={item.id}
-                className="group grid cursor-pointer grid-cols-[1fr_auto] items-center gap-4 px-4 py-3 transition-colors hover:bg-muted/40 sm:grid-cols-[1fr_140px_auto]"
-                onClick={() => openItem(item)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    openItem(item);
-                  }
-                }}
-                role="button"
-                tabIndex={0}
-              >
-                <div className="flex min-w-0 items-center gap-3">
-                  <Icon
-                    className={cn(
-                      "size-5 shrink-0",
-                      item.type === "FOLDER"
-                        ? "text-amber-500"
-                        : "text-blue-500",
-                    )}
-                  />
-                  <span className="truncate font-medium">{item.name}</span>
-                  {item.type === "FOLDER" && item.mentorEditable && (
-                    <Badge variant="secondary" className="shrink-0">
-                      Mentor
-                    </Badge>
-                  )}
-                </div>
-                <span className="hidden text-sm text-muted-foreground sm:inline">
-                  {new Date(item.updatedAt).toLocaleDateString()}
-                </span>
+              <li key={item.id}>
                 <div
-                  className="flex w-20 justify-end gap-1"
-                  onClick={(event) => event.stopPropagation()}
-                  onKeyDown={(event) => event.stopPropagation()}
+                  className="group relative flex cursor-pointer flex-col gap-3 rounded-xl border bg-muted/20 p-4 text-left transition-colors hover:bg-muted/40"
+                  onClick={() => openItem(item)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      openItem(item);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
                 >
-                  {showFolderActions && (
-                    <>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="size-8 opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
-                        onClick={() => {
-                          setRenameTarget({
-                            id: item.id,
-                            name: item.name,
-                            type: item.type,
-                            mentorEditable:
-                              item.type === "FOLDER"
-                                ? item.mentorEditable
-                                : undefined,
-                          });
-                          setRenameName(item.name);
-                          setRenameMentorEditable(
-                            item.type === "FOLDER" ? !!item.mentorEditable : false,
-                          );
-                        }}
+                  <div className="flex items-start justify-between gap-2">
+                    <Icon className="size-4 shrink-0 text-foreground" />
+                    {(item.type === "FOLDER" &&
+                      (item.mentorEditable || item.applicantEditable)) && (
+                      <div className="flex flex-wrap justify-end gap-1.5">
+                        {item.mentorEditable && (
+                          <Badge variant="secondary">Mentor</Badge>
+                        )}
+                        {item.applicantEditable && (
+                          <Badge variant="secondary">Applicant</Badge>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-end justify-between gap-2">
+                    <p className="min-w-0 line-clamp-1 font-medium">{item.name}</p>
+                    {showFolderActions && (
+                      <div
+                        className="shrink-0"
+                        onClick={(event) => event.stopPropagation()}
+                        onKeyDown={(event) => event.stopPropagation()}
                       >
-                        <Pencil className="size-4" />
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="size-8 opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
-                        onClick={() => {
-                          const label =
-                            item.type === "FOLDER" ? "folder" : "file";
-                          if (
-                            confirm(
-                              `Delete this ${label}?${
-                                item.type === "FOLDER"
-                                  ? " Everything inside will be deleted too."
-                                  : ""
-                              }`,
-                            )
-                          ) {
-                            remove.mutate({ id: item.id });
-                          }
-                        }}
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
-                    </>
-                  )}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger
+                            render={
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="size-8"
+                              />
+                            }
+                          >
+                            <EllipsisVertical className="size-4" />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            onClick={(event) => event.stopPropagation()}
+                          >
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setRenameTarget({
+                                  id: item.id,
+                                  name: item.name,
+                                  type: item.type,
+                                  mentorEditable:
+                                    item.type === "FOLDER"
+                                      ? item.mentorEditable
+                                      : undefined,
+                                  applicantEditable:
+                                    item.type === "FOLDER"
+                                      ? item.applicantEditable
+                                      : undefined,
+                                });
+                                setRenameName(item.name);
+                                setRenameMentorEditable(
+                                  item.type === "FOLDER"
+                                    ? !!item.mentorEditable
+                                    : false,
+                                );
+                                setRenameApplicantEditable(
+                                  item.type === "FOLDER"
+                                    ? !!item.applicantEditable
+                                    : false,
+                                );
+                              }}
+                            >
+                              <Pencil className="size-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              variant="destructive"
+                              onClick={() => {
+                                const label =
+                                  item.type === "FOLDER" ? "folder" : "file";
+                                if (
+                                  confirm(
+                                    `Delete this ${label}?${
+                                      item.type === "FOLDER"
+                                        ? " Everything inside will be deleted too."
+                                        : ""
+                                    }`,
+                                  )
+                                ) {
+                                  remove.mutate({ id: item.id });
+                                }
+                              }}
+                            >
+                              <Trash2 className="size-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </li>
             );
           })}
         </ul>
-      </div>
+      )}
 
       <Dialog
         open={folderOpen}
@@ -352,6 +341,7 @@ export function MaterialsBrowser({
                 name: folderName,
                 parentId: parentId ?? null,
                 mentorEditable: folderMentorEditable,
+                applicantEditable: folderApplicantEditable,
               });
             }}
           >
@@ -373,6 +363,15 @@ export function MaterialsBrowser({
                 }
               />
               Allow mentors to edit contents
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <Checkbox
+                checked={folderApplicantEditable}
+                onCheckedChange={(checked) =>
+                  setFolderApplicantEditable(checked === true)
+                }
+              />
+              Allow accepted applicants to edit contents
             </label>
             <DialogFooter>
               <Button
@@ -484,7 +483,10 @@ export function MaterialsBrowser({
                 id: renameTarget.id,
                 name: renameName,
                 ...(renameTarget.type === "FOLDER"
-                  ? { mentorEditable: renameMentorEditable }
+                  ? {
+                      mentorEditable: renameMentorEditable,
+                      applicantEditable: renameApplicantEditable,
+                    }
                   : {}),
               });
             }}
@@ -500,15 +502,26 @@ export function MaterialsBrowser({
               />
             </div>
             {renameTarget?.type === "FOLDER" && (
-              <label className="flex items-center gap-2 text-sm">
-                <Checkbox
-                  checked={renameMentorEditable}
-                  onCheckedChange={(checked) =>
-                    setRenameMentorEditable(checked === true)
-                  }
-                />
-                Allow mentors to edit contents
-              </label>
+              <>
+                <label className="flex items-center gap-2 text-sm">
+                  <Checkbox
+                    checked={renameMentorEditable}
+                    onCheckedChange={(checked) =>
+                      setRenameMentorEditable(checked === true)
+                    }
+                  />
+                  Allow mentors to edit contents
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <Checkbox
+                    checked={renameApplicantEditable}
+                    onCheckedChange={(checked) =>
+                      setRenameApplicantEditable(checked === true)
+                    }
+                  />
+                  Allow accepted applicants to edit contents
+                </label>
+              </>
             )}
             <DialogFooter>
               <Button

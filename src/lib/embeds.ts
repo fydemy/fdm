@@ -135,7 +135,11 @@ export function isHtmlContent(content: string): boolean {
 
 export function contentHasText(html: string): boolean {
   const text = html.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim();
-  return text.length > 0 || html.includes("data-social-embed");
+  return (
+    text.length > 0 ||
+    html.includes("data-social-embed") ||
+    html.includes("data-notion-board")
+  );
 }
 
 export const EMBED_PLATFORM_LABELS: Record<EmbedPlatform, string> = {
