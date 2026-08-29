@@ -19,6 +19,11 @@ export const siteConfig = {
     instagram: "https://www.instagram.com/fydemy/",
     tiktok: "https://www.tiktok.com/@fydemy",
     linkedin: "https://www.linkedin.com/company/fydemy",
+    ntuArticle:
+      "https://www.ntu.edu.sg/honours-college/admissions/undergraduate/premier-scholar-programmes/renaissance-engineering-programme/achievements/year-2026/fydemy-accelerator",
+    notion: "https://www.notion.com",
+    boardy: "https://www.boardy.ai",
+    liftoff: "https://joinliftoff.web.app",
   },
   get url() {
     return process.env.BETTER_AUTH_URL ?? defaultUrl;

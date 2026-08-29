@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { SketchFlag } from "@/components/sketch-flag";
 import { LAND_RINGS, type LandRing } from "@/lib/globe-lands";
 import { cn } from "@/lib/utils";
@@ -138,14 +138,22 @@ function visibleLandSegments(ring: LandRing, rotation: number) {
   return segments;
 }
 
+const SPIN_PER_FRAME = 0.17;
+const DRAG_DEGREES_PER_PX = 0.45;
+
 export function SketchGlobe({ className }: { className?: string }) {
   const [rotation, setRotation] = useState(-20);
+  const [dragging, setDragging] = useState(false);
+  const rotationRef = useRef(-20);
+  const draggingRef = useRef(false);
+  const lastXRef = useRef(0);
 
   useEffect(() => {
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
     if (reduceMotion) {
+      rotationRef.current = 18;
       setRotation(18);
       return;
     }
@@ -155,8 +163,9 @@ export function SketchGlobe({ className }: { className?: string }) {
 
     const tick = () => {
       frame += 1;
-      if (frame % 2 === 0) {
-        setRotation(-20 + frame * 0.12);
+      if (!draggingRef.current && frame % 2 === 0) {
+        rotationRef.current += SPIN_PER_FRAME * 2;
+        setRotation(rotationRef.current);
       }
       raf = requestAnimationFrame(tick);
     };
@@ -164,6 +173,35 @@ export function SketchGlobe({ className }: { className?: string }) {
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, []);
+
+  function isDesktopPointer(event: React.PointerEvent) {
+    return event.pointerType === "mouse" || event.pointerType === "pen";
+  }
+
+  function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    if (!isDesktopPointer(event)) return;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    draggingRef.current = true;
+    lastXRef.current = event.clientX;
+    setDragging(true);
+  }
+
+  function onPointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    if (!draggingRef.current) return;
+    const delta = event.clientX - lastXRef.current;
+    lastXRef.current = event.clientX;
+    rotationRef.current += delta * DRAG_DEGREES_PER_PX;
+    setRotation(rotationRef.current);
+  }
+
+  function onPointerUp(event: React.PointerEvent<HTMLDivElement>) {
+    if (!draggingRef.current) return;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    draggingRef.current = false;
+    setDragging(false);
+  }
 
   const meridians = useMemo(() => graticuleMeridians(rotation), [rotation]);
   const parallels = useMemo(() => graticuleParallels(rotation), [rotation]);
@@ -189,7 +227,18 @@ export function SketchGlobe({ className }: { className?: string }) {
   );
 
   return (
-    <div className={cn("relative mx-auto aspect-square w-full max-w-md", className)}>
+    <div
+      className={cn(
+        "relative mx-auto aspect-square w-full max-w-md select-none",
+        "md:cursor-grab",
+        dragging && "md:cursor-grabbing",
+        className,
+      )}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+    >
       <svg
         viewBox="0 0 400 400"
         className="h-full w-full text-foreground"

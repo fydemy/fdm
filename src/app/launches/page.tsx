@@ -11,7 +11,7 @@ export default function PublicLaunchesPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <PublicSiteHeader />
+      <PublicSiteHeader hideMarquee />
 
       <main className="mx-auto w-full max-w-4xl flex-1 space-y-8 px-6 py-12">
         <h1 className="text-3xl font-semibold tracking-tight">Launches</h1>

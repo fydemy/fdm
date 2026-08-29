@@ -11,12 +11,11 @@ function FlowNode({
   return (
     <div
       className={cn(
-        "w-full max-w-xs rounded-md border border-foreground/15 bg-background px-3 py-2.5 text-center font-mono text-sm leading-snug text-foreground",
+        "w-full max-w-xs rounded-md border border-foreground/15 bg-background px-3 py-2.5 text-center font-mono text-sm leading-snug text-foreground font-medium",
         className,
       )}
     >
-      <span className="text-muted-foreground">[</span> {children}{" "}
-      <span className="text-muted-foreground">]</span>
+      {children}
     </div>
   );
 }
@@ -57,10 +56,6 @@ function ConnectorSplit() {
 function ConnectorMerge() {
   return (
     <div className="w-full py-2" aria-hidden>
-      <div className="mx-auto flex max-w-xs flex-col items-center md:hidden">
-        <div className="h-4 w-px bg-foreground/20" />
-        <ChevronDown className="size-3.5 -mt-0.5 text-foreground/30" strokeWidth={2} />
-      </div>
       <svg
         viewBox="0 0 100 28"
         className="mx-auto hidden h-7 w-full max-w-2xl text-foreground/20 md:block"
@@ -87,13 +82,11 @@ function BranchItem({ children }: { children: React.ReactNode }) {
 }
 
 function OptionColumn({
-  option,
   title,
   subtitle,
   items,
   footer,
 }: {
-  option: string;
   title: string;
   subtitle: string;
   items: React.ReactNode;
@@ -102,9 +95,6 @@ function OptionColumn({
   return (
     <div className="flex flex-col gap-4">
       <div className="space-y-2 text-center">
-        <p className="font-mono text-sm font-medium uppercase tracking-wide text-muted-foreground">
-          {option}
-        </p>
         <FlowNode className="max-w-none">{title}</FlowNode>
         <p className="text-sm text-muted-foreground">{subtitle}</p>
       </div>
@@ -119,7 +109,7 @@ function OptionColumn({
 }
 
 export function FounderFlowDiagram({
-  title = "How it works",
+  title = "How it works?",
   className,
 }: {
   title?: string;
@@ -140,58 +130,48 @@ export function FounderFlowDiagram({
         >
           <FlowNode>Apply</FlowNode>
           <ConnectorDown />
-          <FlowNode>Local AI Filter &amp; Partner Audit</FlowNode>
+          <FlowNode>Review & Choose Option<br />(can be simultaneously)</FlowNode>
           <ConnectorSplit />
 
           <div className="my-4 grid w-full grid-cols-1 gap-10 md:grid-cols-3 md:gap-6 lg:gap-8">
             <OptionColumn
-              option="Option A"
-              title="Core Scaling Track"
-              subtitle="Original Path"
+              title="Core"
+              subtitle="Default"
               items={
                 <>
                   <BranchItem>
-                    <span className="font-medium">High Traction?</span>
-                    <ul className="mt-2 space-y-1.5 pl-1 text-sm">
-                      <li>Yes → Instant Intro</li>
-                      <li>
-                        No → Milestones &amp; Async Checks
-                        <span className="mt-0.5 block text-muted-foreground">
-                          (Blocker? → Mentor Match)
-                        </span>
-                      </li>
-                    </ul>
+                    Accompanied by Deal Partner @ Boardy
+                  </BranchItem>
+                  <BranchItem>
+                    Playbook & tools from Notion and alumni team
+                  </BranchItem>
+                  <BranchItem>
+                    Peer progress & strategic reviews with mentors
                   </BranchItem>
                 </>
               }
             />
 
             <OptionColumn
-              option="Option B"
-              title="Fractional BD / Advisory"
-              subtitle="Network"
+              title="Growth"
+              subtitle="Partner"
               items={
                 <>
                   <BranchItem>
-                    Paired with Ex-Founders / Incubator Managers / Series-A
-                    Alumni
+                    Paired with ex-founders, incubator managers, series-A founders
                   </BranchItem>
-                  <BranchItem>Strategic BD Support &amp; GTM Execution</BranchItem>
+                  <BranchItem>Strategic Business Development &amp; GTM Execution</BranchItem>
                 </>
               }
             />
 
             <OptionColumn
-              option="Option C"
-              title="Top Builders Exchange"
-              subtitle="Network"
+              title="People"
+              subtitle="Partner"
               items={
                 <>
                   <BranchItem>
                     Access to YC, MIT, Harvard, Stanford Builder Hubs
-                  </BranchItem>
-                  <BranchItem>
-                    Peer Code &amp; Strategy Reviews / Masterminds
                   </BranchItem>
                 </>
               }

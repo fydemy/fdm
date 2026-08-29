@@ -1,3 +1,4 @@
+import type { DragEvent } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +12,8 @@ interface OptimizedImageProps {
   fill?: boolean;
   sizes?: string;
   quality?: number;
+  draggable?: boolean;
+  onDragStart?: (event: DragEvent<HTMLImageElement>) => void;
 }
 
 // Custom component for optimized images
@@ -34,6 +37,8 @@ export function OptimizedImage({
         alt={alt}
         className={cn("object-cover", className)}
         loading={priority ? "eager" : "lazy"}
+        draggable={false}
+        onDragStart={(event) => event.preventDefault()}
         width={width}
         height={height}
         {...props}
@@ -53,6 +58,8 @@ export function OptimizedImage({
       fill={fill}
       sizes={sizes}
       quality={quality}
+      draggable={false}
+      onDragStart={(event) => event.preventDefault()}
       {...(fill ? {} : { width, height })}
       {...props}
     />
@@ -122,7 +129,12 @@ export function Logo({ src, name, className }: LogoProps) {
       alt={`${name} logo`}
       width={120}
       height={120}
-      className={cn("h-auto w-auto object-contain", className)}
+      draggable={false}
+      onDragStart={(event) => event.preventDefault()}
+      className={cn(
+        "h-auto w-auto object-contain select-none [user-drag:none]",
+        className,
+      )}
       sizes="(max-width: 768px) 80px, 120px"
     />
   );

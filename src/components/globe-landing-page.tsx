@@ -51,13 +51,25 @@ export function GlobeLandingPage() {
           </Link>
        </div>
 
-        <SketchGlobe className="max-w-sm md:max-w-md" />
+        <div className="flex items-center justify-center gap-3">
+          <p className="text-sm text-muted-foreground">Featured on</p>
+          <a
+            href={siteConfig.links.ntuArticle}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-block"
+          >
+            <Logo src="/logo/ntu.png" name="NTU" className="h-28 w-auto" />
+          </a>
+        </div>
+
+        <SketchGlobe className="max-w-lg md:max-w-xl" />
 
         <LandingBenefitsGrid />
 
-        <FounderFlowDiagram className="w-full max-w-3xl py-2" />
+        <FounderFlowDiagram className="w-full max-w-3xl" />
 
-       <div className="flex flex-col gap-6 md:flex-row items-center justify-center">
+       <div className="flex flex-col gap-6 md:flex-row mb-16 items-center justify-center">
         <div className="bg-gradient-to-tl from-blue-600 to-transparent p-1 rounded-full w-fit">
             <Button
               onClick={() =>
@@ -130,19 +142,45 @@ export function GlobeLandingPage() {
           </Accordion>
         </section>
 
-        <div>
+        <div className="mt-16">
           <h2 className="text-sm text-muted-foreground">Supported by</h2>
           <div className="mt-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
-            <Logo
-              src="/support/notion.svg"
-              name="Notion"
-              className="h-10 w-auto"
-            />
-            <Logo
-              src="/support/boardy.jpeg"
-              name="Boardy"
-              className="h-10 w-auto"
-            />
+            {(
+              [
+                {
+                  src: "/support/notion.svg",
+                  name: "Notion",
+                  href: siteConfig.links.notion,
+                },
+                {
+                  src: "/support/boardy.jpeg",
+                  name: "Boardy",
+                  href: siteConfig.links.boardy,
+                },
+                {
+                  src: "/support/liftoff.jpeg",
+                  name: "Liftoff",
+                  href: siteConfig.links.liftoff,
+                },
+              ] as const
+            ).map((supporter) => (
+              <a
+                key={supporter.name}
+                href={supporter.href}
+                target="_blank"
+                rel="noreferrer"
+                draggable={false}
+                onDragStart={(event) => event.preventDefault()}
+                className="inline-block select-none opacity-90 transition-opacity hover:opacity-100"
+                title={supporter.name}
+              >
+                <Logo
+                  src={supporter.src}
+                  name={supporter.name}
+                  className="h-10 w-auto"
+                />
+              </a>
+            ))}
           </div>
         </div>
       </main>
