@@ -15,11 +15,15 @@ export type MaterialBoardEditor = {
   image: string | null;
 };
 
+export type BoardItemVisibility = "public" | "mentors";
+
 export type MaterialBoardItem = {
   id: string;
   title: string;
   status: string;
   notes: string;
+  visibility: BoardItemVisibility;
+  createdBy: MaterialBoardEditor | null;
   editedBy: MaterialBoardEditor | null;
 };
 
@@ -39,15 +43,43 @@ export function createBoardItem(
   title: string,
   status: string,
   notes = "",
-  editedBy: MaterialBoardEditor | null = null,
+  creator: MaterialBoardEditor | null = null,
+  visibility: BoardItemVisibility = "public",
 ): MaterialBoardItem {
   return {
     id: crypto.randomUUID(),
     title: title.trim() || "Untitled",
     status,
     notes: notes.trim(),
-    editedBy,
+    visibility,
+    createdBy: creator,
+    editedBy: creator,
   };
+}
+
+export function itemCreator(item: MaterialBoardItem): MaterialBoardEditor | null {
+  return item.createdBy ?? item.editedBy;
+}
+
+export function canEditBoardItem(
+  item: MaterialBoardItem,
+  canEditBoard: boolean,
+  editor: MaterialBoardEditor | null,
+): boolean {
+  if (!canEditBoard || !editor) return false;
+  const creator = itemCreator(item);
+  if (!creator) return canEditBoard;
+  return creator.id === editor.id;
+}
+
+export function canViewBoardItem(
+  item: MaterialBoardItem,
+  viewer: { id: string; isMentor?: boolean } | null,
+): boolean {
+  if (item.visibility !== "mentors") return true;
+  if (!viewer) return false;
+  if (viewer.isMentor) return true;
+  return itemCreator(item)?.id === viewer.id;
 }
 
 function parseEditor(value: unknown): MaterialBoardEditor | null {
@@ -93,49 +125,23 @@ export function decodeBoardPayload(encoded: string): MaterialBoard {
 
     return {
       columns,
-        items: parsed.items.map((item) => ({
-          id: String(item.id || crypto.randomUUID()),
-          title: String(item.title || "Untitled"),
-          status: columnIds.has(String(item.status))
-            ? String(item.status)
-            : columns[0].id,
-          notes: String(item.notes || ""),
-          editedBy: parseEditor(item.editedBy),
-        })),
+        items: parsed.items.map((item) => {
+          const editedBy = parseEditor(item.editedBy);
+          return {
+            id: String(item.id || crypto.randomUUID()),
+            title: String(item.title || "Untitled"),
+            status: columnIds.has(String(item.status))
+              ? String(item.status)
+              : columns[0].id,
+            notes: String(item.notes || ""),
+            visibility:
+              item.visibility === "mentors" ? "mentors" : "public",
+            createdBy: parseEditor(item.createdBy) ?? editedBy,
+            editedBy,
+          };
+        }),
     };
   } catch {
     return emptyMaterialBoard();
   }
-}
-
-function csvCell(value: string) {
-  return `"${value.replaceAll('"', '""')}"`;
-}
-
-/** CSV Notion can import as a database (Name + Status + Notes). */
-export function boardToNotionCsv(board: MaterialBoard): string {
-  const statusById = new Map(
-    board.columns.map((column) => [column.id, column.name]),
-  );
-  const rows = [
-    ["Name", "Status", "Notes"].map(csvCell).join(","),
-    ...board.items.map((item) =>
-      [item.title, statusById.get(item.status) ?? item.status, item.notes]
-        .map(csvCell)
-        .join(","),
-    ),
-  ];
-  return `\uFEFF${rows.join("\n")}\n`;
-}
-
-export function downloadNotionCsv(filename: string, board: MaterialBoard) {
-  const blob = new Blob([boardToNotionCsv(board)], {
-    type: "text/csv;charset=utf-8",
-  });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `${filename.replace(/[^\w.-]+/g, "-")}-notion.csv`;
-  link.click();
-  URL.revokeObjectURL(url);
 }

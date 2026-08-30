@@ -83,7 +83,7 @@ export function MaterialsSiteBreadcrumb() {
           return (
             <Fragment key={crumb.id}>
               <BreadcrumbSeparator />
-              <BreadcrumbItem>
+              <BreadcrumbItem className="shrink-0">
                 {isLast ? (
                   <BreadcrumbPage>{crumb.name}</BreadcrumbPage>
                 ) : (
@@ -98,7 +98,7 @@ export function MaterialsSiteBreadcrumb() {
         {currentName ? (
           <>
             <BreadcrumbSeparator />
-            <BreadcrumbItem>
+            <BreadcrumbItem className="shrink-0">
               <BreadcrumbPage>{currentName}</BreadcrumbPage>
             </BreadcrumbItem>
           </>

@@ -13,6 +13,9 @@ export const siteConfig = {
   depositPaymentUrl:
     "https://buy.polar.sh/polar_cl_Tk3KQeZcS1xSvzm59NlN72gkayjYLObKLymF53xZwmS",
   discordInviteUrl: "https://discord.gg/7FBpTEXqVj",
+  get communityJoinUrl() {
+    return `${this.url}/community`;
+  },
   links: {
     events: "https://luma.com/fydemy",
     github: "https://github.com/fydemy/fdm",

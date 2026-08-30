@@ -8,6 +8,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider
+      className="h-svh overflow-hidden"
       style={
         {
           "--sidebar-width": "calc(var(--spacing) * 72)",
@@ -16,9 +17,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       }
     >
       <AppSidebar variant="inset" />
-      <SidebarInset>
+      <SidebarInset className="min-h-0 overflow-hidden">
         <SiteHeader />
-        <div className="flex flex-1 flex-col">
+        <div className="flex min-h-0 flex-1 flex-col overflow-auto">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 px-4 py-4 md:gap-6 md:px-6 md:py-6">
               <ReviewerWorkspaceGuard>{children}</ReviewerWorkspaceGuard>

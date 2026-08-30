@@ -1,17 +1,28 @@
 "use client";
 
+import { useEffect, useMemo } from "react";
 import { Node, mergeAttributes } from "@tiptap/core";
+import { NodeSelection } from "@tiptap/pm/state";
 import {
   NodeViewWrapper,
   ReactNodeViewRenderer,
   type NodeViewProps,
 } from "@tiptap/react";
 import { MaterialBoardViews } from "@/components/material-board-views";
+import { trpc } from "@/lib/trpc/client";
 import {
   decodeBoardPayload,
   emptyMaterialBoard,
   encodeBoard,
 } from "@/lib/material-board";
+
+function boardIsSelected(editor: { state: { selection: unknown } }) {
+  const { selection } = editor.state;
+  return (
+    selection instanceof NodeSelection &&
+    selection.node.type.name === "notionBoard"
+  );
+}
 
 function NotionBoardNodeView({
   node,
@@ -20,8 +31,15 @@ function NotionBoardNodeView({
   selected,
   editor,
 }: NodeViewProps) {
-  const board = decodeBoardPayload(String(node.attrs.payload ?? ""));
+  const payload = String(node.attrs.payload ?? "");
+  const board = useMemo(() => decodeBoardPayload(payload), [payload]);
   const canEdit = editor.isEditable;
+  const { data: me } = trpc.user.me.useQuery();
+  const canDelete = canEdit && Boolean(me?.isReviewer);
+
+  useEffect(() => {
+    editor.storage.notionBoard.canDelete = canDelete;
+  }, [canDelete, editor]);
 
   return (
     <NodeViewWrapper
@@ -31,15 +49,8 @@ function NotionBoardNodeView({
         className="not-prose my-4 rounded-xl border bg-background p-4"
         onMouseDown={(event) => event.stopPropagation()}
       >
-        <div className="mb-3 flex items-center justify-between gap-2">
-          <p
-            className="cursor-grab text-xs font-medium text-muted-foreground"
-            data-drag-handle
-            contentEditable={false}
-          >
-            Notion board
-          </p>
-          {canEdit ? (
+        {canDelete ? (
+          <div className="mb-2 flex justify-end">
             <button
               type="button"
               className="text-xs text-muted-foreground hover:text-foreground"
@@ -47,8 +58,8 @@ function NotionBoardNodeView({
             >
               Remove
             </button>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
         <MaterialBoardViews
           board={board}
           canEdit={canEdit}
@@ -67,13 +78,32 @@ declare module "@tiptap/core" {
       setNotionBoard: () => ReturnType;
     };
   }
+
+  interface Storage {
+    notionBoard: {
+      canDelete: boolean;
+    };
+  }
 }
 
 export const NotionBoard = Node.create({
   name: "notionBoard",
   group: "block",
   atom: true,
-  draggable: true,
+  draggable: false,
+
+  addStorage() {
+    return { canDelete: false };
+  },
+
+  addKeyboardShortcuts() {
+    return {
+      Backspace: ({ editor }) =>
+        boardIsSelected(editor) && !editor.storage.notionBoard.canDelete,
+      Delete: ({ editor }) =>
+        boardIsSelected(editor) && !editor.storage.notionBoard.canDelete,
+    };
+  },
 
   addAttributes() {
     return {
@@ -111,6 +141,8 @@ export const NotionBoard = Node.create({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(NotionBoardNodeView);
+    return ReactNodeViewRenderer(NotionBoardNodeView, {
+      stopEvent: () => true,
+    });
   },
 });

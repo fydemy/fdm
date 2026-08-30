@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
+import { encodeBoard } from "@/lib/material-board";
 import { MarkdownContent } from "@/components/markdown-content";
 import { RichTextEditor } from "@/components/rich-text-editor";
+import { BoardEditorUserContext } from "@/components/board-editor-user";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,14 +37,38 @@ export function MaterialFileView({ id, basePath }: MaterialFileViewProps) {
   const [name, setName] = useState("");
   const [content, setContent] = useState("");
   const [editorKey, setEditorKey] = useState(0);
+  const [viewContent, setViewContent] = useState("");
+  const contentRef = useRef("");
+
+  const { data: session } = authClient.useSession();
+  const boardUser = session?.user
+    ? {
+        id: session.user.id,
+        name: session.user.name,
+        image: session.user.image ?? null,
+      }
+    : null;
+
+  const persistTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (file) {
-      setName(file.name);
-      setContent(file.content ?? "");
-      setEditorKey((key) => key + 1);
-    }
-  }, [file]);
+    if (!file) return;
+    setName(file.name);
+    setContent(file.content ?? "");
+    setViewContent(file.content ?? "");
+    contentRef.current = file.content ?? "";
+    setEditorKey((key) => key + 1);
+  }, [file?.id]);
+
+  useEffect(() => {
+    return () => {
+      if (persistTimer.current) clearTimeout(persistTimer.current);
+    };
+  }, []);
+
+  const persistBoard = trpc.material.updateFile.useMutation({
+    onError: (err) => toast.error(err.message),
+  });
 
   const updateFile = trpc.material.updateFile.useMutation({
     onSuccess: async () => {
@@ -106,7 +133,7 @@ export function MaterialFileView({ id, basePath }: MaterialFileViewProps) {
               <DropdownMenuItem
                 onClick={() => {
                   setName(file.name);
-                  setContent(file.content ?? "");
+                  setContent(contentRef.current || file.content || "");
                   setEditorKey((key) => key + 1);
                   setEditing(true);
                 }}
@@ -134,7 +161,7 @@ export function MaterialFileView({ id, basePath }: MaterialFileViewProps) {
 
       {editing ? (
         <form
-          className="space-y-4 rounded-xl border p-4"
+          className="space-y-4"
           onSubmit={(event) => {
             event.preventDefault();
             if (!contentHasText(content)) {
@@ -184,7 +211,31 @@ export function MaterialFileView({ id, basePath }: MaterialFileViewProps) {
           </div>
         </form>
       ) : (
-        <MarkdownContent content={file.content ?? ""} />
+        <BoardEditorUserContext.Provider value={boardUser}>
+          <MarkdownContent
+            content={viewContent || file.content || ""}
+            canEditBoard={canEdit}
+            onBoardChange={(previousPayload, nextBoard) => {
+              const html = contentRef.current || file.content || "";
+              const encoded = encodeBoard(nextBoard);
+              const marker = `data-notion-board="${previousPayload}"`;
+              if (!html.includes(marker)) {
+                toast.error("Could not update the board");
+                return;
+              }
+              const nextContent = html.replace(marker, `data-notion-board="${encoded}"`);
+              contentRef.current = nextContent;
+              if (persistTimer.current) clearTimeout(persistTimer.current);
+              persistTimer.current = setTimeout(() => {
+                persistBoard.mutate({
+                  id: file.id,
+                  name: file.name,
+                  content: nextContent,
+                });
+              }, 400);
+            }}
+          />
+        </BoardEditorUserContext.Provider>
       )}
     </div>
   );

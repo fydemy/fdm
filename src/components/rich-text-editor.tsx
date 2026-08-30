@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
+import TaskItem from "@tiptap/extension-task-item";
+import TaskList from "@tiptap/extension-task-list";
 import Underline from "@tiptap/extension-underline";
 import { marked } from "marked";
 import {
@@ -18,11 +20,15 @@ import {
   Italic,
   Link2,
   List,
+  ListChecks,
   ListOrdered,
   Loader2,
   Share2,
   Underline as UnderlineIcon,
 } from "lucide-react";
+import { createFileMention } from "@/components/file-mention-suggestion";
+import type { FileMentionItem } from "@/components/file-mention-list";
+import { trpc } from "@/lib/trpc/client";
 import { SocialEmbed } from "@/components/social-embed-extension";
 import { NotionBoard } from "@/components/notion-board-extension";
 import { Button } from "@/components/ui/button";
@@ -83,6 +89,10 @@ export function RichTextEditor({
   const [uploadingImage, setUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadImageRef = useRef<(file: File) => void>(() => {});
+  const searchFilesRef = useRef<(query: string) => Promise<FileMentionItem[]>>(
+    async () => [],
+  );
+  const utils = trpc.useUtils();
   const { data: session } = authClient.useSession();
   const boardUser = session?.user
     ? {
@@ -92,12 +102,31 @@ export function RichTextEditor({
       }
     : null;
 
+  useEffect(() => {
+    searchFilesRef.current = async (query) => {
+      try {
+        const files = await utils.material.searchFiles.fetch({ query });
+        return files.map((file) => ({ id: file.id, label: file.name }));
+      } catch {
+        return [];
+      }
+    };
+  });
+
+  const fileMention = useMemo(
+    () => createFileMention((query) => searchFilesRef.current(query)),
+    [],
+  );
+
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
       }),
+      TaskList,
+      TaskItem.configure({ nested: true }),
+      fileMention,
       Underline,
       Image.configure({
         inline: false,
@@ -299,6 +328,13 @@ export function RichTextEditor({
           label="Ordered list"
         >
           <ListOrdered />
+        </ToolbarButton>
+        <ToolbarButton
+          active={editor.isActive("taskList")}
+          onClick={() => editor.chain().focus().toggleTaskList().run()}
+          label="Checklist"
+        >
+          <ListChecks />
         </ToolbarButton>
         <ToolbarButton
           active={editor.isActive("link")}

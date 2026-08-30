@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { siteConfig } from "@/lib/seo";
+import { signCommunityClaim } from "@/lib/community-claim";
 
 const from = process.env.RESEND_FROM_EMAIL ?? "Fydemy <onboarding@resend.dev>";
 const cc = process.env.RESEND_CC_EMAIL?.trim() || undefined;
@@ -71,8 +72,10 @@ export async function sendApplicationApprovedEmail(input: {
   to: string[];
   productName: string;
   applicantName: string;
+  userId: string;
   note?: string | null;
 }) {
+  const communityUrl = `${siteConfig.communityJoinUrl}?t=${signCommunityClaim(input.userId)}`;
   const lines = [
     "Congratulations, your application has been approved!",
     "",
@@ -89,21 +92,13 @@ export async function sendApplicationApprovedEmail(input: {
       "Pay here:",
       siteConfig.depositPaymentUrl,
       "",
-      "Once paid, you can publish launches and access program materials from your dashboard:",
-      `${siteConfig.url}/apply`,
-      "",
-      "If you haven't already, join us on Discord and say hello so we can get you plugged into the community:",
-      siteConfig.discordInviteUrl,
-    );
-  } else {
-    lines.push(
-      "Head to your dashboard to publish launches and access program materials:",
-      `${siteConfig.url}/apply`,
-      "",
-      "If you haven't already, join us on Discord and say hello so we can get you plugged into the community:",
-      siteConfig.discordInviteUrl,
     );
   }
+
+  lines.push(
+    "Join the Fydemy Discord community with this link. It will sign you in with Discord, assign the Founder role, and take you into the server:",
+    communityUrl,
+  );
 
   if (input.note) {
     lines.push("", `A note from your reviewer: ${input.note}`);

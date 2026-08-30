@@ -183,6 +183,31 @@ export const materialRouter = t.router({
       return { ...item, breadcrumbs, canEdit, canDelete };
     }),
 
+  searchFiles: protectedProcedure
+    .input(z.object({ query: z.string().max(200).optional() }))
+    .query(async ({ ctx, input }) => {
+      await assertCanReadMaterials(ctx.user);
+
+      const query = input.query?.trim() ?? "";
+
+      return prisma.materialItem.findMany({
+        where: {
+          type: "FILE",
+          ...(query
+            ? {
+                name: {
+                  contains: query,
+                  mode: "insensitive",
+                },
+              }
+            : {}),
+        },
+        select: { id: true, name: true },
+        orderBy: { updatedAt: "desc" },
+        take: 12,
+      });
+    }),
+
   createFolder: reviewerProcedure
     .input(
       z.object({
