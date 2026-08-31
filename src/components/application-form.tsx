@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { trpc } from "@/lib/trpc/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Card,
   CardContent,
@@ -26,9 +25,8 @@ import {
   isIdeaStage,
   normalizeApplicantForm,
 } from "@/lib/screening";
-import { siteConfig } from "@/lib/seo";
 import { toast } from "sonner";
-import { Loader2, MessageCircle, Plus, Trash2, Upload } from "lucide-react";
+import { Loader2, Plus, Trash2, Upload } from "lucide-react";
 import { ProductLogo } from "@/components/product-logo";
 
 const schema = z
@@ -38,17 +36,8 @@ const schema = z
       .string()
       .min(2, "Discord username is required")
       .max(37, "Discord username is too long"),
-    depositAccepted: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
-    if (siteConfig.batchDepositRequired && !data.depositAccepted) {
-      ctx.addIssue({
-        code: "custom",
-        message: "You must agree to the refundable deposit on acceptance",
-        path: ["depositAccepted"],
-      });
-    }
-
     const options = buildDecisionMakerValues(
       data.screening.founder.founder_name,
       data.screening.founder.team_members,
@@ -159,7 +148,6 @@ export function ApplicationForm({
     defaultValues: {
       screening: defaultScreeningValues,
       discordUsername: "",
-      depositAccepted: false,
     },
   });
 
@@ -495,59 +483,6 @@ export function ApplicationForm({
               </div>
             </div>
           </section>
-
-          <div className="space-y-2">
-            {siteConfig.batchDepositRequired && (
-              <>
-                <div className="flex items-start gap-3">
-                  <Controller
-                    control={form.control}
-                    name="depositAccepted"
-                    render={({ field }) => (
-                      <Checkbox
-                        id="depositAccepted"
-                        checked={field.value ?? false}
-                        className="bg-secondary"
-                        onCheckedChange={(checked) =>
-                          field.onChange(checked === true)
-                        }
-                        aria-invalid={Boolean(
-                          form.formState.errors.depositAccepted,
-                        )}
-                      />
-                    )}
-                  />
-                  <Label
-                    htmlFor="depositAccepted"
-                    className="font-normal leading-snug"
-                  >
-                    I agree to the <span className="line-through">$300</span>{" "}
-                    <span className="font-medium">$150</span> payment (50% off)
-                    if accepted into the program.
-                  </Label>
-                </div>
-                {form.formState.errors.depositAccepted && (
-                  <p className="text-sm text-destructive">
-                    {form.formState.errors.depositAccepted.message}
-                  </p>
-                )}
-              </>
-            )}
-            <div className="flex items-start gap-3">
-              <MessageCircle className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-              <p className="text-sm leading-snug text-muted-foreground">
-                Join the Discord community:{" "}
-                <a
-                  href={siteConfig.discordInviteUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="font-medium text-primary underline"
-                >
-                  {siteConfig.discordInviteUrl}
-                </a>
-              </p>
-            </div>
-          </div>
 
           <Button
             type="submit"

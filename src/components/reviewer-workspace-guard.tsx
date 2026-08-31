@@ -6,16 +6,8 @@ import { trpc } from "@/lib/trpc/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { staffHomePath } from "@/lib/auth-helpers";
 
-function isWorkspacePath(pathname: string) {
-  if (pathname.startsWith("/dashboard/review")) return false;
-  if (pathname.startsWith("/dashboard/mentor")) return false;
-  if (pathname.startsWith("/dashboard/partner")) return false;
-  return (
-    pathname === "/" ||
-    pathname === "/dashboard" ||
-    pathname.startsWith("/apply") ||
-    pathname.startsWith("/launches/new")
-  );
+function isApplicantPath(pathname: string) {
+  return pathname === "/";
 }
 
 export function ReviewerWorkspaceGuard({
@@ -26,8 +18,8 @@ export function ReviewerWorkspaceGuard({
   const pathname = usePathname();
   const router = useRouter();
   const { data: me, isLoading } = trpc.user.me.useQuery();
-  const onWorkspace = isWorkspacePath(pathname);
-  const shouldRedirect = !!me?.isStaff && onWorkspace;
+  const onApplicantPath = isApplicantPath(pathname);
+  const shouldRedirect = !!me?.isStaff && onApplicantPath;
 
   useEffect(() => {
     if (shouldRedirect && me) {
@@ -35,7 +27,7 @@ export function ReviewerWorkspaceGuard({
     }
   }, [shouldRedirect, me, router]);
 
-  if (onWorkspace && (isLoading || me?.isStaff)) {
+  if (onApplicantPath && (isLoading || me?.isStaff)) {
     return <Skeleton className="h-96" />;
   }
 

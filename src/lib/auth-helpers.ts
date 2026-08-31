@@ -43,16 +43,23 @@ export function isStaff(role?: string | null) {
   );
 }
 
-export function staffHomePath(role?: string | null) {
-  if (isReviewer(role)) return "/dashboard/review";
-  if (isMentor(role)) return "/dashboard/mentor";
-  if (isPartner(role)) return "/dashboard/partner";
-  return "/";
+export function staffHomePath(_role?: string | null) {
+  return "/app";
 }
 
 export function canAccessApplicantWorkspace(role?: string | null) {
   const userRole = getUserRole(role);
   return userRole === "applicant" || userRole === "founder";
+}
+
+export function canAccessWorkspace(role?: string | null) {
+  const userRole = getUserRole(role);
+  return (
+    userRole === "reviewer" ||
+    userRole === "mentor" ||
+    userRole === "applicant" ||
+    userRole === "founder"
+  );
 }
 
 export function roleLabel(role?: string | null) {

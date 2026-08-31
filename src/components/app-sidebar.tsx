@@ -22,11 +22,10 @@ import {
   FileTextIcon,
   MessageCircleIcon,
   PackageIcon,
-  RocketIcon,
 } from "lucide-react";
 
 const discordNavItem: NavItem = {
-  title: "Discord",
+  title: "Community",
   url: siteConfig.discordInviteUrl,
   icon: <MessageCircleIcon />,
   external: true,
@@ -35,15 +34,10 @@ const discordNavItem: NavItem = {
 const applicantNav: NavItem[] = [
   {
     title: "Applications",
-    url: "/apply",
+    url: "/app",
     icon: <FileTextIcon />,
   },
   {
-    title: "Launches",
-    url: "/launches",
-    icon: <RocketIcon />,
-  },
-  {
     title: "Workspace",
     url: "/workspace",
     icon: <PackageIcon />,
@@ -51,29 +45,10 @@ const applicantNav: NavItem[] = [
   discordNavItem,
 ];
 
-const reviewerNav: NavItem[] = [
+const staffNav: NavItem[] = [
   {
     title: "Applications",
-    url: "/dashboard/review",
-    icon: <ClipboardCheckIcon />,
-  },
-  {
-    title: "Launches",
-    url: "/launches",
-    icon: <RocketIcon />,
-  },
-  {
-    title: "Workspace",
-    url: "/workspace",
-    icon: <PackageIcon />,
-  },
-  discordNavItem,
-];
-
-const mentorNav: NavItem[] = [
-  {
-    title: "Applications",
-    url: "/dashboard/mentor",
+    url: "/app",
     icon: <ClipboardCheckIcon />,
   },
   {
@@ -87,7 +62,7 @@ const mentorNav: NavItem[] = [
 const partnerNav: NavItem[] = [
   {
     title: "Applications",
-    url: "/dashboard/partner",
+    url: "/app",
     icon: <ClipboardCheckIcon />,
   },
   discordNavItem,
@@ -106,10 +81,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const nav = React.useMemo(() => {
     if (!me) return null;
-    if (me.isReviewer) return { items: reviewerNav, label: "Review" };
-    if (me.isMentor) return { items: mentorNav, label: "Mentor" };
+    if (me.isReviewer) return { items: staffNav, label: "Review" };
+    if (me.isMentor) return { items: staffNav, label: "Mentor" };
     if (me.isPartner) return { items: partnerNav, label: "Partner" };
-    return { items: applicantNav, label: "Workspace" };
+    return {
+      items: me.hasApprovedApplication
+        ? applicantNav
+        : applicantNav.filter((item) => item.url !== "/workspace"),
+    };
   }, [me]);
 
   return (

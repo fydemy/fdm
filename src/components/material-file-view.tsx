@@ -15,13 +15,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { contentHasText } from "@/lib/embeds";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { EllipsisVertical, Loader2, Pencil, Trash2 } from "lucide-react";
+import { EllipsisVertical, FolderInput, Loader2, Pencil, Trash2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { MoveToFolderDialog } from "@/components/move-to-folder-dialog";
 
 type MaterialFileViewProps = {
   id: string;
@@ -38,6 +39,7 @@ export function MaterialFileView({ id, basePath }: MaterialFileViewProps) {
   const [content, setContent] = useState("");
   const [editorKey, setEditorKey] = useState(0);
   const [viewContent, setViewContent] = useState("");
+  const [moveOpen, setMoveOpen] = useState(false);
   const contentRef = useRef("");
 
   const { data: session } = authClient.useSession();
@@ -122,7 +124,7 @@ export function MaterialFileView({ id, basePath }: MaterialFileViewProps) {
           <h1 className="text-2xl font-semibold tracking-tight">{file.name}</h1>
         </div>
 
-        {canEdit && !editing && (
+        {!editing && (
           <DropdownMenu>
             <DropdownMenuTrigger
               render={<Button type="button" variant="ghost" size="icon" />}
@@ -130,16 +132,22 @@ export function MaterialFileView({ id, basePath }: MaterialFileViewProps) {
               <EllipsisVertical className="size-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={() => {
-                  setName(file.name);
-                  setContent(contentRef.current || file.content || "");
-                  setEditorKey((key) => key + 1);
-                  setEditing(true);
-                }}
-              >
-                <Pencil className="size-4" />
-                Edit
+              {canEdit && (
+                <DropdownMenuItem
+                  onClick={() => {
+                    setName(file.name);
+                    setContent(contentRef.current || file.content || "");
+                    setEditorKey((key) => key + 1);
+                    setEditing(true);
+                  }}
+                >
+                  <Pencil className="size-4" />
+                  Edit
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onClick={() => setMoveOpen(true)}>
+                <FolderInput className="size-4" />
+                Move
               </DropdownMenuItem>
               {canDelete && (
                 <DropdownMenuItem
@@ -237,6 +245,14 @@ export function MaterialFileView({ id, basePath }: MaterialFileViewProps) {
           />
         </BoardEditorUserContext.Provider>
       )}
+
+      <MoveToFolderDialog
+        open={moveOpen}
+        onOpenChange={setMoveOpen}
+        itemId={file.id}
+        itemType="FILE"
+        currentParentId={file.parentId}
+      />
     </div>
   );
 }

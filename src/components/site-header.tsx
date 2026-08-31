@@ -1,54 +1,23 @@
 "use client";
 
 import { Suspense } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import {
   MaterialsSiteBreadcrumb,
   getMaterialsRoute,
 } from "@/components/materials-site-breadcrumb";
+import { ApplicationReviewHeaderActions } from "@/components/application-review-header-actions";
 
 const titles: Record<string, string> = {
-  "/apply": "Application",
-  "/launches": "Launches",
-  "/dashboard/review": "Review applications",
-  "/dashboard/review/launches": "Launches",
+  "/app": "Applications",
 };
 
 function getTitle(pathname: string) {
   if (titles[pathname]) return titles[pathname];
-  if (pathname.startsWith("/dashboard/review/")) return "Application review";
-  if (pathname.startsWith("/dashboard/mentor")) return "Mentors";
-  if (pathname.startsWith("/dashboard/partner")) return "Partners";
+  if (pathname.startsWith("/app/")) return "Application";
   return "Dashboard";
-}
-
-function LaunchesNewBreadcrumb() {
-  return (
-    <Breadcrumb>
-      <BreadcrumbList className="text-base font-medium tracking-tight text-foreground">
-        <BreadcrumbItem>
-          <BreadcrumbLink render={<Link href="/launches" />}>
-            Launches
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbPage>New</BreadcrumbPage>
-        </BreadcrumbItem>
-      </BreadcrumbList>
-    </Breadcrumb>
-  );
 }
 
 export function SiteHeader() {
@@ -72,14 +41,13 @@ export function SiteHeader() {
             >
               <MaterialsSiteBreadcrumb />
             </Suspense>
-          ) : pathname === "/launches/new" ? (
-            <LaunchesNewBreadcrumb />
           ) : (
             <h1 className="text-base font-medium tracking-tight">
               {getTitle(pathname)}
             </h1>
           )}
         </div>
+        <ApplicationReviewHeaderActions />
       </div>
     </header>
   );

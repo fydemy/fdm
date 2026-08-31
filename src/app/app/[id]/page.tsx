@@ -1,13 +1,11 @@
 "use client";
 
-import { use } from "react";
-import Link from "next/link";
+import { use, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { trpc } from "@/lib/trpc/client";
 import { ProductLogo } from "@/components/product-logo";
 import { StatusBadge } from "@/components/status-badge";
 import { ApplicationScreeningView } from "@/components/application-screening-view";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import {
   Card,
   CardContent,
@@ -17,53 +15,77 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getApplicationSummary } from "@/lib/screening";
-import { ArrowLeft } from "lucide-react";
 
-export default function MentorApplicationDetailPage({
+export default function DashboardApplicationDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
+  const router = useRouter();
   const { data: me, isLoading: meLoading } = trpc.user.me.useQuery();
-  const { data: application, isLoading } = trpc.mentor.getApplication.useQuery(
+
+  useEffect(() => {
+    if (me && !me.isStaff) router.replace("/app");
+  }, [me, router]);
+
+  const reviewerQuery = trpc.review.getApplication.useQuery(
     { id },
-    { enabled: !!me?.isMentor },
+    { enabled: Boolean(me?.isReviewer) },
+  );
+  const mentorQuery = trpc.mentor.getApplication.useQuery(
+    { id },
+    { enabled: Boolean(me?.isMentor) },
+  );
+  const partnerQuery = trpc.partner.getApplication.useQuery(
+    { id },
+    { enabled: Boolean(me?.isPartner) },
   );
 
-  if (meLoading || isLoading) return <Skeleton className="h-96" />;
+  const application = me?.isReviewer
+    ? reviewerQuery.data
+    : me?.isMentor
+      ? mentorQuery.data
+      : partnerQuery.data;
+  const isLoading = me?.isReviewer
+    ? reviewerQuery.isLoading
+    : me?.isMentor
+      ? mentorQuery.isLoading
+      : partnerQuery.isLoading;
+  const error = me?.isReviewer
+    ? reviewerQuery.error
+    : me?.isMentor
+      ? mentorQuery.error
+      : partnerQuery.error;
 
-  if (!me?.isMentor) {
+  if (meLoading || (me && !me.isStaff) || isLoading) {
+    return <Skeleton className="mt-12 h-96" />;
+  }
+
+  if (!me?.isStaff) {
     return (
       <Alert>
-        <AlertTitle>Mentor access only</AlertTitle>
+        <AlertTitle>Staff access only</AlertTitle>
         <AlertDescription>
-          You do not have permission to view applications.
+          You do not have permission to view this application.
         </AlertDescription>
       </Alert>
     );
   }
 
-  if (!application) {
+  if (error || !application) {
     return (
       <Alert>
         <AlertTitle>Not found</AlertTitle>
-        <AlertDescription>This approved application does not exist.</AlertDescription>
+        <AlertDescription>This application does not exist.</AlertDescription>
       </Alert>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <div className="mt-12 space-y-8">
       <div className="space-y-2">
-        <Link
-          href="/dashboard/mentor"
-          className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}
-        >
-          <ArrowLeft className="size-4" />
-          Back
-        </Link>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <ProductLogo
             src={application.logoUrl}
             name={application.name}
@@ -89,24 +111,15 @@ export default function MentorApplicationDetailPage({
         )}
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Screening application</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ApplicationScreeningView description={application.description} />
-        </CardContent>
-      </Card>
-
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Founder</CardTitle>
+            <CardTitle>{me.isMentor ? "Founder" : "Applicant"}</CardTitle>
           </CardHeader>
           <CardContent className="text-sm">
             <div className="font-medium">{application.user.name}</div>
             <div className="text-muted-foreground">{application.user.email}</div>
-            {application.linkedin && (
+            {application.linkedin ? (
               <div className="mt-2">
                 <a
                   href={application.linkedin}
@@ -117,7 +130,7 @@ export default function MentorApplicationDetailPage({
                   LinkedIn
                 </a>
               </div>
-            )}
+            ) : null}
             {application.discordUsername && (
               <div className="mt-2 text-muted-foreground">
                 Discord: {application.discordUsername}
@@ -143,6 +156,15 @@ export default function MentorApplicationDetailPage({
         </Card>
       </div>
 
+      <Card>
+        <CardHeader>
+          <CardTitle>About</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ApplicationScreeningView description={application.description} />
+        </CardContent>
+      </Card>
+
       {application.members.length > 0 && (
         <Card>
           <CardHeader>
@@ -167,30 +189,21 @@ export default function MentorApplicationDetailPage({
         </Card>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Launches</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {application.launches.length === 0 && (
-            <p className="text-sm text-muted-foreground">No launches yet.</p>
-          )}
-          {application.launches.map((launch) => (
-            <div key={launch.id} className="rounded-xl border p-4">
-              <Link
-                href={`/launches/${launch.slug}`}
-                target="_blank"
-                className="font-medium hover:underline"
-              >
-                {launch.title}
-              </Link>
-              <p className="text-xs text-muted-foreground">
-                {new Date(launch.createdAt).toLocaleString()}
+      {(application.reviewNote || application.reviewedAt) && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Review</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            {application.reviewedAt && (
+              <p className="text-muted-foreground">
+                Reviewed {new Date(application.reviewedAt).toLocaleString()}
               </p>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+            )}
+            {application.reviewNote && <p>{application.reviewNote}</p>}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

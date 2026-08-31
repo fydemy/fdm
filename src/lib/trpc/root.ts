@@ -2,7 +2,6 @@ import { t } from "@/lib/trpc/trpc";
 import { helloRouter } from "./routes/hello";
 import { applicationRouter } from "./routes/application";
 import { reviewRouter } from "./routes/review";
-import { launchRouter } from "./routes/launch";
 import { materialRouter } from "./routes/material";
 import { mentorRouter } from "./routes/mentor";
 import { partnerRouter } from "./routes/partner";
@@ -15,7 +14,6 @@ export const appRouter = t.router({
   review: reviewRouter,
   mentor: mentorRouter,
   partner: partnerRouter,
-  launch: launchRouter,
   material: materialRouter,
 });
 

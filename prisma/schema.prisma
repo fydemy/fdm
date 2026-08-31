@@ -88,6 +88,7 @@ model Application {
   pitchDeckUrl     String
   pitchDeckName    String
   status          ApplicationStatus @default(PENDING)
+  cohort          String            @default("F26")
   reviewNote      String?
   reviewedAt      DateTime?
   feePaid         Boolean           @default(false)
@@ -100,6 +101,7 @@ model Application {
 
   @@index([userId])
   @@index([status])
+  @@index([cohort])
   @@map("application")
 }
 

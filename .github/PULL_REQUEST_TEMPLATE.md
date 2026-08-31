@@ -5,5 +5,5 @@
 ## Test plan
 
 - [ ] `bun run lint` passes
-- [ ] Manual check of affected flows (auth, apply, review, launches, materials)
+- [ ] Manual check of affected flows (auth, apply, review, materials)
 - [ ] No secrets or local uploads committed

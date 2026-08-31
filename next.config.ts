@@ -24,11 +24,6 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
-        source: "/dashboard/review/launches",
-        destination: "/launches",
-        permanent: true,
-      },
-      {
         source: "/workspace/f/:id",
         destination: "/workspace/:id",
         permanent: true,
@@ -41,26 +36,6 @@ const nextConfig: NextConfig = {
       {
         source: "/dashboard/mentor/workspace/f/:id",
         destination: "/workspace/:id",
-        permanent: true,
-      },
-      {
-        source: "/dashboard/apply",
-        destination: "/apply",
-        permanent: true,
-      },
-      {
-        source: "/dashboard/apply/:path*",
-        destination: "/apply/:path*",
-        permanent: true,
-      },
-      {
-        source: "/dashboard/launches",
-        destination: "/launches",
-        permanent: true,
-      },
-      {
-        source: "/dashboard/launches/:path*",
-        destination: "/launches/:path*",
         permanent: true,
       },
       {
@@ -101,6 +76,76 @@ const nextConfig: NextConfig = {
       {
         source: "/dashboard/mentor/materials/:path*",
         destination: "/workspace/:path*",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/launches",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/launches/:path*",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/launches",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/launches/:path*",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/apply",
+        destination: "/app",
+        permanent: true,
+      },
+      {
+        source: "/apply/:path*",
+        destination: "/app/:path*",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/review",
+        destination: "/app",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/review/:path*",
+        destination: "/app/:path*",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/mentor",
+        destination: "/app",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/mentor/:path*",
+        destination: "/app/:path*",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/partner",
+        destination: "/app",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/partner/:path*",
+        destination: "/app/:path*",
+        permanent: true,
+      },
+      {
+        source: "/dashboard",
+        destination: "/app",
+        permanent: true,
+      },
+      {
+        source: "/dashboard/:path*",
+        destination: "/app/:path*",
         permanent: true,
       },
     ];

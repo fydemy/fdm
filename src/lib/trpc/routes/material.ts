@@ -106,6 +106,24 @@ async function getBreadcrumbs(folderId: string | null) {
   return crumbs;
 }
 
+async function isInSubtree(rootId: string, nodeId: string | null) {
+  let currentId = nodeId;
+  const seen = new Set<string>();
+
+  while (currentId && !seen.has(currentId)) {
+    if (currentId === rootId) return true;
+    seen.add(currentId);
+    const node = await prisma.materialItem.findUnique({
+      where: { id: currentId },
+      select: { parentId: true },
+    });
+    if (!node) return false;
+    currentId = node.parentId;
+  }
+
+  return false;
+}
+
 function sortItems<
   T extends { type: "FOLDER" | "FILE"; name: string },
 >(items: T[]) {
@@ -182,6 +200,36 @@ export const materialRouter = t.router({
 
       return { ...item, breadcrumbs, canEdit, canDelete };
     }),
+
+  listFolders: protectedProcedure.query(async ({ ctx }) => {
+    await assertCanReadMaterials(ctx.user);
+
+    const folders = await prisma.materialItem.findMany({
+      where: { type: "FOLDER" },
+      select: { id: true, name: true, parentId: true },
+    });
+
+    const byId = new Map(folders.map((folder) => [folder.id, folder]));
+
+    return folders.map((folder) => {
+      const parts: string[] = [];
+      let currentId: string | null = folder.id;
+      const seen = new Set<string>();
+      while (currentId && !seen.has(currentId)) {
+        seen.add(currentId);
+        const current = byId.get(currentId);
+        if (!current) break;
+        parts.unshift(current.name);
+        currentId = current.parentId;
+      }
+      return {
+        id: folder.id,
+        name: folder.name,
+        parentId: folder.parentId,
+        path: parts.join(" / "),
+      };
+    });
+  }),
 
   searchFiles: protectedProcedure
     .input(z.object({ query: z.string().max(200).optional() }))
@@ -309,6 +357,67 @@ export const materialRouter = t.router({
           name: input.name.trim(),
           content: input.content,
         },
+      });
+    }),
+
+  move: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        parentId: z.string().nullable(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const item = await prisma.materialItem.findUnique({
+        where: { id: input.id },
+      });
+
+      if (!item) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Item not found" });
+      }
+
+      const parentId = input.parentId;
+
+      if (parentId) {
+        const parent = await prisma.materialItem.findUnique({
+          where: { id: parentId },
+        });
+        if (!parent || parent.type !== "FOLDER") {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Folder not found",
+          });
+        }
+      }
+
+      if (item.type === "FOLDER") {
+        if (parentId === item.id || (await isInSubtree(item.id, parentId))) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "You cannot move a folder into itself",
+          });
+        }
+      }
+
+      if (item.parentId === parentId) {
+        return item;
+      }
+
+      const allowed =
+        isReviewer(ctx.user.role) ||
+        ((await canWriteInFolder(ctx.user, item.parentId)) &&
+          (await canWriteInFolder(ctx.user, parentId)));
+
+      if (!allowed) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You cannot move this item to that folder",
+        });
+      }
+
+      return prisma.materialItem.update({
+        where: { id: item.id },
+        data: { parentId },
       });
     }),
 

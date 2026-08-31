@@ -129,10 +129,10 @@ export function HomePage() {
             <Button
               onClick={() =>
                 hasSession
-                  ? router.push("/apply")
+                  ? router.push("/app")
                   : authClient.signIn.social({
                     provider: "google",
-                    callbackURL: "/apply",
+                    callbackURL: "/app",
                   })
               }
               className="rounded-full px-12 py-6"
@@ -325,19 +325,7 @@ export function HomePage() {
                   Serious Founders
                 </h3>
                 <p className="flex flex-wrap items-baseline gap-2 text-3xl font-semibold tracking-tight">
-                  {siteConfig.batchDepositRequired ? (
-                    <>
-                      <span className="text-xl font-normal text-muted-foreground line-through">
-                        $300
-                      </span>
-                      $150
-                      <span className="text-sm font-normal text-muted-foreground">
-                        50% off · Upon acceptance
-                      </span>
-                    </>
-                  ) : (
-                    "Free"
-                  )}
+                  Free
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Get real 1-on-1 mentoring from <b>VC-backed Founders</b>.
@@ -354,10 +342,10 @@ export function HomePage() {
                 className="mt-auto w-fit rounded-full"
                 onClick={() =>
                   hasSession
-                    ? router.push("/apply")
+                    ? router.push("/app")
                     : authClient.signIn.social({
                         provider: "google",
-                        callbackURL: "/apply",
+                        callbackURL: "/app",
                       })
                 }
               >

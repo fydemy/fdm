@@ -2,10 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/lib/seo";
-import { cn } from "@/lib/utils";
-import { ArrowRight } from "lucide-react";
 import { Logo } from "@/components/ui/optimized-image";
 import { authClient } from "@/lib/auth-client";
 
@@ -65,24 +63,14 @@ export function PublicSiteHeader({
             <p className="min-w-0 truncate text-sm font-medium">{title}</p>
           ) : (
             <div className="flex items-center gap-2">
-              <Link
-                href="/launches"
-                className={cn(
-                  buttonVariants({
-                    variant: "outline",
-                  }),
-                )}
-              >
-                Portfolio
-              </Link>
               <div className="w-fit rounded-full bg-gradient-to-tl from-blue-600 to-transparent p-0.5">
                 <Button
                   onClick={() =>
                     hasSession
-                      ? router.push("/apply")
+                      ? router.push("/app")
                       : authClient.signIn.social({
                           provider: "google",
-                          callbackURL: "/apply",
+                          callbackURL: "/app",
                         })
                   }
                   className="rounded-full"

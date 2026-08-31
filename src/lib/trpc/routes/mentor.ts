@@ -3,33 +3,35 @@ import { TRPCError } from "@trpc/server";
 import { t } from "../trpc";
 import { mentorProcedure } from "../context";
 import { prisma } from "@/lib/prisma";
+import { APPLICATION_COHORTS } from "@/lib/cohort";
 
 const applicationInclude = {
   members: true,
   user: { select: { id: true, name: true, email: true, image: true } },
-  launches: {
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-      createdAt: true,
-    },
-    orderBy: { createdAt: "desc" as const },
-  },
 };
 
 export const mentorRouter = t.router({
-  listApplications: mentorProcedure.query(async () => {
-    return prisma.application.findMany({
-      where: { status: "APPROVED" },
-      include: {
-        members: true,
-        user: { select: { id: true, name: true, email: true, image: true } },
-        _count: { select: { launches: true } },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-  }),
+  listApplications: mentorProcedure
+    .input(
+      z
+        .object({
+          cohort: z.enum(APPLICATION_COHORTS).optional(),
+        })
+        .optional(),
+    )
+    .query(async ({ input }) => {
+      return prisma.application.findMany({
+        where: {
+          status: "APPROVED",
+          ...(input?.cohort ? { cohort: input.cohort } : {}),
+        },
+        include: {
+          members: true,
+          user: { select: { id: true, name: true, email: true, image: true } },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+    }),
 
   getApplication: mentorProcedure
     .input(z.object({ id: z.string() }))

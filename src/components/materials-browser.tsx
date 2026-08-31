@@ -25,6 +25,7 @@ import {
   EllipsisVertical,
   FileText,
   Folder,
+  FolderInput,
   FolderPlus,
   Loader2,
   Pencil,
@@ -36,6 +37,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { MoveToFolderDialog } from "@/components/move-to-folder-dialog";
 
 type MaterialsBrowserProps = {
   basePath: string;
@@ -78,6 +80,10 @@ export function MaterialsBrowser({
   const [renameName, setRenameName] = useState("");
   const [renameMentorEditable, setRenameMentorEditable] = useState(false);
   const [renameApplicantEditable, setRenameApplicantEditable] = useState(false);
+  const [moveTarget, setMoveTarget] = useState<{
+    id: string;
+    type: "FOLDER" | "FILE";
+  } | null>(null);
 
   const invalidate = async () => {
     await utils.material.list.invalidate();
@@ -204,7 +210,7 @@ export function MaterialsBrowser({
           This folder is empty.
         </p>
       ) : (
-        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 py-12">
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {items.map((item) => {
             const Icon = item.type === "FOLDER" ? Folder : FileText;
             return (
@@ -237,29 +243,29 @@ export function MaterialsBrowser({
                   </div>
                   <div className="flex items-end justify-between gap-2">
                     <p className="min-w-0 line-clamp-1 font-medium">{item.name}</p>
-                    {showFolderActions && (
-                      <div
-                        className="shrink-0"
-                        onClick={(event) => event.stopPropagation()}
-                        onKeyDown={(event) => event.stopPropagation()}
-                      >
-                        <DropdownMenu>
-                          <DropdownMenuTrigger
-                            render={
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                className="size-8"
-                              />
-                            }
-                          >
-                            <EllipsisVertical className="size-4" />
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="end"
-                            onClick={(event) => event.stopPropagation()}
-                          >
+                    <div
+                      className="shrink-0"
+                      onClick={(event) => event.stopPropagation()}
+                      onKeyDown={(event) => event.stopPropagation()}
+                    >
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          render={
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="size-8"
+                            />
+                          }
+                        >
+                          <EllipsisVertical className="size-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          {showFolderActions && (
                             <DropdownMenuItem
                               onClick={() => {
                                 setRenameTarget({
@@ -291,6 +297,16 @@ export function MaterialsBrowser({
                               <Pencil className="size-4" />
                               Edit
                             </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem
+                            onClick={() =>
+                              setMoveTarget({ id: item.id, type: item.type })
+                            }
+                          >
+                            <FolderInput className="size-4" />
+                            Move
+                          </DropdownMenuItem>
+                          {showFolderActions && (
                             <DropdownMenuItem
                               variant="destructive"
                               onClick={() => {
@@ -312,10 +328,10 @@ export function MaterialsBrowser({
                               <Trash2 className="size-4" />
                               Delete
                             </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    )}
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </div>
                 </div>
               </li>
@@ -544,6 +560,16 @@ export function MaterialsBrowser({
           </form>
         </DialogContent>
       </Dialog>
+
+      <MoveToFolderDialog
+        open={!!moveTarget}
+        onOpenChange={(open) => {
+          if (!open) setMoveTarget(null);
+        }}
+        itemId={moveTarget?.id ?? null}
+        itemType={moveTarget?.type}
+        currentParentId={parentId ?? null}
+      />
     </div>
   );
 }

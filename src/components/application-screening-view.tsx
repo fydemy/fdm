@@ -1,10 +1,6 @@
 import {
-  REVIEW_STATUS_LABELS,
-  SCORE_FIELDS,
-  averageScore,
   parseScreeningPayload,
   type ApplicantForm,
-  type ScreeningEvaluation,
 } from "@/lib/screening";
 
 function Field({
@@ -500,95 +496,23 @@ function ApplicantFormView({ form }: { form: ApplicantForm }) {
   );
 }
 
-function EvaluationSummary({ evaluation }: { evaluation: ScreeningEvaluation }) {
-  const avg = averageScore(evaluation.scores);
-
-  return (
-    <section className="space-y-3 rounded-xl border bg-muted/20 p-4">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="text-sm font-medium">Screening evaluation</h3>
-        <p className="text-sm text-muted-foreground">
-          Avg {avg.toFixed(1)} / 5 ·{" "}
-          {REVIEW_STATUS_LABELS[evaluation.decision.review_status]}
-        </p>
-      </div>
-      <dl className="grid gap-3 sm:grid-cols-2">
-        {SCORE_FIELDS.map(({ key, label }) => (
-          <div key={key} className="space-y-1">
-            <dt className="text-xs text-muted-foreground">
-              {label} · {evaluation.scores[key]}/5
-            </dt>
-            <dd className="text-sm whitespace-pre-wrap">
-              {evaluation.score_rationales?.[key] || "—"}
-            </dd>
-          </div>
-        ))}
-      </dl>
-      {evaluation.decision.rationale ? (
-        <Field label="Overall rationale" value={evaluation.decision.rationale} />
-      ) : null}
-      {evaluation.decision.reviewer ? (
-        <Field label="Reviewer" value={evaluation.decision.reviewer} />
-      ) : null}
-      {evaluation.decision.review_date ? (
-        <Field label="Review date" value={evaluation.decision.review_date} />
-      ) : null}
-      {evaluation.decision.follow_up_review_by_date ? (
-        <Field
-          label="Follow-up / review-by"
-          value={evaluation.decision.follow_up_review_by_date}
-        />
-      ) : null}
-      {evaluation.decision.recommended_next_action ? (
-        <Field
-          label="Recommended next action"
-          value={evaluation.decision.recommended_next_action}
-        />
-      ) : null}
-      {evaluation.decision.next_action_owner ? (
-        <Field
-          label="Next-action owner"
-          value={evaluation.decision.next_action_owner}
-        />
-      ) : null}
-      {evaluation.decision.next_gating_milestone ? (
-        <Field
-          label="Next gating milestone"
-          value={evaluation.decision.next_gating_milestone}
-        />
-      ) : null}
-      {evaluation.decision.internal_notes ? (
-        <Field
-          label="Internal notes"
-          value={evaluation.decision.internal_notes}
-        />
-      ) : null}
-    </section>
-  );
-}
-
 export function ApplicationScreeningView({
   description,
-  showEvaluation = false,
 }: {
   description: string | null | undefined;
-  showEvaluation?: boolean;
 }) {
   const payload = parseScreeningPayload(description);
 
   if (!payload) {
     return (
       <p className="text-sm whitespace-pre-wrap text-muted-foreground">
-        {description || "No screening details."}
+        {description || "No description."}
       </p>
     );
   }
 
   return (
     <div className="space-y-8">
-      {showEvaluation && payload.evaluation ? (
-        <EvaluationSummary evaluation={payload.evaluation} />
-      ) : null}
       <ApplicantFormView form={payload.form} />
     </div>
   );

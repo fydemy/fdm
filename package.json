@@ -2,7 +2,7 @@
   "name": "fdm",
   "version": "0.1.0",
   "private": true,
-  "description": "Fydemy — product applications, reviews, launches, and shared materials",
+  "description": "Fydemy — product applications, reviews, and shared materials",
   "license": "MIT",
   "repository": {
     "type": "git",

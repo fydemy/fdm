@@ -4,36 +4,33 @@ import { t } from "../trpc";
 import { reviewerProcedure } from "../context";
 import { prisma } from "@/lib/prisma";
 import { getUserRole } from "@/lib/auth-helpers";
+import { APPLICATION_COHORTS } from "@/lib/cohort";
 import {
   sendApplicationApprovedEmail,
   sendApplicationRejectedEmail,
 } from "@/lib/email";
-import {
-  encodeScreeningPayload,
-  parseScreeningPayload,
-  screeningEvaluationSchema,
-} from "@/lib/screening";
+
+const listInput = z
+  .object({
+    status: z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(),
+    cohort: z.enum(APPLICATION_COHORTS).optional(),
+  })
+  .optional();
 
 export const reviewRouter = t.router({
-  listApplications: reviewerProcedure
-    .input(
-      z
-        .object({
-          status: z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(),
-        })
-        .optional(),
-    )
-    .query(async ({ input }) => {
-      return prisma.application.findMany({
-        where: input?.status ? { status: input.status } : undefined,
-        include: {
-          members: true,
-          user: { select: { id: true, name: true, email: true, image: true } },
-          _count: { select: { launches: true } },
-        },
-        orderBy: { createdAt: "desc" },
-      });
-    }),
+  listApplications: reviewerProcedure.input(listInput).query(async ({ input }) => {
+    return prisma.application.findMany({
+      where: {
+        ...(input?.status ? { status: input.status } : {}),
+        ...(input?.cohort ? { cohort: input.cohort } : {}),
+      },
+      include: {
+        members: true,
+        user: { select: { id: true, name: true, email: true, image: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+  }),
 
   getApplication: reviewerProcedure
     .input(z.object({ id: z.string() }))
@@ -43,15 +40,6 @@ export const reviewRouter = t.router({
         include: {
           members: true,
           user: { select: { id: true, name: true, email: true, image: true } },
-          launches: {
-            select: {
-              id: true,
-              title: true,
-              slug: true,
-              createdAt: true,
-            },
-            orderBy: { createdAt: "desc" },
-          },
         },
       });
 
@@ -60,71 +48,6 @@ export const reviewRouter = t.router({
       }
 
       return application;
-    }),
-
-  saveEvaluation: reviewerProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        evaluation: screeningEvaluationSchema,
-      }),
-    )
-    .mutation(async ({ input }) => {
-      const application = await prisma.application.findUnique({
-        where: { id: input.id },
-      });
-
-      if (!application) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Application not found",
-        });
-      }
-
-      const payload = parseScreeningPayload(application.description);
-      if (!payload) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message:
-            "This application has no structured screening data to evaluate",
-        });
-      }
-
-      return prisma.application.update({
-        where: { id: input.id },
-        data: {
-          description: encodeScreeningPayload({
-            ...payload,
-            evaluation: input.evaluation,
-          }),
-        },
-      });
-    }),
-
-  setFeePaid: reviewerProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        feePaid: z.boolean(),
-      }),
-    )
-    .mutation(async ({ input }) => {
-      const application = await prisma.application.findUnique({
-        where: { id: input.id },
-        select: { id: true },
-      });
-
-      if (!application) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Application not found",
-        });
-      }
-
-      return prisma.application.update({
-        where: { id: input.id },
-        data: { feePaid: input.feePaid },
-      });
     }),
 
   decide: reviewerProcedure
@@ -205,28 +128,6 @@ export const reviewRouter = t.router({
 
       return updated;
     }),
-
-  listLaunches: reviewerProcedure.query(async () => {
-    return prisma.launch.findMany({
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        createdAt: true,
-        application: {
-          select: {
-            id: true,
-            name: true,
-            logoUrl: true,
-            websiteUrl: true,
-            status: true,
-            user: { select: { name: true, email: true } },
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-  }),
 
 });
 

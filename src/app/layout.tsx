@@ -22,7 +22,6 @@ export const metadata: Metadata = {
   applicationName: siteConfig.name,
   keywords: [
     "Fydemy",
-    "product launches",
     "startup community",
     "product builders",
   ],

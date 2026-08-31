@@ -271,6 +271,11 @@
   cursor: pointer;
 }
 
+.tiptap a[data-link-badge],
+.prose a[data-link-badge] {
+  text-decoration: none;
+}
+
 .tiptap img[data-board-avatar],
 .prose img[data-board-avatar] {
   display: block;

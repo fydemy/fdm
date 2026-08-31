@@ -10,10 +10,18 @@ import {
   isStaff,
   roleLabel,
 } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
 
 export const userRouter = t.router({
   me: protectedProcedure.query(async ({ ctx }) => {
     const role = getUserRole(ctx.user.role);
+
+    const approvedApplication = canAccessApplicantWorkspace(role)
+      ? await prisma.application.findFirst({
+          where: { userId: ctx.user.id, status: "APPROVED" },
+          select: { id: true },
+        })
+      : null;
 
     return {
       ...ctx.user,
@@ -25,6 +33,7 @@ export const userRouter = t.router({
       isFounder: isFounder(role),
       isStaff: isStaff(role),
       canAccessApplicantWorkspace: canAccessApplicantWorkspace(role),
+      hasApprovedApplication: Boolean(approvedApplication),
     };
   }),
 });

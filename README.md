@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Open-source platform for product applications, reviewer decisions, public launches, and shared materials — built for the [Fydemy](https://fydemy.com) community.
+Open-source platform for product applications, reviewer decisions, and shared materials — built for the [Fydemy](https://fydemy.com) community.
 
 ## Features
 
@@ -10,19 +10,17 @@ Open-source platform for product applications, reviewer decisions, public launch
 
 - Apply with product name, description, logo, pitch deck upload, and team members
 - Confirmation email (via Resend) to the applicant and every team member
-- After approval, publish launches (markdown, YouTube, social embeds)
+- After approval, access workspace materials
 - Read materials published by reviewers
 
 **Reviewers**
 
 - Approve or reject applications with optional notes
 - Approval / rejection emails via Resend templates
-- Monitor launches across approved products
 - Create multi-section markdown materials for approved applicants
 
 **Public site**
 
-- Browse and view individual launch pages
 - SEO-friendly metadata, sitemap, and robots
 
 ## Tech stack
@@ -85,7 +83,7 @@ bunx prisma generate
 bun dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000), sign in with Google, and open `/dashboard`.
+Visit [http://localhost:3000](http://localhost:3000), sign in with Google, and open `/app`.
 
 ### User roles
 
@@ -94,10 +92,10 @@ Roles are stored on the `user` table (`applicant`, `founder`, `reviewer`, `mento
 | Role        | Access                                                                                             |
 | ----------- | -------------------------------------------------------------------------------------------------- |
 | `applicant` | Default for new users — apply and manage pending applications                                      |
-| `founder`   | Set automatically when an application is approved — launches and materials                         |
-| `reviewer`  | Review applications, manage materials, feature launches (`/dashboard/review`)                      |
-| `mentor`    | View approved applications and edit files in reviewer-labeled mentor folders (`/dashboard/mentor`) |
-| `partner`   | Read-only view of all applications (`/dashboard/partner`)                                          |
+| `founder`   | Set automatically when an application is approved — workspace materials                            |
+| `reviewer`  | Review applications and manage materials (`/app`, `/workspace`)                                    |
+| `mentor`    | View approved applications and edit files in mentor folders (`/app`, `/workspace`)                 |
+| `partner`   | Read-only view of applications (`/app`)                                                            |
 
 Assign staff roles directly in the database, e.g. with Prisma Studio:
 

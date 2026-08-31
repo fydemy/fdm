@@ -3,19 +3,11 @@ import { TRPCError } from "@trpc/server";
 import { t } from "../trpc";
 import { partnerProcedure } from "../context";
 import { prisma } from "@/lib/prisma";
+import { APPLICATION_COHORTS } from "@/lib/cohort";
 
 const applicationInclude = {
   members: true,
   user: { select: { id: true, name: true, email: true, image: true } },
-  launches: {
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-      createdAt: true,
-    },
-    orderBy: { createdAt: "desc" as const },
-  },
 };
 
 /** Read-only access for partners — can view all applications, cannot modify. */
@@ -25,16 +17,19 @@ export const partnerRouter = t.router({
       z
         .object({
           status: z.enum(["PENDING", "APPROVED", "REJECTED"]).optional(),
+          cohort: z.enum(APPLICATION_COHORTS).optional(),
         })
         .optional(),
     )
     .query(async ({ input }) => {
       return prisma.application.findMany({
-        where: input?.status ? { status: input.status } : undefined,
+        where: {
+          ...(input?.status ? { status: input.status } : {}),
+          ...(input?.cohort ? { cohort: input.cohort } : {}),
+        },
         include: {
           members: true,
           user: { select: { id: true, name: true, email: true, image: true } },
-          _count: { select: { launches: true } },
         },
         orderBy: { createdAt: "desc" },
       });

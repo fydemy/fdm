@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { t } from "../trpc";
 import { applicantProcedure } from "../context";
 import { prisma } from "@/lib/prisma";
+import { DEFAULT_APPLICATION_COHORT } from "@/lib/cohort";
 import { sendApplicationReceivedEmail } from "@/lib/email";
 import {
   readPitchDeckMeta,
@@ -29,10 +30,6 @@ export const applicationRouter = t.router({
       where: { userId: ctx.user.id },
       include: {
         members: true,
-        launches: {
-          select: { id: true },
-          orderBy: { createdAt: "desc" },
-        },
       },
       orderBy: { createdAt: "desc" },
     });
@@ -120,7 +117,6 @@ export const applicationRouter = t.router({
             message: "Upload a valid logo before submitting",
           });
         }
-
         logoUrl = input.logoUrl;
       }
 
@@ -129,7 +125,6 @@ export const applicationRouter = t.router({
       const application = await prisma.application.create({
         data: {
           name: screening.company.company_name.trim(),
-          // Screening payload is stored in description to avoid a DB migration.
           description: encodeScreeningPayload({
             version: 1,
             form: screening,
@@ -144,6 +139,7 @@ export const applicationRouter = t.router({
           discordUsername: input.discordUsername.trim(),
           pitchDeckUrl,
           pitchDeckName,
+          cohort: DEFAULT_APPLICATION_COHORT,
           userId: ctx.user.id,
           members: {
             create: input.members,

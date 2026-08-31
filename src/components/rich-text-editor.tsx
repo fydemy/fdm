@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
-import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
@@ -31,6 +30,7 @@ import type { FileMentionItem } from "@/components/file-mention-list";
 import { trpc } from "@/lib/trpc/client";
 import { SocialEmbed } from "@/components/social-embed-extension";
 import { NotionBoard } from "@/components/notion-board-extension";
+import { LinkBadgeNode } from "@/components/link-badge-extension";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -78,7 +78,7 @@ type RichTextEditorProps = {
 export function RichTextEditor({
   value,
   onChange,
-  placeholder = "Write your launch post…",
+  placeholder = "Write…",
   className,
   enableBoard = true,
 }: RichTextEditorProps) {
@@ -135,13 +135,7 @@ export function RichTextEditor({
           class: "max-w-full h-auto",
         },
       }),
-      Link.configure({
-        openOnClick: false,
-        autolink: true,
-        HTMLAttributes: {
-          class: "text-primary underline underline-offset-2",
-        },
-      }),
+      LinkBadgeNode,
       Placeholder.configure({ placeholder }),
       SocialEmbed,
       ...(enableBoard ? [NotionBoard] : []),
@@ -223,19 +217,26 @@ export function RichTextEditor({
     if (!editor) return;
     const trimmed = linkUrl.trim();
     if (!trimmed) {
-      editor.chain().focus().extendMarkRange("link").unsetLink().run();
+      if (editor.isActive("linkBadge")) {
+        editor.chain().focus().unsetLinkBadge().run();
+      }
       setLinkOpen(false);
       return;
     }
 
     try {
-      const href = new URL(trimmed).toString();
-      editor
-        .chain()
-        .focus()
-        .extendMarkRange("link")
-        .setLink({ href })
-        .run();
+      const href = new URL(
+        /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`,
+      ).toString();
+      if (editor.isActive("linkBadge")) {
+        editor
+          .chain()
+          .focus()
+          .updateAttributes("linkBadge", { href, title: null })
+          .run();
+      } else {
+        editor.chain().focus().setLinkBadge({ href }).run();
+      }
       setLinkUrl("");
       setLinkOpen(false);
     } catch {
@@ -245,7 +246,7 @@ export function RichTextEditor({
 
   function openLinkDialog() {
     if (!editor) return;
-    setLinkUrl(editor.getAttributes("link").href ?? "");
+    setLinkUrl(editor.getAttributes("linkBadge").href ?? "");
     setLinkOpen(true);
   }
 
@@ -337,7 +338,7 @@ export function RichTextEditor({
           <ListChecks />
         </ToolbarButton>
         <ToolbarButton
-          active={editor.isActive("link")}
+          active={editor.isActive("linkBadge")}
           onClick={openLinkDialog}
           label="Link"
         >
@@ -390,7 +391,7 @@ export function RichTextEditor({
             <DialogTitle>Embed social post</DialogTitle>
             <DialogDescription>
               Paste a YouTube, X, LinkedIn, or Instagram URL. The post will
-              appear inline in your launch.
+              appear inline.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
@@ -424,7 +425,7 @@ export function RichTextEditor({
           <DialogHeader>
             <DialogTitle>Add link</DialogTitle>
             <DialogDescription>
-              Link the selected text, or clear the field to remove a link.
+              Paste a URL to insert a site badge, or clear the field to remove one.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">

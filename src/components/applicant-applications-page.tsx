@@ -5,7 +5,7 @@ import { trpc } from "@/lib/trpc/client";
 import { ApplicationForm } from "@/components/application-form";
 import { ProductLogo } from "@/components/product-logo";
 import { StatusBadge } from "@/components/status-badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -16,12 +16,11 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { siteConfig } from "@/lib/seo";
-import { cn } from "@/lib/utils";
 import { ApplicationScreeningView } from "@/components/application-screening-view";
 import { getApplicationSummary } from "@/lib/screening";
 import { ExternalLink } from "lucide-react";
 
-export default function ApplyPage() {
+export function ApplicantApplicationsPage() {
   const { data, isLoading } = trpc.application.me.useQuery();
   const [showForm, setShowForm] = useState(false);
   const [pendingDiscordJoin, setPendingDiscordJoin] = useState(false);
@@ -135,44 +134,8 @@ export default function ApplyPage() {
             <StatusBadge status={application.status} />
           </CardHeader>
           <CardContent className="space-y-6">
-            {application.status === "APPROVED" && siteConfig.batchDepositRequired && (
-              <>
-                <div className="space-y-3 rounded-lg border bg-muted/20 p-4">
-                  <div>
-                    <h3 className="text-sm font-medium">
-                      Confirm your spot — deposit
-                    </h3>
-                    {application.feePaid ? (
-                      <p className="text-sm text-muted-foreground">
-                        Fee marked as paid.
-                      </p>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">
-                        Pay the <span className="line-through">$300</span>{" "}
-                        <span className="font-medium text-foreground">$150</span>{" "}
-                        deposit (50% off) to lock in your place in the batch.
-                      </p>
-                    )}
-                  </div>
-                  {!application.feePaid ? (
-                    <a
-                      href={siteConfig.depositPaymentUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className={cn(buttonVariants(), "w-fit")}
-                    >
-                      Pay <span className="line-through opacity-70">$300</span>{" "}
-                      $150 with Polar
-                      <ExternalLink className="size-4" />
-                    </a>
-                  ) : null}
-                </div>
-                <Separator />
-              </>
-            )}
-
             <div>
-              <h3 className="mb-3 text-sm font-medium">Screening details</h3>
+              <h3 className="mb-3 text-sm font-medium">About</h3>
               <ApplicationScreeningView description={application.description} />
             </div>
 

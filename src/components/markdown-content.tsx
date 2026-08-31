@@ -7,7 +7,9 @@ import DOMPurify from "isomorphic-dompurify";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { SocialEmbedFrame } from "@/components/social-embed-frame";
+import { LinkBadge } from "@/components/link-badge";
 import { MaterialBoardViews } from "@/components/material-board-views";
+import { parseHttpUrl } from "@/lib/link-preview";
 import {
   decodeBoardPayload,
   encodeBoard,
@@ -44,7 +46,19 @@ export function MarkdownContent({
         </div>
       ) : (
         <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none text-sm prose-img:rounded-none prose-headings:scroll-mt-20 prose-a:text-primary">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              a({ href, children }) {
+                if (!href || !parseHttpUrl(href)) {
+                  return <a href={href}>{children}</a>;
+                }
+                return <LinkBadge href={href} />;
+              },
+            }}
+          >
+            {content}
+          </ReactMarkdown>
         </div>
       )}
 
@@ -182,6 +196,17 @@ function renderRichHtml(
         );
       }
 
+      if (domNode.name === "a") {
+        const href = domNode.attribs?.href;
+        if (href && parseHttpUrl(href)) {
+          const title =
+            domNode.attribs["data-title"] ||
+            textFromDom(domNode) ||
+            undefined;
+          return <LinkBadge href={href} title={title} />;
+        }
+      }
+
       if (domNode.name !== "div") return;
 
       const url = domNode.attribs?.["data-social-embed"];
@@ -205,4 +230,15 @@ function renderRichHtml(
 
 function isElement(node: DOMNode): node is Element {
   return node.type === "tag";
+}
+
+function textFromDom(node: Element): string {
+  return node.children
+    .map((child) => {
+      if ("data" in child && typeof child.data === "string") return child.data;
+      if (child.type === "tag") return textFromDom(child as Element);
+      return "";
+    })
+    .join("")
+    .trim();
 }

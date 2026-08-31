@@ -74,10 +74,10 @@ export function GlobeLandingPage() {
             <Button
               onClick={() =>
                 hasSession
-                  ? router.push("/apply")
+                  ? router.push("/app")
                   : authClient.signIn.social({
                       provider: "google",
-                      callbackURL: "/apply",
+                      callbackURL: "/app",
                     })
               }
               className="rounded-full px-10 py-6"
