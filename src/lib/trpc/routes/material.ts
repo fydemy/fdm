@@ -134,6 +134,44 @@ function sortItems<
 }
 
 export const materialRouter = t.router({
+  authorProfiles: protectedProcedure
+    .input(z.object({ userIds: z.array(z.string()).max(100) }))
+    .query(async ({ ctx, input }) => {
+      await assertCanReadMaterials(ctx.user);
+
+      const userIds = [...new Set(input.userIds.filter(Boolean))];
+      if (userIds.length === 0) return [];
+
+      const applications = await prisma.application.findMany({
+        where: { userId: { in: userIds } },
+        select: {
+          userId: true,
+          name: true,
+          status: true,
+          updatedAt: true,
+        },
+        orderBy: { updatedAt: "desc" },
+      });
+
+      const byUser = new Map<string, { startupName: string; approved: boolean }>();
+
+      for (const application of applications) {
+        const current = byUser.get(application.userId);
+        const approved = application.status === "APPROVED";
+        if (!current || (!current.approved && approved)) {
+          byUser.set(application.userId, {
+            startupName: application.name,
+            approved,
+          });
+        }
+      }
+
+      return userIds.map((userId) => ({
+        userId,
+        startupName: byUser.get(userId)?.startupName ?? "",
+      }));
+    }),
+
   list: protectedProcedure
     .input(z.object({ parentId: z.string().nullable().optional() }))
     .query(async ({ ctx, input }) => {

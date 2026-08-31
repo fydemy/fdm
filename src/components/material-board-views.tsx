@@ -14,6 +14,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { toast } from "sonner";
 import { Columns3, Globe, Lock, Plus, Table2, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,10 +31,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { useBoardEditorUser } from "@/components/board-editor-user";
 import { trpc } from "@/lib/trpc/client";
 import {
+  BOARD_ITEM_TAG_LABELS,
+  BOARD_ITEM_TAGS,
   canEditBoardItem,
   canViewBoardItem,
   createBoardItem,
   itemCreator,
+  type BoardItemTag,
   type BoardItemVisibility,
   type MaterialBoard,
   type MaterialBoardEditor,
@@ -109,33 +113,43 @@ function BoardCardModal({
   );
 }
 
-function EditorAvatar({ editor }: { editor: MaterialBoardEditor | null }) {
+function CreatorMeta({
+  editor,
+  profiles,
+}: {
+  editor: MaterialBoardEditor | null;
+  profiles: Map<string, { startupName: string }>;
+}) {
   if (!editor) return null;
-  const initial = editor.name.trim().charAt(0).toUpperCase() || "?";
+  const startupName =
+    profiles.get(editor.id)?.startupName.trim() || editor.name;
 
   return (
     <span
-      className="inline-flex items-center gap-1.5"
-      title={`Created by ${editor.name}`}
+      className="max-w-36 truncate text-xs font-medium text-muted-foreground"
+      title={startupName}
     >
-      {editor.image ? (
-        <span className="size-5 shrink-0 overflow-hidden rounded-full">
-          <img
-            src={editor.image}
-            alt=""
-            data-board-avatar
-            className="size-5 rounded-full object-cover"
-          />
-        </span>
-      ) : (
-        <span className="flex size-5 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted text-[10px] font-medium">
-          {initial}
-        </span>
-      )}
-      <span className="max-w-24 truncate text-xs text-muted-foreground">
-        {editor.name}
-      </span>
+      {startupName}
     </span>
+  );
+}
+
+function TagBadge({ tag }: { tag: BoardItemTag | "" }) {
+  if (!tag) return null;
+  return (
+    <Badge
+      variant={
+        tag === "blocker"
+          ? "destructive"
+          : tag === "win"
+            ? "default"
+            : tag === "ship"
+              ? "secondary"
+              : "outline"
+      }
+    >
+      {BOARD_ITEM_TAG_LABELS[tag]}
+    </Badge>
   );
 }
 
@@ -176,10 +190,12 @@ function VisibilityBadge({ visibility }: { visibility: BoardItemVisibility }) {
 function KanbanCard({
   item,
   canEdit,
+  profiles,
   onOpen,
 }: {
   item: MaterialBoardItem;
   canEdit: boolean;
+  profiles: Map<string, { startupName: string }>;
   onOpen: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
@@ -205,14 +221,17 @@ function KanbanCard({
         onOpen();
       }}
     >
-      <p className="text-sm font-medium">{item.title}</p>
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-sm font-medium">{item.title}</p>
+        <TagBadge tag={item.tag} />
+      </div>
       {item.notes ? (
         <p className="mt-1 line-clamp-3 text-xs text-muted-foreground">
           {item.notes}
         </p>
       ) : null}
       <div className="mt-2 flex items-center justify-between gap-2">
-        <EditorAvatar editor={itemCreator(item)} />
+        <CreatorMeta editor={itemCreator(item)} profiles={profiles} />
         <VisibilityBadge visibility={item.visibility} />
       </div>
     </div>
@@ -225,6 +244,7 @@ function KanbanColumn({
   items,
   canEditBoard,
   editor,
+  profiles,
   onOpenItem,
   onAdd,
 }: {
@@ -233,6 +253,7 @@ function KanbanColumn({
   items: MaterialBoardItem[];
   canEditBoard: boolean;
   editor: MaterialBoardEditor | null;
+  profiles: Map<string, { startupName: string }>;
   onOpenItem: (itemId: string) => void;
   onAdd: () => void;
 }) {
@@ -269,6 +290,7 @@ function KanbanColumn({
           key={item.id}
           item={item}
           canEdit={canEditBoardItem(item, canEditBoard, editor)}
+          profiles={profiles}
           onOpen={() => onOpenItem(item.id)}
         />
       ))}
@@ -283,6 +305,28 @@ export function MaterialBoardViews({
 }: MaterialBoardViewsProps) {
   const editor = useBoardEditorUser();
   const { data: me } = trpc.user.me.useQuery();
+  const authorIds = useMemo(
+    () =>
+      [
+        ...new Set(
+          board.items
+            .map((item) => itemCreator(item)?.id)
+            .filter((id): id is string => Boolean(id)),
+        ),
+      ],
+    [board.items],
+  );
+  const { data: authorProfiles } = trpc.material.authorProfiles.useQuery(
+    { userIds: authorIds },
+    { enabled: authorIds.length > 0 },
+  );
+  const profiles = useMemo(() => {
+    const map = new Map<string, { startupName: string }>();
+    for (const profile of authorProfiles ?? []) {
+      map.set(profile.userId, { startupName: profile.startupName });
+    }
+    return map;
+  }, [authorProfiles]);
   const viewer = me
     ? { id: me.id, isMentor: me.isMentor }
     : editor
@@ -295,6 +339,7 @@ export function MaterialBoardViews({
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState(defaultStatus);
   const [visibility, setVisibility] = useState<BoardItemVisibility>("public");
+  const [tag, setTag] = useState<BoardItemTag | "">("");
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -328,6 +373,7 @@ export function MaterialBoardViews({
     setNotes("");
     setStatus(columnId);
     setVisibility("public");
+    setTag("");
     setDialog({ mode: "create", status: columnId });
   }
 
@@ -338,6 +384,7 @@ export function MaterialBoardViews({
     setNotes(item.notes);
     setStatus(item.status);
     setVisibility(item.visibility);
+    setTag(item.tag);
     setDialog({ mode: "edit", itemId });
   }
 
@@ -351,12 +398,16 @@ export function MaterialBoardViews({
       toast.error("Add a name for the card");
       return;
     }
+    if (!tag) {
+      toast.error("Choose a tag");
+      return;
+    }
     if (dialog.mode === "create") {
       onChange({
         ...board,
         items: [
           ...board.items,
-          createBoardItem(title, status, notes, editor, visibility),
+          createBoardItem(title, status, notes, editor, visibility, tag),
         ],
       });
       closeDialog();
@@ -370,7 +421,7 @@ export function MaterialBoardViews({
       updateItem(
         board,
         dialog.itemId,
-        { title, notes, status, visibility },
+        { title, notes, status, visibility, tag },
         editor,
       ),
     );
@@ -444,6 +495,7 @@ export function MaterialBoardViews({
                 items={itemsByStatus.get(column.id) ?? []}
                 canEditBoard={canEdit}
                 editor={editor}
+                profiles={profiles}
                 onOpenItem={openEdit}
                 onAdd={() => openCreate(column.id)}
               />
@@ -456,16 +508,17 @@ export function MaterialBoardViews({
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
+                <TableHead>Tag</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Notes</TableHead>
                 <TableHead>Visibility</TableHead>
-                <TableHead>Created by</TableHead>
+                <TableHead>Startup</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {visibleItems.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-muted-foreground">
+                  <TableCell colSpan={6} className="text-muted-foreground">
                     No rows yet. {canEdit ? "Add a card to get started." : ""}
                   </TableCell>
                 </TableRow>
@@ -477,6 +530,9 @@ export function MaterialBoardViews({
                   onClick={() => openEdit(item.id)}
                 >
                   <TableCell>{item.title}</TableCell>
+                  <TableCell>
+                    <TagBadge tag={item.tag} />
+                  </TableCell>
                   <TableCell>
                     {board.columns.find((column) => column.id === item.status)
                       ?.name ?? item.status}
@@ -490,7 +546,7 @@ export function MaterialBoardViews({
                     <VisibilityBadge visibility={item.visibility} />
                   </TableCell>
                   <TableCell>
-                    <EditorAvatar editor={itemCreator(item)} />
+                    <CreatorMeta editor={itemCreator(item)} profiles={profiles} />
                   </TableCell>
                 </TableRow>
               ))}
@@ -505,7 +561,7 @@ export function MaterialBoardViews({
         title={dialog?.mode === "create" ? "Add card" : "Card"}
         description={
           dialog?.mode === "create"
-            ? "Add a card to this board."
+            ? "Add a card to this board. A tag is required."
             : itemEditable
               ? "Update the card details, then save."
               : "Only the person who created this card can edit it."
@@ -556,6 +612,38 @@ export function MaterialBoardViews({
               disabled={!itemEditable}
             />
           </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="board-card-tag">Tag</Label>
+            <select
+              id="board-card-tag"
+              required
+              value={tag}
+              disabled={!itemEditable}
+              onChange={(event) => {
+                const value = event.target.value;
+                if (
+                  value === "ship" ||
+                  value === "experiment" ||
+                  value === "win" ||
+                  value === "blocker"
+                ) {
+                  setTag(value);
+                } else {
+                  setTag("");
+                }
+              }}
+              className="h-8 w-full rounded-lg border border-input bg-neutral-50 px-2.5 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30"
+            >
+              <option value="" disabled>
+                Select a tag
+              </option>
+              {BOARD_ITEM_TAGS.map((value) => (
+                <option key={value} value={value}>
+                  {BOARD_ITEM_TAG_LABELS[value]}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5">
               <Label htmlFor="board-card-status">Status</Label>
@@ -594,7 +682,7 @@ export function MaterialBoardViews({
           </div>
           {editingItem ? (
             <div className="pt-1">
-              <EditorAvatar editor={itemCreator(editingItem)} />
+              <CreatorMeta editor={itemCreator(editingItem)} profiles={profiles} />
             </div>
           ) : null}
         </div>

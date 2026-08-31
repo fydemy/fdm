@@ -17,11 +17,38 @@ export type MaterialBoardEditor = {
 
 export type BoardItemVisibility = "public" | "mentors";
 
+export const BOARD_ITEM_TAGS = [
+  "ship",
+  "experiment",
+  "win",
+  "blocker",
+] as const;
+
+export type BoardItemTag = (typeof BOARD_ITEM_TAGS)[number];
+
+export const BOARD_ITEM_TAG_LABELS: Record<BoardItemTag, string> = {
+  ship: "Ship",
+  experiment: "Experiment",
+  win: "Win",
+  blocker: "Blocker",
+};
+
+export function parseBoardItemTag(value: unknown): BoardItemTag | "" {
+  if (
+    typeof value === "string" &&
+    (BOARD_ITEM_TAGS as readonly string[]).includes(value)
+  ) {
+    return value as BoardItemTag;
+  }
+  return "";
+}
+
 export type MaterialBoardItem = {
   id: string;
   title: string;
   status: string;
   notes: string;
+  tag: BoardItemTag | "";
   visibility: BoardItemVisibility;
   createdBy: MaterialBoardEditor | null;
   editedBy: MaterialBoardEditor | null;
@@ -45,12 +72,14 @@ export function createBoardItem(
   notes = "",
   creator: MaterialBoardEditor | null = null,
   visibility: BoardItemVisibility = "public",
+  tag: BoardItemTag,
 ): MaterialBoardItem {
   return {
     id: crypto.randomUUID(),
     title: title.trim() || "Untitled",
     status,
     notes: notes.trim(),
+    tag,
     visibility,
     createdBy: creator,
     editedBy: creator,
@@ -134,6 +163,7 @@ export function decodeBoardPayload(encoded: string): MaterialBoard {
               ? String(item.status)
               : columns[0].id,
             notes: String(item.notes || ""),
+            tag: parseBoardItemTag(item.tag),
             visibility:
               item.visibility === "mentors" ? "mentors" : "public",
             createdBy: parseEditor(item.createdBy) ?? editedBy,
