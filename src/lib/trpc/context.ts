@@ -94,3 +94,11 @@ export const applicantProcedure = protectedProcedure.use(({ ctx, next }) => {
 
   return next({ ctx });
 });
+
+export const staffProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (!isStaff(ctx.user.role)) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Staff access required" });
+  }
+
+  return next({ ctx });
+});

@@ -5,6 +5,7 @@ import { reviewerProcedure } from "../context";
 import { prisma } from "@/lib/prisma";
 import { getUserRole } from "@/lib/auth-helpers";
 import { APPLICATION_COHORTS } from "@/lib/cohort";
+import { ensureApplicationWorkspace } from "@/lib/application-workspace";
 import {
   sendApplicationApprovedEmail,
   sendApplicationRejectedEmail,
@@ -100,6 +101,12 @@ export const reviewRouter = t.router({
             data: { role: "founder" },
           });
         }
+
+        await ensureApplicationWorkspace({
+          id: updated.id,
+          name: updated.name,
+          userId: updated.userId,
+        });
       }
 
       const recipients = [

@@ -1,8 +1,10 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { t } from "../trpc";
-import { applicantProcedure } from "../context";
+import { applicantProcedure, staffProcedure } from "../context";
 import { prisma } from "@/lib/prisma";
+import { isMentor } from "@/lib/auth-helpers";
+import { ensureApplicationWorkspace } from "@/lib/application-workspace";
 import { DEFAULT_APPLICATION_COHORT } from "@/lib/cohort";
 import { sendApplicationReceivedEmail } from "@/lib/email";
 import {
@@ -163,4 +165,66 @@ export const applicationRouter = t.router({
 
       return application;
     }),
+
+  getWorkspace: staffProcedure
+    .input(z.object({ applicationId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const application = await assertStaffCanViewApplication(
+        ctx.user.role,
+        input.applicationId,
+      );
+      if (application.status !== "APPROVED") {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Approved application not found",
+        });
+      }
+
+      const { folder, logFile } = await ensureApplicationWorkspace({
+        id: application.id,
+        name: application.name,
+        userId: application.userId,
+      });
+
+      const items = await prisma.materialItem.findMany({
+        where: { parentId: folder.id },
+        select: {
+          id: true,
+          name: true,
+          type: true,
+          locked: true,
+          updatedAt: true,
+        },
+        orderBy: [{ type: "asc" }, { name: "asc" }],
+      });
+
+      return {
+        folder: {
+          id: folder.id,
+          name: folder.name,
+        },
+        items,
+        kanbanLog: {
+          id: logFile.id,
+          name: logFile.name,
+          content: logFile.content ?? "",
+        },
+      };
+    }),
 });
+
+async function assertStaffCanViewApplication(role: string, applicationId: string) {
+  const application = await prisma.application.findUnique({
+    where: { id: applicationId },
+  });
+  if (!application) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Application not found" });
+  }
+  if (isMentor(role) && application.status !== "APPROVED") {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "Approved application not found",
+    });
+  }
+  return application;
+}

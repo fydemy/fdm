@@ -26,6 +26,7 @@ model User {
   sessions      Session[]
   applications   Application[]
   materialItems  MaterialItem[]
+  staffFiles     ApplicationStaffFile[]
 
   @@map("user")
 }
@@ -96,6 +97,9 @@ model Application {
   user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   members         Member[]
   launches        Launch[]
+  kanbanLogs      ApplicationKanbanLog[]
+  staffFiles      ApplicationStaffFile[]
+  workspaceFolder MaterialItem?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
@@ -147,6 +151,9 @@ model MaterialItem {
   content           String?
   mentorEditable    Boolean        @default(false)
   applicantEditable Boolean        @default(false)
+  locked            Boolean        @default(false)
+  applicationId     String?        @unique
+  application       Application?   @relation(fields: [applicationId], references: [id], onDelete: Cascade)
   parentId       String?
   parent      MaterialItem?  @relation("MaterialTree", fields: [parentId], references: [id], onDelete: Cascade)
   children    MaterialItem[] @relation("MaterialTree")
@@ -158,4 +165,37 @@ model MaterialItem {
   @@index([parentId])
   @@index([createdById])
   @@map("material_item")
+}
+
+model ApplicationKanbanLog {
+  id            String      @id @default(cuid())
+  cardId        String      @unique
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  title         String
+  notes         String      @default("")
+  tag           String      @default("")
+  status        String
+  visibility    String      @default("public")
+  authorUserId  String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([applicationId])
+  @@map("application_kanban_log")
+}
+
+model ApplicationStaffFile {
+  id            String      @id @default(cuid())
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  name          String
+  content       String
+  createdById   String
+  createdBy     User        @relation(fields: [createdById], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([applicationId])
+  @@map("application_staff_file")
 }
