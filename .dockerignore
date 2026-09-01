@@ -1,0 +1,45 @@
+# Reinstalled or regenerated inside the image. `generated/` in particular MUST
+# be excluded: the Prisma client is rebuilt by `prisma generate` during the
+# build, and shipping a host-built copy risks a stale or wrong-platform client.
+node_modules
+.next
+generated
+*.tsbuildinfo
+
+# VCS / CI metadata
+.git
+.gitignore
+.github
+
+# Secrets never enter the build context. Every value arrives at runtime via
+# compose `environment:`, except NEXT_PUBLIC_* which arrive as build args.
+.env
+.env.*
+!.env.example
+
+# Editor and agent tooling
+.vscode
+.idea
+.cursor
+.claude
+.superpowers
+
+# Project meta — not needed to build or run
+README.md
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+SECURITY.md
+LICENSE
+docs
+
+# Docker files themselves. Excluding them means editing docker-compose.yml
+# does not invalidate the `COPY . .` layer and force a full rebuild.
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
