@@ -9,6 +9,9 @@ export const siteConfig = {
     deadlineLabel: "end of August",
   },
   discordInviteUrl: "https://discord.gg/7FBpTEXqVj",
+  get joinUrl() {
+    return `${this.url}/join`;
+  },
   get communityJoinUrl() {
     return `${this.url}/community`;
   },

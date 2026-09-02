@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { siteConfig } from "@/lib/seo";
 import { addFounderToCommunity } from "@/lib/discord";
-import { verifyCommunityClaim } from "@/lib/community-claim";
+import { findApprovedApplicationForUser } from "@/lib/community-access";
 
-export async function POST(request: Request) {
+export async function POST() {
   const requestHeaders = await headers();
   const session = await auth.api.getSession({
     headers: requestHeaders,
@@ -16,23 +16,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ needAuth: true }, { status: 401 });
   }
 
-  const body = (await request.json().catch(() => ({}))) as { token?: string };
-  const cookieStore = await cookies();
-  const claimedUserId = verifyCommunityClaim(
-    body.token || cookieStore.get("fdm_community_claim")?.value || "",
-  );
-
-  const approved = await prisma.application.findFirst({
-    where: {
-      status: "APPROVED",
-      OR: [
-        { userId: session.user.id },
-        ...(claimedUserId ? [{ userId: claimedUserId }] : []),
-      ],
-    },
-    select: { id: true },
-  });
-
   const discord = await prisma.account.findFirst({
     where: { userId: session.user.id, providerId: "discord" },
   });
@@ -40,6 +23,11 @@ export async function POST(request: Request) {
   if (!discord?.accountId) {
     return NextResponse.json({ needDiscord: true });
   }
+
+  const approved = await findApprovedApplicationForUser({
+    id: session.user.id,
+    email: session.user.email,
+  });
 
   if (!approved) {
     return NextResponse.json({ url: siteConfig.discordInviteUrl });

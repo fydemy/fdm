@@ -121,15 +121,12 @@ export const reviewRouter = t.router({
           to: recipients,
           productName: updated.name,
           applicantName: updated.user.name,
-          userId: updated.userId,
-          note: input.note,
         });
       } else {
         await sendApplicationRejectedEmail({
           to: recipients,
           productName: updated.name,
           applicantName: updated.user.name,
-          note: input.note,
         });
       }
 
