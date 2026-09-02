@@ -170,18 +170,30 @@ export async function isStartupFolder(folderId: string | null) {
 }
 
 export async function canWriteInStartupFolder(
-  user: { id: string; role: string },
+  user: { id: string; email: string },
   folderId: string,
 ) {
   const folder = await prisma.materialItem.findUnique({
     where: { id: folderId },
     select: {
       applicationId: true,
-      application: { select: { userId: true } },
+      application: {
+        select: {
+          status: true,
+          userId: true,
+          members: { select: { email: true } },
+        },
+      },
     },
   });
   if (!folder?.applicationId || !folder.application) return false;
-  return folder.application.userId === user.id;
+  if (folder.application.status !== "APPROVED") return false;
+  if (folder.application.userId === user.id) return true;
+
+  const email = user.email.toLowerCase();
+  return folder.application.members.some(
+    (member) => member.email.toLowerCase() === email,
+  );
 }
 
 export function parseVisibility(value: string): BoardItemVisibility {

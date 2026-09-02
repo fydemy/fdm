@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { betterFetch } from "@better-fetch/fetch";
 import { prisma } from "@/lib/prisma";
+import { findApprovedApplicationForUser } from "@/lib/application-access";
 import {
   canAccessApplicantWorkspace,
   canAccessWorkspace,
@@ -42,7 +43,7 @@ export default async function proxy(request: NextRequest) {
   if (pathname.startsWith("/workspace")) {
     const user = await prisma.user.findUnique({
       where: { id: sessionData.user.id },
-      select: { id: true, role: true },
+      select: { id: true, email: true, role: true },
     });
 
     if (!user || !canAccessWorkspace(user.role)) {
@@ -50,9 +51,9 @@ export default async function proxy(request: NextRequest) {
     }
 
     if (canAccessApplicantWorkspace(user.role)) {
-      const approved = await prisma.application.findFirst({
-        where: { userId: user.id, status: "APPROVED" },
-        select: { id: true },
+      const approved = await findApprovedApplicationForUser({
+        id: user.id,
+        email: user.email,
       });
 
       if (!approved) {

@@ -13,15 +13,21 @@ import {
   isMentor,
   isReviewer,
 } from "@/lib/auth-helpers";
+import { findApprovedApplicationForUser } from "@/lib/application-access";
 import { contentHasText } from "@/lib/embeds";
 
-async function assertCanReadMaterials(user: { id: string; role: string }) {
+async function assertCanReadMaterials(user: {
+  id: string;
+  email: string;
+  role: string;
+}) {
   const role = getUserRole(user.role);
 
   if (role === "reviewer" || role === "mentor") return;
 
-  const application = await prisma.application.findFirst({
-    where: { userId: user.id, status: "APPROVED" },
+  const application = await findApprovedApplicationForUser({
+    id: user.id,
+    email: user.email,
   });
 
   if (!application) {
@@ -202,8 +208,9 @@ export const materialRouter = t.router({
     }),
 
   countFiles: applicantProcedure.query(async ({ ctx }) => {
-    const application = await prisma.application.findFirst({
-      where: { userId: ctx.user.id, status: "APPROVED" },
+    const application = await findApprovedApplicationForUser({
+      id: ctx.user.id,
+      email: ctx.user.email,
     });
     if (!application) return 0;
 

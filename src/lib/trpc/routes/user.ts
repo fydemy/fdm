@@ -10,16 +10,16 @@ import {
   isStaff,
   roleLabel,
 } from "@/lib/auth-helpers";
-import { prisma } from "@/lib/prisma";
+import { findApprovedApplicationForUser } from "@/lib/application-access";
 
 export const userRouter = t.router({
   me: protectedProcedure.query(async ({ ctx }) => {
     const role = getUserRole(ctx.user.role);
 
     const approvedApplication = canAccessApplicantWorkspace(role)
-      ? await prisma.application.findFirst({
-          where: { userId: ctx.user.id, status: "APPROVED" },
-          select: { id: true },
+      ? await findApprovedApplicationForUser({
+          id: ctx.user.id,
+          email: ctx.user.email,
         })
       : null;
 

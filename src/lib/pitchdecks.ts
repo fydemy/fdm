@@ -1,6 +1,7 @@
 import path from "path";
 import { prisma } from "@/lib/prisma";
 import { isMentor, isPartner, isReviewer } from "@/lib/auth-helpers";
+import { applicationAccessWhere } from "@/lib/application-access";
 import {
   STORAGE_BUCKETS,
   assertSafeStoragePath,
@@ -42,22 +43,40 @@ export function readPitchDeckMeta(storagePath: string) {
 export async function canAccessPitchDeck(input: {
   storagePath: string;
   userId: string;
+  userEmail: string;
   role: string;
 }) {
   if (!assertSafeStoragePath(input.storagePath)) return false;
 
-  const application = await prisma.application.findFirst({
-    where: { pitchDeckUrl: pitchDeckUrlFor(input.storagePath) },
-    select: { userId: true, status: true },
-  });
+  const pitchDeckUrl = pitchDeckUrlFor(input.storagePath);
 
-  if (application) {
-    if (application.userId === input.userId) return true;
-    if (isReviewer(input.role)) return true;
-    if (isPartner(input.role)) return true;
-    if (isMentor(input.role) && application.status === "APPROVED") return true;
-    return false;
+  if (isReviewer(input.role) || isPartner(input.role)) {
+    const application = await prisma.application.findFirst({
+      where: { pitchDeckUrl },
+      select: { id: true },
+    });
+    if (application) return true;
   }
+
+  if (isMentor(input.role)) {
+    const application = await prisma.application.findFirst({
+      where: { pitchDeckUrl, status: "APPROVED" },
+      select: { id: true },
+    });
+    if (application) return true;
+  }
+
+  const application = await prisma.application.findFirst({
+    where: {
+      pitchDeckUrl,
+      ...applicationAccessWhere({
+        id: input.userId,
+        email: input.userEmail,
+      }),
+    },
+    select: { id: true },
+  });
+  if (application) return true;
 
   const meta = readPitchDeckMeta(input.storagePath);
   return meta?.userId === input.userId;

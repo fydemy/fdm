@@ -4,6 +4,7 @@ import { t } from "../trpc";
 import { applicantProcedure, staffProcedure } from "../context";
 import { prisma } from "@/lib/prisma";
 import { isMentor } from "@/lib/auth-helpers";
+import { findApplicationsForUser } from "@/lib/application-access";
 import { ensureApplicationWorkspace } from "@/lib/application-workspace";
 import { DEFAULT_APPLICATION_COHORT } from "@/lib/cohort";
 import { sendApplicationReceivedEmail } from "@/lib/email";
@@ -28,15 +29,15 @@ const memberSchema = z.object({
 
 export const applicationRouter = t.router({
   me: applicantProcedure.query(async ({ ctx }) => {
-    const applications = await prisma.application.findMany({
-      where: { userId: ctx.user.id },
-      include: {
-        members: true,
-      },
-      orderBy: { createdAt: "desc" },
+    const applications = await findApplicationsForUser({
+      id: ctx.user.id,
+      email: ctx.user.email,
     });
 
-    const latest = applications[0] ?? null;
+    const ownedApplications = applications.filter(
+      (application) => application.userId === ctx.user.id,
+    );
+    const latest = ownedApplications[0] ?? null;
     const approved =
       applications.find((application) => application.status === "APPROVED") ??
       null;
