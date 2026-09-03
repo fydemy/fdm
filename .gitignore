@@ -48,3 +48,10 @@ yarn-error.log*
 next-env.d.ts
 
 /generated/prisma
+
+# Claude Code — personal overrides stay local, shared config is committed
+CLAUDE.md
+.claude/settings.local.json
+
+# Brainstorming specs and plans are laptop-local, never pushed
+**/superpowers/

@@ -37,8 +37,22 @@ services:
     # Deliberately NO traefik.* labels. Dokploy generates and reconciles the
     # router, service and certresolver labels from its Domains UI; anything
     # hand-written here is clobbered on the next redeploy.
+    #
+    # Two networks, two jobs — see the `networks:` block at the bottom for why.
+    # dokploy-network is INGRESS ONLY (Traefik -> here). fydemy-internal is
+    # EAST-WEST ONLY (this app <-> discord-bot-gateway). Never reach a Fydemy
+    # sibling over dokploy-network; that is the coupling this split removes.
+    #
+    # Compose already aliases a service by its own name on every network it
+    # joins, so the alias below is redundant today. It is written out anyway:
+    # fydemy-internal is shared with other compose projects, and `fdm` is the
+    # hostname the gateway's FDM_BASE_URL hardcodes. Spelling it here makes it
+    # a declared contract rather than a side effect of the service key.
     networks:
-      - dokploy-network
+      dokploy-network: {}
+      fydemy-internal:
+        aliases:
+          - fdm
 
     environment:
       NODE_ENV: production
@@ -94,10 +108,32 @@ services:
       start_period: 20s
 
 networks:
-  # Created and owned by Dokploy. `external: true` means compose attaches to it
-  # and never tries to create or remove it — this must already exist on the
-  # host, which it does on any Dokploy node.
+  # INGRESS ONLY. Created and owned by Dokploy. `external: true` means compose
+  # attaches to it and never tries to create or remove it — this must already
+  # exist on the host, which it does on any Dokploy node.
+  #
+  # Every Dokploy app on the node shares this bridge, so any container on it can
+  # already reach fdm:3000 directly and skip the proxy. That is tolerable for
+  # the app (Traefik has to get in somehow) but not for the rest of the stack,
+  # which is why service-to-service traffic moved off it.
   dokploy-network:
+    external: true
+
+  # EAST-WEST ONLY. Private bridge for Fydemy services talking to each other:
+  # fdm <-> discord-bot-gateway. The gateway attaches to THIS AND NOTHING ELSE —
+  # no dokploy-network, no domain, no Traefik router — so it is unreachable from
+  # every other app on the node while still getting NAT egress to discord.com.
+  #
+  # `external: true` is forced, not stylistic: fdm and the gateway are separate
+  # Dokploy applications, hence separate compose projects, and a project-scoped
+  # network cannot be shared across them. Create it once per host, by hand:
+  #
+  #   docker network create fydemy-internal
+  #
+  # It is not managed by Dokploy, so nothing recreates it for you. `docker
+  # network prune` WILL delete it whenever no container is attached — after a
+  # full stack teardown, recreate it before bringing services back up.
+  fydemy-internal:
     external: true
 
 # To turn the reminder bot on later, set CRON_SECRET above and add a Dokploy
