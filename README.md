@@ -1,8 +1,6 @@
 # Fydemy
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-
-Open-source platform for product applications, reviewer decisions, and shared materials — built for the [Fydemy](https://fydemy.com) community.
+Open-source platform for product applications, reviewer decisions, and shared materials.
 
 ## Features
 
