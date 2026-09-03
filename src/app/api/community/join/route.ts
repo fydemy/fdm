@@ -44,8 +44,7 @@ export async function POST() {
     console.error("[discord] getAccessToken failed", error);
   }
 
-  // The gateway owns the bot token and the guild id, and it returns the
-  // resolved community url — this app no longer knows the guild id at all.
+  // The gateway owns the guild id, so it returns the community url too.
   const result = await assignFounderRole({
     discordUserId: discord.accountId,
     accessToken,

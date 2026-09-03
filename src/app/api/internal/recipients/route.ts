@@ -6,17 +6,7 @@ import { checkInternalAuth } from "@/lib/internal-auth";
 // Reads the database per request; there is nothing to prerender.
 export const dynamic = "force-dynamic";
 
-/**
- * Every approved founder's email, for the gateway's roadmap reminder run.
- *
- * This one call is the entire reason the two services talk. `batch` and
- * `reminder_log` live in the gateway's own database with no foreign keys into
- * these tables, so an HTTP hop here replaces what would otherwise be a second
- * Prisma schema pointed at this database.
- *
- * Internal only: it is reachable from fydemy-internal, never through Traefik
- * with a public hostname, and it requires the shared bearer token.
- */
+// Approved founders' emails for the gateway's reminder run. Internal only.
 export async function GET() {
   const auth = checkInternalAuth((await headers()).get("authorization"));
   if (!auth.ok) {

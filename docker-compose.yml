@@ -73,9 +73,7 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
 
-      # OAuth only. The bot token, guild id, role and channel ids all moved to
-      # discord-bot-gateway — this app can no longer post to the community or
-      # hand out roles, which is the point of the split.
+      # OAuth only; the bot token and guild id moved to discord-bot-gateway.
       DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID}
       DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET}
 
@@ -89,14 +87,9 @@ services:
       # what puts it in the browser bundle.
       NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
 
-      # Shared bearer secret for discord-bot-gateway, used in BOTH directions:
-      # this app sends it when calling the gateway, and the gateway sends it
-      # back when calling GET /api/internal/recipients. Must be byte-identical
-      # on both sides. Unset ⇒ that endpoint answers 503 and every founder-role
-      # assignment degrades to the public invite link.
+      # Shared both directions with the gateway; must match byte for byte.
       GATEWAY_TOKEN: ${GATEWAY_TOKEN}
-      # The gateway's address on fydemy-internal. It has no public hostname, so
-      # this is a service name, never a domain.
+      # Service name on fydemy-internal; the gateway has no public hostname.
       GATEWAY_BASE_URL: ${GATEWAY_BASE_URL:-http://gateway:8080}
 
     healthcheck:
@@ -141,14 +134,8 @@ networks:
   fydemy-internal:
     external: true
 
-# The roadmap reminder bot lives in discord-bot-gateway now, and its scheduler
-# is embedded and on by default — there is nothing to schedule from here.
-#
-# To trigger a run by hand, do it from inside fydemy-internal, since the
-# gateway has no public hostname:
-#
+# The reminder bot lives in discord-bot-gateway with an embedded scheduler.
+# Trigger a run by hand from inside fydemy-internal:
 #   docker compose exec fdm wget -qO- \
 #     --header="Authorization: Bearer $GATEWAY_TOKEN" \
 #     "http://gateway:8080/runs?dryRun=1"
-#
-# Drop '?dryRun=1' to actually send.

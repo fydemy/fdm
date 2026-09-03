@@ -1,13 +1,4 @@
-/**
- * Typed client for discord-bot-gateway.
- *
- * Everything Discord-bot-shaped moved out of this app: the bot token, the
- * guild id, role and channel ids, the roadmap schedule and the reminder run
- * all live in that service now. fdm keeps Discord OAuth and nothing else.
- *
- * The gateway is internal-only — it has no public hostname — so this base url
- * is a service name on fydemy-internal, not a domain.
- */
+// Typed client for discord-bot-gateway. Internal-only: a service name, not a domain.
 const baseUrl = () => (process.env.GATEWAY_BASE_URL || "http://gateway:8080").replace(/\/+$/, "");
 
 function token() {
@@ -25,15 +16,7 @@ async function gatewayFetch(path: string, init: RequestInit = {}) {
   return fetch(`${baseUrl()}${path}`, { ...init, headers, cache: "no-store" });
 }
 
-/**
- * Joins the founder to the guild (when an OAuth access token is supplied) and
- * assigns the Founder role. Returns the url the browser should be sent to
- * either way — a founder should reach the community even when the role did
- * not stick.
- *
- * `fallbackUrl` is used when the gateway itself is unreachable, so a gateway
- * outage degrades to the public invite link rather than a 500.
- */
+// Assigns the Founder role. Always returns a url; a gateway outage falls back to it.
 export async function assignFounderRole(input: {
   discordUserId: string;
   accessToken?: string;
